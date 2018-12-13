@@ -2,17 +2,14 @@ package org.devio.simple;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
-import com.bumptech.glide.Glide;
-
+import android.support.v4.view.ViewPager;
+import android.view.ViewGroup;
+import com.hss01248.adapter.SuperPagerAdapter;
+import com.hss01248.adapter.SuperPagerHolder;
 import org.devio.takephoto.model.TImage;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -37,6 +34,8 @@ import java.util.ArrayList;
  */
 public class ResultActivity extends Activity {
     ArrayList<TImage> images;
+    ViewPager viewPager;
+    SuperPagerAdapter<Activity> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +46,21 @@ public class ResultActivity extends Activity {
     }
 
     private void showImg() {
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.llImages);
+        viewPager = findViewById(R.id.vp);
+        adapter = new SuperPagerAdapter<Activity>(this) {
+            @Override
+            protected SuperPagerHolder generateNewHolder(Activity context, ViewGroup viewGroup, int i) {
+                return new BigPagerHolder(context);
+            }
+
+            @Override
+            public List getListData() {
+                return images;
+            }
+        };
+        viewPager.setAdapter(adapter);
+        adapter.addAll(images);
+       /* LinearLayout linearLayout = (LinearLayout) findViewById(R.id.llImages);
         for (int i = 0, j = images.size(); i < j - 1; i += 2) {
             View view = LayoutInflater.from(this).inflate(R.layout.image_show, null);
             ImageView imageView1 = (ImageView) view.findViewById(R.id.imgShow1);
@@ -61,7 +74,7 @@ public class ResultActivity extends Activity {
             ImageView imageView1 = (ImageView) view.findViewById(R.id.imgShow1);
             Glide.with(this).load(new File(images.get(images.size() - 1).getCompressPath())).into(imageView1);
             linearLayout.addView(view);
-        }
+        }*/
 
     }
 }
