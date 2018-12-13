@@ -24,4 +24,5 @@ dependencies {
     compile project(':takephoto_library')
     compile 'com.github.hss01248:SuperAdapter:2.2.4'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
+    implementation 'com.noober.light:core:1.2.0'
 }

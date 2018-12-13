@@ -6,6 +6,8 @@ import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
 import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
+import com.light.body.Light;
+import com.light.body.LightConfig;
 import org.devio.takephoto.model.TImage;
 
 import java.util.ArrayList;
@@ -42,6 +44,14 @@ public class ResultActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_layout);
         images = (ArrayList<TImage>) getIntent().getSerializableExtra("images");
+
+        LightConfig lightConfig = new LightConfig();
+        lightConfig.setDefaultQuality(70);
+        lightConfig.setMaxWidth(1500);
+        lightConfig.setMaxHeight(1500);
+        Light.getInstance().setConfig(lightConfig);
+
+
         showImg();
     }
 

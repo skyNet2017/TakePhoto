@@ -22,4 +22,14 @@
         android:layout_marginRight="5dp"
         android:background="@android:color/darker_gray"
         android:scaleType="fitCenter" />
+
+     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+         android:id="@+id/imgShow3"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:layout_gravity="center_horizontal"
+         android:layout_marginRight="5dp"
+         android:background="@android:color/darker_gray"
+         android:scaleType="fitCenter" />
 </LinearLayout>
