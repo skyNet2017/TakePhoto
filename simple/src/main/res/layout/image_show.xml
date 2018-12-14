@@ -4,32 +4,68 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     >
-     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:id="@+id/imgShow1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginRight="5dp"
-        android:background="@android:color/darker_gray"
-        android:scaleType="fitCenter" />
-     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:id="@+id/imgShow2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginRight="5dp"
-        android:background="@android:color/darker_gray"
-        android:scaleType="fitCenter" />
-
-     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-         android:id="@+id/imgShow3"
+     <SeekBar
+         android:id="@+id/seekbar"
+         android:max="100"
          android:layout_width="match_parent"
-         android:layout_height="wrap_content"
+         android:layout_height="30dp"/>
+     <TextView
+         android:id="@+id/tv_percent"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"/>
+     <RelativeLayout
          android:layout_weight="1"
-         android:layout_gravity="center_horizontal"
-         android:layout_marginRight="5dp"
-         android:background="@android:color/darker_gray"
-         android:scaleType="fitCenter" />
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content">
+          <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+              android:id="@+id/imgShow1"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center_horizontal"
+              android:background="@android:color/darker_gray"
+              android:scaleType="fitCenter" />
+          <TextView
+              android:id="@+id/tv_size_original"
+              android:layout_margin="5dp"
+              android:textColor="#ffff00"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+     </RelativeLayout>
+
+     <RelativeLayout
+         android:layout_weight="1"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content">
+          <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+              android:id="@+id/imgShow2"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center_horizontal"
+              android:background="@android:color/darker_gray"
+              android:scaleType="fitCenter" />
+          <TextView
+              android:id="@+id/tv_size_cpp"
+              android:layout_margin="5dp"
+              android:textColor="#ffff00"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+     </RelativeLayout>
+     <RelativeLayout
+         android:layout_weight="1"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content">
+          <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+              android:id="@+id/imgShow3"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center_horizontal"
+              android:background="@android:color/darker_gray"
+              android:scaleType="fitCenter" />
+          <TextView
+              android:id="@+id/tv_size_luban"
+              android:layout_margin="5dp"
+              android:textColor="#ffff00"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"/>
+     </RelativeLayout>
 </LinearLayout>
