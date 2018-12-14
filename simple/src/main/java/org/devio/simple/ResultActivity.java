@@ -46,9 +46,9 @@ public class ResultActivity extends Activity {
         images = (ArrayList<TImage>) getIntent().getSerializableExtra("images");
 
         LightConfig lightConfig = new LightConfig();
-        lightConfig.setDefaultQuality(70);
-        lightConfig.setMaxWidth(1500);
-        lightConfig.setMaxHeight(1500);
+        lightConfig.setDefaultQuality(50);
+        lightConfig.setMaxWidth(2000);
+        lightConfig.setMaxHeight(2000);
         Light.getInstance().setConfig(lightConfig);
 
 

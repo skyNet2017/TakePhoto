@@ -12,8 +12,6 @@ import android.widget.TextView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.adapter.SuperPagerHolder;
-import com.light.body.CompressArgs;
-import com.light.body.Light;
 import me.shaohui.advancedluban.Luban;
 import me.shaohui.advancedluban.OnCompressListener;
 import org.devio.takephoto.model.TImage;
@@ -110,22 +108,46 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
 
         tvQuality.setText(progress+"%");
         //c++ 压缩:
-        CompressArgs args = new CompressArgs.Builder().quality(progress).ignoreSize(true).build();
-        String outPath = new File(activity.getCacheDir(),System.currentTimeMillis()+".jpg").getAbsolutePath();
-        Light.getInstance().compress(tImage.getOriginalPath(),args, outPath);
+        //CompressArgs args = new CompressArgs.Builder().compressFileSize(300*1024).build();
+       /* String outPath = new File(activity.getCacheDir(),System.currentTimeMillis()+".jpg").getAbsolutePath();
+        Light.getInstance().compress(tImage.getOriginalPath(), outPath);
         imageView2.setImage(ImageSource.uri(outPath));
         String info = formatImagInfo(outPath);
         tvSizecpp.setText(info);
 
-        Log.d("dd","compressed by c++,:"+info);
+        Log.d("dd","compressed by c++,:"+info);*/
+        top.zibin.luban.Luban.with(rootView.getContext())
+                .load(tImage.getOriginalPath())
+                .setTargetDir(rootView.getContext().getCacheDir().getAbsolutePath())
+                .setCompressListener(new top.zibin.luban.OnCompressListener() {
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onSuccess(File file) {
+                        imageView2.setImage(ImageSource.uri(file.getAbsolutePath()));
+                        String info = formatImagInfo(file.getAbsolutePath());
+                        tvSizecpp.setText(info);
+
+                        Log.d("dd","compressed by luban,:"+info);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                }).launch();
 
 
         //advanceluban:
         int [] wh = getImageWidthHeight(tImage.getOriginalPath());
+
         Luban.compress(rootView.getContext(), new File(tImage.getOriginalPath()))
-                .setMaxSize(1024)                // limit the final image size（unit：Kb）
-                .setMaxHeight(wh[1])             // limit image height
-                .setMaxWidth(wh[0])// limit image width
+                .setMaxSize(400)                // limit the final image size（unit：Kb）
+                .setMaxHeight(2000)             // limit image height
+                .setMaxWidth(2000)// limit image width
                 .putGear(Luban.CUSTOM_GEAR)     // use CUSTOM GEAR compression mode
         .launch(new OnCompressListener() {
             @Override
@@ -139,7 +161,7 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
                 String info = formatImagInfo(file.getAbsolutePath());
                 tvSizeLuabn.setText(info);
 
-                Log.d("dd","compressed by luban,:"+info);
+                Log.d("dd","compressed by advance luban,:"+info);
             }
 
             @Override
