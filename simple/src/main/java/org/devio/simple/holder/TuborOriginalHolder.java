@@ -1,6 +1,7 @@
 package org.devio.simple.holder;
 
 import android.app.Activity;
+import android.os.Environment;
 
 import com.hss01248.lubanturbo.TurboCompressor;
 
@@ -26,7 +27,13 @@ public class TuborOriginalHolder extends SinglePicHolder {
 
     @Override
     protected void compress(String path, CommonCallback<File> callback) {
-        String outPath = new File(rootView.getContext().getCacheDir(),System.currentTimeMillis()+".jpg").getAbsolutePath();
+        File file = new File(path);
+        String name = file.getName();
+        File dir = new File(file.getParentFile(),file.getParentFile().getName()+"-compressed");
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        String outPath = new File(dir,name).getAbsolutePath();
        boolean success =  TurboCompressor.compressOringinal(path, BigPagerHolder.quality,outPath);
        callback.onSuccess(new File(outPath));
     }

@@ -53,7 +53,7 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
 
     TuborOriginalHolder tuborOriginalHolder;
 
-    public static int quality = 60;
+    public static int quality = 70;
 
 
     public BigPagerHolder(Activity context) {

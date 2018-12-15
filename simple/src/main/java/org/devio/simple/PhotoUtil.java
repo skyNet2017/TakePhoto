@@ -63,6 +63,7 @@ public class PhotoUtil {
         ExifInterface exif = new ExifInterface();
         try {
             exif.readExif( path, ExifInterface.Options.OPTION_ALL );
+
             List<ExifTag> all_tags = exif.getAllTags();
            StringBuilder builder = new StringBuilder(320);
            builder.append("path:")
@@ -78,6 +79,16 @@ public class PhotoUtil {
                    .append("quality:")
                    .append(exif.getQualityGuess())
                    .append("\n");
+          /* if(all_tags != null && !all_tags.isEmpty()){
+               for (ExifTag tag : all_tags) {
+                   if(tag.hasValue() ){
+                       builder.append(tag.getValueAsString())
+                               .append("\n");
+                   }
+
+               }
+           }*/
+
            return builder.toString();
 
         } catch (IOException e) {

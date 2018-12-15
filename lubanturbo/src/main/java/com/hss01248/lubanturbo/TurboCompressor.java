@@ -25,16 +25,18 @@ public class TurboCompressor {
     public static boolean compressOringinal(String srcPath,int quality,String outPath){
         Bitmap bitmap = BitmapFactory.decodeFile(srcPath);
         boolean success =  nativeCompress(bitmap,quality,outPath);
-        /*if(success){
+        if(success){
             ExifInterface exif = new ExifInterface();
+
             try {
-                exif.writeExif( srcPath, outPath );
+                exif.readExif( srcPath, ExifInterface.Options.OPTION_ALL );
+                exif.writeExif( outPath );
             } catch (IOException e) {
                 e.printStackTrace();
             }finally {
                 return true;
             }
-        }*/
+        }
         return success;
     }
 
