@@ -7,17 +7,30 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.hss01248.adapter.CommonViewHolder;
 import com.hss01248.adapter.SuperPagerHolder;
+import com.hss01248.adapter.SuperViewGroupSingleAdapter;
+
 import me.shaohui.advancedluban.Luban;
 import me.shaohui.advancedluban.OnCompressListener;
+
+import org.devio.simple.holder.AdvanceLubanHolder;
+import org.devio.simple.holder.CppHolder;
+import org.devio.simple.holder.LubanHolder;
+import org.devio.simple.holder.OriginalHolder;
+import org.devio.simple.holder.TuborOriginalHolder;
 import org.devio.takephoto.model.TImage;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by huangshuisheng on 2018/12/13.
@@ -28,15 +41,19 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
     TextView tvQuality;
     SeekBar seekBar;
 
-    SubsamplingScaleImageView imageView1;
-    SubsamplingScaleImageView imageView2;
-    SubsamplingScaleImageView imageView3;
+    SuperViewGroupSingleAdapter<Activity> adapter;
+    LinearLayout llContainer;
+    Button btnCompress;
+    TImage image;
 
-    TextView tvSizeOriginal;
-    TextView tvSizecpp;
-    TextView tvSizeLuabn;
+    OriginalHolder originalHolder;
+    CppHolder cppHolder;
+    LubanHolder lubanHolder;
+    AdvanceLubanHolder advanceLubanHolder;
 
-    TImage tImage;
+    TuborOriginalHolder tuborOriginalHolder;
+
+    public static int quality = 60;
 
 
     public BigPagerHolder(Activity context) {
@@ -50,37 +67,48 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
 
     @Override
     protected void findViewsById(View view) {
-         imageView1 = (SubsamplingScaleImageView) view.findViewById(R.id.imgShow1);
-         imageView2 = (SubsamplingScaleImageView) view.findViewById(R.id.imgShow2);
-        imageView3 = (SubsamplingScaleImageView) view.findViewById(R.id.imgShow3);
+
 
         seekBar = view.findViewById(R.id.seekbar);
         tvQuality = view.findViewById(R.id.tv_percent);
+        btnCompress = view.findViewById(R.id.btn_compress);
+        llContainer = view.findViewById(R.id.ll_pics);
 
-        tvSizeOriginal = view.findViewById(R.id.tv_size_original);
-        tvSizecpp = view.findViewById(R.id.tv_size_cpp);
-        tvSizeLuabn = view.findViewById(R.id.tv_size_luban);
+        originalHolder =  new OriginalHolder(activity);
+        cppHolder = new CppHolder(activity);
+        lubanHolder = new LubanHolder(activity);
+        advanceLubanHolder = new AdvanceLubanHolder(activity);
+        tuborOriginalHolder = new TuborOriginalHolder(activity);
+
+        llContainer.addView(originalHolder.rootView);
+        llContainer.addView(tuborOriginalHolder.rootView);
+        llContainer.addView(cppHolder.rootView);
+        llContainer.addView(lubanHolder.rootView);
+
+        llContainer.addView(advanceLubanHolder.rootView);
+
+        btnCompress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                originalHolder.doCompress();
+                tuborOriginalHolder.doCompress();
+                cppHolder.doCompress();
+                lubanHolder.doCompress();
+                advanceLubanHolder.doCompress();
+            }
+        });
+
     }
 
     @Override
     public void assingDatasAndEvents(Activity activity, @Nullable TImage tImage, int i) {
-        this.tImage = tImage;
-        if(!TextUtils.isEmpty(tImage.getOriginalPath())){
-            imageView1.setImage(ImageSource.uri(tImage.getOriginalPath()));
-            String info = formatImagInfo(tImage.getOriginalPath());
-            Log.d("dd","original :"+info);
-            tvSizeOriginal.setText(info);
+        this.image = tImage;
 
-
-
-        }
-        if(!TextUtils.isEmpty(tImage.getCompressPath())){
-            imageView3.setImage(ImageSource.uri(tImage.getCompressPath()));
-            String info = formatImagInfo(tImage.getCompressPath());
-            Log.d("dd","original :"+info);
-            tvSizeLuabn.setText(info);
-            Log.d("dd","compressed by luban :"+info);
-        }
+        originalHolder.assingDatasAndEvents(activity,image,0);
+        tuborOriginalHolder.assingDatasAndEvents(activity,image,1);
+        cppHolder.assingDatasAndEvents(activity,image,2);
+        lubanHolder.assingDatasAndEvents(activity,image,3);
+        advanceLubanHolder.assingDatasAndEvents(activity,image,4);
 
 
         seekBar.setMax(100);
@@ -97,121 +125,21 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                compressByQuality(seekBar.getProgress());
-            }
-        });
-
-
-    }
-
-    private void compressByQuality(int progress) {
-
-        tvQuality.setText(progress+"%");
-        //c++ 压缩:
-        //CompressArgs args = new CompressArgs.Builder().compressFileSize(300*1024).build();
-       /* String outPath = new File(activity.getCacheDir(),System.currentTimeMillis()+".jpg").getAbsolutePath();
-        Light.getInstance().compress(tImage.getOriginalPath(), outPath);
-        imageView2.setImage(ImageSource.uri(outPath));
-        String info = formatImagInfo(outPath);
-        tvSizecpp.setText(info);
-
-        Log.d("dd","compressed by c++,:"+info);*/
-        top.zibin.luban.Luban.with(rootView.getContext())
-                .load(tImage.getOriginalPath())
-                .setTargetDir(rootView.getContext().getCacheDir().getAbsolutePath())
-                .setCompressListener(new top.zibin.luban.OnCompressListener() {
-                    @Override
-                    public void onStart() {
-
-                    }
-
-                    @Override
-                    public void onSuccess(File file) {
-                        imageView2.setImage(ImageSource.uri(file.getAbsolutePath()));
-                        String info = formatImagInfo(file.getAbsolutePath());
-                        tvSizecpp.setText(info);
-
-                        Log.d("dd","compressed by luban,:"+info);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-                }).launch();
-
-
-        //advanceluban:
-        int [] wh = getImageWidthHeight(tImage.getOriginalPath());
-
-        Luban.compress(rootView.getContext(), new File(tImage.getOriginalPath()))
-                .setMaxSize(400)                // limit the final image size（unit：Kb）
-                .setMaxHeight(2000)             // limit image height
-                .setMaxWidth(2000)// limit image width
-                .putGear(Luban.CUSTOM_GEAR)     // use CUSTOM GEAR compression mode
-        .launch(new OnCompressListener() {
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onSuccess(File file) {
-                imageView3.setImage(ImageSource.uri(file.getAbsolutePath()));
-                String info = formatImagInfo(file.getAbsolutePath());
-                tvSizeLuabn.setText(info);
-
-                Log.d("dd","compressed by advance luban,:"+info);
-            }
-
-            @Override
-            public void onError(Throwable e) {
+                //compressByQuality(seekBar.getProgress());
+                quality = seekBar.getProgress();
+                tvQuality.setText("质量:"+quality+"%");
+                compressByQuality();
 
             }
         });
 
+
+    }
+
+    private void compressByQuality() {
+        tuborOriginalHolder.doCompress();
+        cppHolder.doCompress();
     }
 
 
-    public static String formatImagInfo(String path){
-        String size = formatFileSize(new File(path).length());
-        int [] wh = getImageWidthHeight(path);
-        return "path:"+path+",\nw:"+wh[0]+",h:"+wh[1]+",\nfilesize:"+size;
-    }
-
-
-    public static String formatFileSize(long size) {
-        try {
-            DecimalFormat dff = new DecimalFormat(".00");
-            if (size >= 1024 * 1024) {
-                double doubleValue = ((double) size) / (1024 * 1024);
-                String value = dff.format(doubleValue);
-                return value + "MB";
-            } else if (size > 1024) {
-                double doubleValue = ((double) size) / 1024;
-                String value = dff.format(doubleValue);
-                return value + "KB";
-            } else {
-                return size + "B";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return String.valueOf(size);
-    }
-
-    public static int[] getImageWidthHeight(String path){
-        BitmapFactory.Options options = new BitmapFactory.Options();
-
-        /**
-         * 最关键在此，把options.inJustDecodeBounds = true;
-         * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
-         */
-        options.inJustDecodeBounds = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
-        /**
-         *options.outHeight为原始图片的高
-         */
-        return new int[]{options.outWidth,options.outHeight};
-    }
 }
