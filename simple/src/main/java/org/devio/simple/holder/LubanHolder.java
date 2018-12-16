@@ -49,10 +49,7 @@ public class LubanHolder extends SinglePicHolder{
         });
     }
 
-    @Override
-    public void assingDatasAndEvents(Activity activity, @Nullable TImage tImage) {
-        super.assingDatasAndEvents(activity, tImage);
-    }
+
 
     @Override
     protected void compress(String path, final CommonCallback<File> callback) {

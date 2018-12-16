@@ -59,8 +59,9 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     @BindView(R.id.rb_compressall)
     RadioButton rbCompressall;
     File selectedDir;
+    ArrayList<File> files;
 
-    int quality;
+    int quality  = PhotoUtil.DEFAULT_QUALITY;
     @BindView(R.id.tv_end)
     TextView tvEnd;
 
@@ -110,12 +111,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
             case R.id.btn_selected:
                 getTakePhoto().onPickMultiple(65535);
                 break;
-            case R.id.btn_preview:
-                Intent intent = new Intent(this, ResultActivity.class);
-                intent.putExtra("images", images);
-                startActivity(intent);
-                break;
-            case R.id.btn_start_compress:
+            case R.id.btn_start_compress:{
                 if (rbCompressall.isChecked()) {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
@@ -130,6 +126,27 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     compressAllFiles(getFiles(images));
 
                 }
+            }
+                /*Intent intent = new Intent(this, ResultActivity.class);
+                intent.putExtra("images", images);
+                startActivity(intent);*/
+
+                break;
+            case R.id.btn_preview:
+                if (rbCompressall.isChecked()) {
+                    File[] files = selectedDir.listFiles(new FileFilter() {
+                        @Override
+                        public boolean accept(File pathname) {
+                            String name = pathname.getName();
+                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")|| name.endsWith(".JPG");
+                        }
+                    });
+                    this.files = new ArrayList<File>(Arrays.asList(files));
+                } else {
+                    this.files = getFiles(images);
+                }
+                CompressResultCompareActivity.files = this.files;
+                startActivity(new Intent(this,CompressResultCompareActivity.class));
                 break;
         }
     }
@@ -203,6 +220,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
 
 
     }
+
+
 
     private String getoutputDesc(ArrayList<File> files) {
         long originalSize = 0;

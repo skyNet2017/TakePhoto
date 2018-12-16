@@ -17,6 +17,9 @@ import it.sephiroth.android.library.exif2.ExifTag;
 
 public class PhotoUtil {
 
+
+    public static final int DEFAULT_QUALITY = 70;
+
     public static String formatImagInfo(String path){
         String size = formatFileSize(new File(path).length());
         int [] wh = getImageWidthHeight(path);
@@ -95,5 +98,20 @@ public class PhotoUtil {
             e.printStackTrace();
         }
         return formatImagInfo(path);
+    }
+
+    public static String getCompressedFilePath(String path,boolean needFileExistFirst){
+        File file = new File(path);
+        String name = file.getName();
+        File dir = new File(file.getParentFile(), file.getParentFile().getName() + "-compressed-quality-" + DEFAULT_QUALITY);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File fileCompressed = new File(dir,name);
+        if(needFileExistFirst && !fileCompressed.exists()){
+            return "";
+        }
+        String outPath = fileCompressed.getAbsolutePath();
+        return outPath;
     }
 }

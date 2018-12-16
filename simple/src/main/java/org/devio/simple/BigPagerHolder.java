@@ -45,6 +45,7 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
     LinearLayout llContainer;
     Button btnCompress;
     TImage image;
+    String path;
 
     OriginalHolder originalHolder;
     CppHolder cppHolder;
@@ -103,12 +104,13 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
     @Override
     public void assingDatasAndEvents(Activity activity, @Nullable TImage tImage, int i) {
         this.image = tImage;
+        this.path = image.getOriginalPath();
 
-        originalHolder.assingDatasAndEvents(activity,image,0);
-        tuborOriginalHolder.assingDatasAndEvents(activity,image,1);
-        cppHolder.assingDatasAndEvents(activity,image,2);
-        lubanHolder.assingDatasAndEvents(activity,image,3);
-        advanceLubanHolder.assingDatasAndEvents(activity,image,4);
+        originalHolder.assingDatasAndEvents(activity,path,0);
+        tuborOriginalHolder.assingDatasAndEvents(activity,path,1);
+        cppHolder.assingDatasAndEvents(activity,path,2);
+        lubanHolder.assingDatasAndEvents(activity,path,3);
+        advanceLubanHolder.assingDatasAndEvents(activity,path,4);
 
 
         seekBar.setMax(100);

@@ -23,7 +23,7 @@ import it.sephiroth.android.library.exif2.ExifTag;
  * Created by hss on 2018/12/15.
  */
 
-public abstract class SinglePicHolder extends CommonViewHolder<TImage,Activity> {
+public abstract class SinglePicHolder extends CommonViewHolder<String,Activity> {
     public SinglePicHolder(Activity context) {
         super(context);
     }
@@ -49,9 +49,9 @@ public abstract class SinglePicHolder extends CommonViewHolder<TImage,Activity> 
     }
 
     @Override
-    public void assingDatasAndEvents(Activity activity, @Nullable TImage tImage) {
-        this.path = tImage.getOriginalPath();
-        displayImageAndInfo(tImage.getOriginalPath(),0);
+    public void assingDatasAndEvents(Activity activity, @Nullable String path) {
+        this.path = path;
+        displayImageAndInfo(path,0);
         tvType.setText(typeDesc());
     }
 
