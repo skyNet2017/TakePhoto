@@ -35,7 +35,7 @@ import java.util.List;
  * Email:crazycodeboy@gmail.com
  */
 public class ResultActivity extends Activity {
-    ArrayList<TImage> images;
+    public static ArrayList<TImage> images;
     ViewPager viewPager;
     SuperPagerAdapter<Activity> adapter;
 
@@ -43,13 +43,16 @@ public class ResultActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_layout);
-        images = (ArrayList<TImage>) getIntent().getSerializableExtra("images");
+        ArrayList<TImage> images = (ArrayList<TImage>) getIntent().getSerializableExtra("images");
+        if(images != null){
+            ResultActivity.images = images;
+        }
 
-        LightConfig lightConfig = new LightConfig();
+        /*LightConfig lightConfig = new LightConfig();
         lightConfig.setDefaultQuality(50);
         lightConfig.setMaxWidth(2000);
         lightConfig.setMaxHeight(2000);
-        Light.getInstance().setConfig(lightConfig);
+        Light.getInstance().setConfig(lightConfig);*/
 
 
         showImg();

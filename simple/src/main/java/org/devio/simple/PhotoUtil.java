@@ -20,7 +20,7 @@ public class PhotoUtil {
     public static String formatImagInfo(String path){
         String size = formatFileSize(new File(path).length());
         int [] wh = getImageWidthHeight(path);
-        return "path:"+path+",\nw:"+wh[0]+",h:"+wh[1]+",\nfilesize:"+size;
+        return "path:"+path+",\nw:"+wh[0]+",h:"+wh[1]+",filesize:"+size;
     }
 
 

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import org.devio.simple.compress.CompressActivity;
+
 
 /**
  * - 支持通过相机拍照获取图片
@@ -41,6 +43,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btnTakePhotoFragment:
                 startActivity(new Intent(this, SimpleFragmentActivity.class));
+                break;
+            case R.id.btncompressactivity:
+                startActivity(new Intent(this, CompressActivity.class));
                 break;
             default:
         }

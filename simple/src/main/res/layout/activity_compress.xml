@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btn_selected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选择图片或者文件夹" />
+    <TextView
+        android:id="@+id/tv_dir_info"
+        android:text="选中的图片和文件夹信息"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="预览选中的图片,以及对比压缩效果" />
+    <RadioButton
+        android:id="@+id/rb_compressall"
+        android:text="压缩整个文件夹的图片(不选就只压选中的那几张)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <SeekBar
+        android:id="@+id/sb_quality"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_start_compress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="开始压缩" />
+    <TextView
+        android:id="@+id/tv_end"
+        android:text="压缩效果"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:id="@+id/ll_dirs"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
