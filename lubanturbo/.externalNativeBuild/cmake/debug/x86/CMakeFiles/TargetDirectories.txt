@@ -1,3 +1,3 @@
-D:/projects/Android/github/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/x86/CMakeFiles/luban.dir
-D:/projects/Android/github/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/x86/CMakeFiles/edit_cache.dir
-D:/projects/Android/github/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/x86/CMakeFiles/rebuild_cache.dir
+D:/projects/android/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/x86/CMakeFiles/luban.dir
+D:/projects/android/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/x86/CMakeFiles/edit_cache.dir
+D:/projects/android/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/x86/CMakeFiles/rebuild_cache.dir

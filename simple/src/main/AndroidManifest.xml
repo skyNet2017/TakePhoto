@@ -26,8 +26,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"></activity>
         <activity android:name=".ResultActivity"></activity>
         <activity android:name=".compress.CompressActivity" />
-        <activity android:name=".compress.CompressResultCompareActivity" />
-        <activity android:name=".WithUiActivity"/>
+        <activity android:name=".compress.CompressResultCompareActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>
