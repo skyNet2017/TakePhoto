@@ -1,6 +1,7 @@
 package org.devio.takephoto.uitl;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -8,6 +9,12 @@ import android.util.Log;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
+import com.zhihu.matisse.filter.Filter;
+
+import org.devio.takephoto.R;
 import org.devio.takephoto.model.CropOptions;
 import org.devio.takephoto.model.TContextWrap;
 

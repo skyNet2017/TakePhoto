@@ -3,6 +3,7 @@ package org.devio.takephoto.app;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +21,7 @@ import org.devio.takephoto.model.TExceptionType;
 import org.devio.takephoto.model.TImage;
 import org.devio.takephoto.model.TIntentWap;
 import org.devio.takephoto.permission.PermissionManager;
+import org.devio.takephoto.uitl.Glide4Engine;
 import org.devio.takephoto.uitl.TUriParse;
 import org.devio.takephoto.compress.CompressConfig;
 import org.devio.takephoto.model.CropOptions;
@@ -34,9 +36,13 @@ import org.devio.takephoto.uitl.TImageFiles;
 import org.devio.takephoto.uitl.TUtils;
 import com.soundcloud.android.crop.Crop;
 import com.yalantis.ucrop.UCrop;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -237,8 +243,15 @@ public class TakePhotoImpl implements TakePhoto {
                 }
                 break;
             case TConstant.RC_PICK_MULTIPLE://多选图片返回结果
+            case TConstant.RC_PICK_MULTIPLE_BY_ZHIHU:
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    ArrayList<Image> images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+                    ArrayList<Image> images = null;
+                    if(requestCode == TConstant.RC_PICK_MULTIPLE){
+                        images =  data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+                    }else {
+                        List<Uri> mSelected = Matisse.obtainResult(data);
+                         images = UrisToImgs(mSelected);
+                    }
                     if (cropOptions != null) {
                         try {
                             onCrop(MultipleCrop.of(TUtils.convertImageToUri(contextWrap.getActivity(), images), contextWrap.getActivity(),
@@ -260,13 +273,43 @@ public class TakePhotoImpl implements TakePhoto {
         }
     }
 
+    private ArrayList<Image> UrisToImgs(List<Uri> uris) {
+        if(uris == null || uris.isEmpty()){
+            return new ArrayList<>();
+        }
+        ArrayList<Image> images = new ArrayList<>();
+        for (Uri uri : uris) {
+            try {
+                String path = TUriParse.getFilePathWithUri(uri,contextWrap.getActivity());
+                Image image = new Image(0,"name",path,true);
+                images.add(image);
+            } catch (TException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return images;
+    }
+
     @Override
     public void onPickMultiple(int limit) {
         if (PermissionManager.TPermissionType.WAIT.equals(permissionType)) {
             return;
         }
-        TUtils.startActivityForResult(contextWrap,
-            new TIntentWap(IntentUtils.getPickMultipleIntent(contextWrap, limit), TConstant.RC_PICK_MULTIPLE));
+
+       /* TUtils.startActivityForResult(contextWrap,
+            new TIntentWap(IntentUtils.getPickMultipleIntent(contextWrap, limit), TConstant.RC_PICK_MULTIPLE));*/
+
+        Matisse.from(contextWrap.getActivity())
+                .choose(MimeType.ofImage())
+                .countable(true)
+                .maxSelectable(limit)
+                //.addFilter(new GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                //.gridExpectedSize(contextWrap.getActivity().getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
+                .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                .thumbnailScale(0.8f)
+                .imageEngine(new Glide4Engine())
+                .forResult(TConstant.RC_PICK_MULTIPLE_BY_ZHIHU);
     }
 
     @Override
