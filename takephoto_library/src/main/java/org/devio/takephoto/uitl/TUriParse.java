@@ -25,6 +25,8 @@ import java.util.Locale;
  * Uri解析工具类
  * Author: JPH
  * Date: 2015/8/26 0026 16:23
+ * fileprovider冲突问题
+ * https://www.jianshu.com/p/88a3f8608d6f
  */
 public class TUriParse {
     private static final String TAG = IntentUtils.class.getName();

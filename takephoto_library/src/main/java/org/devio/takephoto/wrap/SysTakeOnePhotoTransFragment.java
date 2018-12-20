@@ -13,6 +13,8 @@ public class SysTakeOnePhotoTransFragment extends TakePhotoFragment {
 
 
     private TakeOnePhotoListener listener;
+    boolean useSystemAlbum;
+    boolean fromCamera;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,11 +26,19 @@ public class SysTakeOnePhotoTransFragment extends TakePhotoFragment {
         return this;
     }
 
-    public void pickFromCamera(boolean fromCamera){
+    public void pickFromCamera(boolean fromCamera,boolean useSystemAlbum){
+        this.fromCamera = fromCamera;
+        this.useSystemAlbum = useSystemAlbum;
         if(fromCamera){
             getTakePhoto().onPickFromCapture(TUriParse.getTempUri(getContext()));
         }else {
-            getTakePhoto().onPickFromGallery();
+            if(useSystemAlbum){
+                getTakePhoto().onPickFromGallery();
+            }else {
+                getTakePhoto().onPickMultiple(1);
+            }
+
+
         }
 
     }
@@ -38,7 +48,12 @@ public class SysTakeOnePhotoTransFragment extends TakePhotoFragment {
     public void takeSuccess(TResult result) {
         super.takeSuccess(result);
         if(listener != null){
-            listener.onSuccess(result.getImage().getOriginalPath());
+            if(fromCamera || useSystemAlbum){
+                listener.onSuccess(result.getImage().getOriginalPath());
+            }else {
+                listener.onSuccess(result.getImages().get(0).getOriginalPath());
+            }
+
         }
     }
 
