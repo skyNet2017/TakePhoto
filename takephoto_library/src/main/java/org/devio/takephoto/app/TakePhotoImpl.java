@@ -33,6 +33,7 @@ import org.devio.takephoto.uitl.TFileUtils;
 import org.devio.takephoto.uitl.TImageFiles;
 import org.devio.takephoto.uitl.TUtils;
 import com.soundcloud.android.crop.Crop;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -191,6 +192,7 @@ public class TakePhotoImpl implements TakePhoto {
                 }
                 break;
             case TConstant.RC_CROP://裁剪照片返回结果
+            case UCrop.REQUEST_CROP://裁剪照片返回结果
             case Crop.REQUEST_CROP://裁剪照片返回结果
                 if (resultCode == Activity.RESULT_OK) {
                     if (multipleCrop != null) {

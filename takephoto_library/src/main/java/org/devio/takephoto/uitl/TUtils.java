@@ -21,6 +21,7 @@ import org.devio.takephoto.model.TIntentWap;
 import org.devio.takephoto.R;
 import org.devio.takephoto.model.TContextWrap;
 import com.soundcloud.android.crop.Crop;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -159,7 +160,7 @@ public class TUtils {
      * @param options
      */
     public static void cropWithOwnApp(TContextWrap contextWrap, Uri imageUri, Uri outPutUri, CropOptions options) {
-        if (options.getAspectX() * options.getAspectY() > 0) {
+        /*if (options.getAspectX() * options.getAspectY() > 0) {
             if (contextWrap.getFragment() != null) {
                 Crop.of(imageUri, outPutUri)
                     .withAspect(options.getAspectX(), options.getAspectY())
@@ -181,7 +182,36 @@ public class TUtils {
             } else {
                 Crop.of(imageUri, outPutUri).asSquare().start(contextWrap.getActivity());
             }
+        }*/
+
+        if (options.getAspectX() * options.getAspectY() > 0) {
+            if (contextWrap.getFragment() != null) {
+                UCrop.of(imageUri, outPutUri)
+                        .withAspectRatio(options.getAspectX(), options.getAspectY())
+                        .start(contextWrap.getActivity(), contextWrap.getFragment());
+            } else {
+                UCrop.of(imageUri, outPutUri).withAspectRatio(options.getAspectX(), options.getAspectY()).start(contextWrap.getActivity());
+            }
+        } else if (options.getOutputX() * options.getOutputY() > 0) {
+            if (contextWrap.getFragment() != null) {
+                UCrop.of(imageUri, outPutUri)
+                        .withMaxResultSize(options.getOutputX(), options.getOutputY())
+                        .start(contextWrap.getActivity(), contextWrap.getFragment());
+            } else {
+                UCrop.of(imageUri, outPutUri).withMaxResultSize(options.getOutputX(), options.getOutputY()).start(contextWrap.getActivity());
+            }
+        } else {
+            if (contextWrap.getFragment() != null) {
+                UCrop.of(imageUri, outPutUri).start(contextWrap.getActivity(), contextWrap.getFragment());
+            } else {
+                UCrop.of(imageUri, outPutUri).start(contextWrap.getActivity());
+            }
         }
+
+        /*UCrop.of(imageUri, outPutUri)
+                .withAspectRatio(options.getAspectX(), options.getAspectY())
+                .withMaxResultSize(options.getOutputX(), options.getOutputY())
+                .start(contextWrap.getActivity());*/
     }
 
     /**
