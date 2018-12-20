@@ -12,5 +12,8 @@
     <string name="tip_permission_camera">No permission to use the camera, open the rights management</string>
     <string name="tip_permission_storage">No permission to use the SD card, open the rights management</string>
     <string name="tip_permission_camera_storage">No permission to use the camera and SD card, open the rights management</string>
-
+    <!--Select photo-->
+    <string name="take_photo">Take a photo</string>
+    <string name="choose_existing">album</string>
+    <string name="cancel">Cancel</string>
 </resources>

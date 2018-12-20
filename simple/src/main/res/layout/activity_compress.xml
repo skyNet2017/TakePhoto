@@ -32,11 +32,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="开始压缩" />
+    <Button
+        android:id="@+id/btn_pick_img"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="弹窗选图" />
     <TextView
         android:id="@+id/tv_end"
         android:text="压缩效果"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+        android:layout_width="match_parent"
+        android:id="@+id/iv_preview"
+        android:layout_height="match_parent"/>
     <LinearLayout
         android:id="@+id/ll_dirs"
         android:orientation="vertical"

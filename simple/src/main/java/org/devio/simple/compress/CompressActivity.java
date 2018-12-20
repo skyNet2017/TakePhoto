@@ -9,34 +9,29 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
-import com.hss01248.lubanturbo.TurboCompressor;
-
-import org.devio.simple.BigPagerHolder;
-import org.devio.simple.PhotoUtil;
-import org.devio.simple.R;
-import org.devio.simple.ResultActivity;
-import org.devio.takephoto.app.TakePhotoFragmentActivity;
-import org.devio.takephoto.model.TImage;
-import org.devio.takephoto.model.TResult;
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.hss01248.lubanturbo.TurboCompressor;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import org.devio.simple.PhotoUtil;
+import org.devio.simple.R;
+import org.devio.takephoto.app.TakePhotoFragmentActivity;
+import org.devio.takephoto.model.TImage;
+import org.devio.takephoto.model.TResult;
+import org.devio.takephoto.wrap.TakeOnePhotoListener;
+import org.devio.takephoto.wrap.TakePhotoUtil;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by hss on 2018/12/16.
@@ -54,6 +49,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     Button btnStartCompress;
     @BindView(R.id.ll_dirs)
     LinearLayout llDirs;
+    @BindView(R.id.iv_preview)
+    SubsamplingScaleImageView ivPreview;
 
     ArrayList<TImage> images;
     @BindView(R.id.rb_compressall)
@@ -105,7 +102,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         Log.e("dd", "quality:" + quality);*/
     }
 
-    @OnClick({R.id.btn_selected, R.id.btn_preview, R.id.btn_start_compress})
+    @OnClick({R.id.btn_selected, R.id.btn_preview, R.id.btn_start_compress,R.id.btn_pick_img})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_selected:
@@ -147,6 +144,26 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                 }
                 CompressResultCompareActivity.files = this.files;
                 startActivity(new Intent(this,CompressResultCompareActivity.class));
+                break;
+
+            case R.id.btn_pick_img:
+                TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
+                    @Override
+                    public void onSuccess(String paths) {
+                        ivPreview.setImage(ImageSource.uri(paths));
+                    }
+
+                    @Override
+                    public void onFail(String paths, String msg) {
+                        Log.e("dd",msg);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.w("dd","onCancel");
+                    }
+                });
+
                 break;
         }
     }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Select photo-->
+    <string name="take_photo">Kamera</string>
+    <string name="choose_existing">Galeri</string>
+    <string name="cancel">Batal</string>
+</resources>

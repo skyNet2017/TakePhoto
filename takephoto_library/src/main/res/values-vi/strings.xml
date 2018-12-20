@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Select photo-->
+    <string name="take_photo">Chụp ảnh</string>
+    <string name="choose_existing">Thư viện ảnh</string>
+    <string name="cancel">Huỷ bỏ</string>
+</resources>

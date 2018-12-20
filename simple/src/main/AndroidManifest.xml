@@ -27,6 +27,7 @@
         <activity android:name=".ResultActivity"></activity>
         <activity android:name=".compress.CompressActivity" />
         <activity android:name=".compress.CompressResultCompareActivity" />
+        <activity android:name=".WithUiActivity"/>
     </application>
 
 </manifest>

@@ -20,5 +20,9 @@
     <string name="add">确定</string>
     <string name="selected">已选</string>
     <string name="limit_exceeded">最多能选 %d 张</string>
+    <!--Select photo-->
+    <string name="take_photo">Take a photo</string>
+    <string name="choose_existing">album</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

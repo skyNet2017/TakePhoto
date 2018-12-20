@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Select photo-->
+    <string name="take_photo">Ambil Gambar</string>
+    <string name="choose_existing">Album gambar</string>
+    <string name="cancel">Batal</string>
+</resources>

@@ -1,0 +1,5 @@
+# ninja log v5
+65	920	0	CMakeFiles/luban.dir/src/main/cpp/turbo.c.o	a8d436f940b0b5d0
+920	1496	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libluban.so	96863027c26af92e
+2	120	0	CMakeFiles/luban.dir/src/main/cpp/turbo.c.o	a8d436f940b0b5d0
+120	201	0	../../../../build/intermediates/cmake/debug/obj/armeabi-v7a/libluban.so	96863027c26af92e

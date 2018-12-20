@@ -1,36 +1,16 @@
 package org.devio.simple;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.hss01248.adapter.CommonViewHolder;
 import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.adapter.SuperViewGroupSingleAdapter;
-
-import me.shaohui.advancedluban.Luban;
-import me.shaohui.advancedluban.OnCompressListener;
-
-import org.devio.simple.holder.AdvanceLubanHolder;
-import org.devio.simple.holder.CppHolder;
-import org.devio.simple.holder.LubanHolder;
-import org.devio.simple.holder.OriginalHolder;
-import org.devio.simple.holder.TuborOriginalHolder;
+import org.devio.simple.holder.*;
 import org.devio.takephoto.model.TImage;
-
-import java.io.File;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by huangshuisheng on 2018/12/13.
@@ -117,7 +97,7 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+                tvQuality.setText("质量:"+progress+"%");
             }
 
             @Override
