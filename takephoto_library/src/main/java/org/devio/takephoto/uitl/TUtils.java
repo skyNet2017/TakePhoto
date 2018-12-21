@@ -11,17 +11,11 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.darsh.multipleimageselect.models.Image;
-import org.devio.takephoto.model.CropOptions;
-import org.devio.takephoto.model.TException;
-import org.devio.takephoto.model.TExceptionType;
-import org.devio.takephoto.model.TImage;
-import org.devio.takephoto.model.TIntentWap;
-import org.devio.takephoto.R;
-import org.devio.takephoto.model.TContextWrap;
-import com.soundcloud.android.crop.Crop;
 import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.UCropActivity;
+import org.devio.takephoto.R;
+import org.devio.takephoto.model.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -184,27 +178,54 @@ public class TUtils {
             }
         }*/
 
+        UCrop.Options uoptions = new UCrop.Options();
+       // uoptions.setCompressionFormat(Bitmap.CompressFormat.JPEG);
+        uoptions.setAllowedGestures(UCropActivity.SCALE,UCropActivity.NONE,UCropActivity.ALL);
+       /* uoptions.setHideBottomControls(false);
+        uoptions.setShowCropFrame(true);
+        uoptions.setCompressionQuality(85);*/
+       // uoptions.setToolbarColor(config.toolbarColor);
+      //  uoptions.setStatusBarColor(config.statusBarColor);
+       if(options.isAvatar()){
+            uoptions.setCircleDimmedLayer(true);
+            uoptions.setShowCropGrid(false);
+            uoptions.setCropFrameStrokeWidth(0);
+        }
+
+
         if (options.getAspectX() * options.getAspectY() > 0) {
             if (contextWrap.getFragment() != null) {
                 UCrop.of(imageUri, outPutUri)
+                        .withOptions(uoptions)
                         .withAspectRatio(options.getAspectX(), options.getAspectY())
                         .start(contextWrap.getActivity(), contextWrap.getFragment());
             } else {
-                UCrop.of(imageUri, outPutUri).withAspectRatio(options.getAspectX(), options.getAspectY()).start(contextWrap.getActivity());
+                UCrop.of(imageUri, outPutUri)
+                        .withOptions(uoptions)
+                        .withAspectRatio(options.getAspectX(), options.getAspectY())
+                        .start(contextWrap.getActivity());
             }
         } else if (options.getOutputX() * options.getOutputY() > 0) {
             if (contextWrap.getFragment() != null) {
                 UCrop.of(imageUri, outPutUri)
+                        .withOptions(uoptions)
                         .withMaxResultSize(options.getOutputX(), options.getOutputY())
                         .start(contextWrap.getActivity(), contextWrap.getFragment());
             } else {
-                UCrop.of(imageUri, outPutUri).withMaxResultSize(options.getOutputX(), options.getOutputY()).start(contextWrap.getActivity());
+                UCrop.of(imageUri, outPutUri)
+                        .withOptions(uoptions)
+                        .withMaxResultSize(options.getOutputX(), options.getOutputY())
+                        .start(contextWrap.getActivity());
             }
         } else {
             if (contextWrap.getFragment() != null) {
-                UCrop.of(imageUri, outPutUri).start(contextWrap.getActivity(), contextWrap.getFragment());
+                UCrop.of(imageUri, outPutUri)
+                        .withOptions(uoptions)
+                        .start(contextWrap.getActivity(), contextWrap.getFragment());
             } else {
-                UCrop.of(imageUri, outPutUri).start(contextWrap.getActivity());
+                UCrop.of(imageUri, outPutUri)
+                        .withOptions(uoptions)
+                        .start(contextWrap.getActivity());
             }
         }
 

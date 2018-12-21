@@ -166,6 +166,7 @@ public class CustomHelper {
         boolean withWonCrop = rgCropTool.getCheckedRadioButtonId() == R.id.rbCropOwn ? true : false;
 
         CropOptions.Builder builder = new CropOptions.Builder();
+        builder.setCropForAvatar(true);
 
         if (rgCropSize.getCheckedRadioButtonId() == R.id.rbAspect) {
             builder.setAspectX(width).setAspectY(height);

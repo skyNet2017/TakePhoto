@@ -12,6 +12,14 @@ public class CropOptions implements Serializable {
      * 使用TakePhoto自带的裁切工具进行裁切
      */
     private boolean withOwnCrop;
+
+
+
+
+    /**
+     * 是不是头像模式
+     */
+    private boolean isAvatar;
     private int aspectX;
     private int aspectY;
     private int outputX;
@@ -60,6 +68,14 @@ public class CropOptions implements Serializable {
         this.withOwnCrop = withOwnCrop;
     }
 
+    public boolean isAvatar() {
+        return isAvatar;
+    }
+
+    public void setAvatar(boolean avatar) {
+        isAvatar = avatar;
+    }
+
     public static class Builder {
         private CropOptions options;
 
@@ -89,6 +105,15 @@ public class CropOptions implements Serializable {
 
         public Builder setWithOwnCrop(boolean withOwnCrop) {
             options.setWithOwnCrop(withOwnCrop);
+            return this;
+        }
+
+        public Builder setCropForAvatar(boolean isAvatar) {
+            options.setAvatar(isAvatar);
+            if(isAvatar){
+                options.setAspectX(1);
+                options.setAspectY(1);
+            }
             return this;
         }
 
