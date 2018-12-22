@@ -15,16 +15,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <RadioButton
+    <CheckBox
         android:id="@+id/rb_compressall"
         android:text="压缩整个文件夹的图片(不选就只压选中的那几张)"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <SeekBar
+        android:visibility="gone"
         android:id="@+id/sb_quality"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
+        android:text="压缩质量:70%"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
@@ -52,6 +54,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="预览选中的图片,以及对比压缩效果" />
+
+    <Button
+        android:visibility="gone"
+        android:id="@+id/btn_sendBroadcast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="测试发送广播" />
+
+
     <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:layout_width="match_parent"
         android:id="@+id/iv_preview"

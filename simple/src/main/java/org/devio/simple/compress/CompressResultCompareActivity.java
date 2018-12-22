@@ -10,6 +10,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -61,6 +63,11 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //无title
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //全屏
+        getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN ,
+                WindowManager.LayoutParams. FLAG_FULLSCREEN);
         setContentView(R.layout.activity_compress_compare);
         ButterKnife.bind(this);
         adapter = new SuperPagerAdapter(this) {
@@ -81,6 +88,9 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        //处理点击进来的情况:
+
 
 
         size = files.size();

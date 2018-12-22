@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="org.devio.simple">
-    <uses-sdk tools:overrideLibrary="com.hss01248.lib,com.hss01248.adapter"/>
+    <uses-sdk tools:overrideLibrary="com.hss01248.lib,com.hss01248.adapter,com.hss01248.notifyutil"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,6 +28,14 @@
         <activity android:name=".ResultActivity"></activity>
         <activity android:name=".compress.CompressResultCompareActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" android:screenOrientation="landscape" />
+
+
+        <receiver android:name="org.devio.simple.compress.NewPhotoAddedReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_SCANNER_SCAN_FILE" />
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

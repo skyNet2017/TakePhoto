@@ -2,10 +2,12 @@ package org.devio.simple.compress;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -51,10 +53,9 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     LinearLayout llDirs;
     @BindView(R.id.iv_preview)
     SubsamplingScaleImageView ivPreview;
-
     ArrayList<TImage> images;
     @BindView(R.id.rb_compressall)
-    RadioButton rbCompressall;
+    CheckBox rbCompressall;
     File selectedDir;
     ArrayList<File> files;
 
@@ -67,6 +68,22 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compress);
         ButterKnife.bind(this);
+        Intent intent = getIntent();
+        if(intent != null){
+            Log.w("onCreate",intent.getData()+"");
+
+        }
+    }
+
+    @Override
+    public Intent getIntent() {
+        return super.getIntent();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.w("onNewIntent",intent.getData()+"");
     }
 
     @Override
@@ -103,7 +120,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         Log.e("dd", "quality:" + quality);*/
     }
 
-    @OnClick({R.id.btn_selected, R.id.btn_preview, R.id.btn_start_compress,R.id.btn_pick_img})
+    @OnClick({R.id.btn_selected, R.id.btn_preview, R.id.btn_start_compress,R.id.btn_pick_img,R.id.btn_sendBroadcast})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_selected:
@@ -134,8 +151,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
-                            //return isCompressFile(pathname);
-                            return true;
+                            return isCompressFile(pathname);
+                            //return true;
                         }
                     });
                     this.files = new ArrayList<File>(Arrays.asList(files));
@@ -167,6 +184,11 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                 });
 
                 break;
+            case R.id.btn_sendBroadcast:
+                getWindow().getDecorView().setDrawingCacheEnabled(true);
+                Bitmap bitmap = getWindow().getDecorView().getDrawingCache();
+                PhotoUtil.saveImageToGallery(this,bitmap);
+                break;
         }
     }
 
@@ -187,9 +209,10 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         if(!isJpg){
             return false;
         }
-        int quality = PhotoUtil.getQuality(pathname.getAbsolutePath());
+        return true;
+        /*int quality = PhotoUtil.getQuality(pathname.getAbsolutePath());
         Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
-        return  quality > PhotoUtil.DEFAULT_QUALITY;
+        return  quality > PhotoUtil.DEFAULT_QUALITY;*/
     }
 
     private ArrayList<File> getFiles(ArrayList<TImage> images) {

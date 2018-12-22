@@ -27,12 +27,12 @@ public class ImageInfoFormater {
         File file = new File(path);
         String size = formatFileSize(file.length());
         int [] wh = getImageWidthHeight(path);
-        String str = wh[0]+"x"+wh[1]+","+size+",quality:"+getQuality(path);
+        String str = wh[0]+"x"+wh[1]+", "+size+", quality:"+getQuality(path);
         if(showFullPath){
-            return "path:"+path+"\n"+str;
+            return str + "\n"+path;
 
         }else {
-            return file.getName()+"\n"+str;
+            return str;
         }
     }
 
@@ -41,15 +41,15 @@ public class ImageInfoFormater {
 
     public static String formatFileSize(long size) {
         try {
-            DecimalFormat dff = new DecimalFormat(".00");
+            DecimalFormat dff = new DecimalFormat(".0");
             if (size >= 1024 * 1024) {
                 double doubleValue = ((double) size) / (1024 * 1024);
                 String value = dff.format(doubleValue);
-                return value + "MB";
+                return value + "M";
             } else if (size > 1024) {
                 double doubleValue = ((double) size) / 1024;
                 String value = dff.format(doubleValue);
-                return value + "KB";
+                return value + "K";
             } else {
                 return size + "B";
             }

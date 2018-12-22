@@ -6,70 +6,71 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/rl_original"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
         android:layout_height="match_parent">
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:id="@+id/iv_original"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
         <TextView
             android:text="原图"
             android:padding="10dp"
-            android:textColor="#ff00ff"
+            android:background="#66000000"
+            android:textColor="#ffffff"
             android:gravity="center"
-            android:layout_width="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp">
-            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-                android:id="@+id/iv_original"
-                android:layout_centerVertical="true"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </RelativeLayout>
-
         <TextView
             android:id="@+id/tv_original"
             android:padding="10dp"
-            android:textColor="#00ffff"
+            android:background="#66000000"
+            android:textColor="#ffffff"
+            android:maxLines="3"
+            android:ellipsize="marquee"
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/rl_compressed"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
         android:layout_height="match_parent">
+
+        <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+            android:id="@+id/iv_compressed"
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
         <TextView
             android:text="压缩后的图"
             android:padding="10dp"
-            android:textColor="#ff00ff"
+            android:background="#66000000"
+            android:textColor="#ffffff"
             android:gravity="center"
-            android:layout_width="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp">
-            <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-                android:id="@+id/iv_compressed"
-                android:layout_centerVertical="true"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </RelativeLayout>
         <TextView
             android:padding="10dp"
-            android:textColor="#00ffff"
+            android:background="#66000000"
+            android:textColor="#ffffff"
             android:id="@+id/tv_compressed"
+            android:maxLines="3"
+            android:ellipsize="marquee"
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>
