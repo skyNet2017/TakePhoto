@@ -3,6 +3,7 @@ package org.devio.simple;
 import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -36,10 +37,10 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
 
     public static int quality = 70;
 
-
-    public BigPagerHolder(Activity context) {
-        super(context);
+    public BigPagerHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
     }
+
 
     @Override
     protected int setLayoutRes() {
@@ -55,11 +56,11 @@ public class BigPagerHolder extends SuperPagerHolder<TImage,Activity> {
         btnCompress = view.findViewById(R.id.btn_compress);
         llContainer = view.findViewById(R.id.ll_pics);
 
-        originalHolder =  new OriginalHolder(activity);
-        cppHolder = new CppHolder(activity);
-        lubanHolder = new LubanHolder(activity);
-        advanceLubanHolder = new AdvanceLubanHolder(activity);
-        tuborOriginalHolder = new TuborOriginalHolder(activity);
+        originalHolder =  new OriginalHolder(activity,llContainer);
+        cppHolder = new CppHolder(activity,llContainer);
+        lubanHolder = new LubanHolder(activity,llContainer);
+        advanceLubanHolder = new AdvanceLubanHolder(activity,llContainer);
+        tuborOriginalHolder = new TuborOriginalHolder(activity,llContainer);
 
         llContainer.addView(originalHolder.rootView);
         llContainer.addView(tuborOriginalHolder.rootView);

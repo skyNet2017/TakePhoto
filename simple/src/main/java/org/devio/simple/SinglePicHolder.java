@@ -3,6 +3,7 @@ package org.devio.simple;
 import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -24,15 +25,17 @@ import it.sephiroth.android.library.exif2.ExifTag;
  */
 
 public abstract class SinglePicHolder extends CommonViewHolder<String,Activity> {
-    public SinglePicHolder(Activity context) {
-        super(context);
-    }
+
 
     protected SubsamplingScaleImageView imageView;
     protected TextView tvInfo;
     protected String path;
     protected TextView tvType;
     protected Button btnRxtra;
+
+    public SinglePicHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
+    }
 
     @Override
     protected int setLayoutRes() {

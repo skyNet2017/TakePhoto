@@ -2,6 +2,7 @@ package org.devio.simple.holder;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.ViewGroup;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 
@@ -18,8 +19,10 @@ import me.shaohui.advancedluban.OnCompressListener;
  */
 
 public class AdvanceLubanHolder extends SinglePicHolder {
-    public AdvanceLubanHolder(Activity context) {
-        super(context);
+
+
+    public AdvanceLubanHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
     }
 
     @Override

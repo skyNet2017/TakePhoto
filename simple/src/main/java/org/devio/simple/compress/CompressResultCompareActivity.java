@@ -73,7 +73,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         adapter = new SuperPagerAdapter(this) {
             @Override
             protected SuperPagerHolder generateNewHolder(Context context, ViewGroup viewGroup, int i) {
-                return new CpHolder(CompressResultCompareActivity.this);
+                return new CpHolder(CompressResultCompareActivity.this,viewGroup);
             }
 
             @Override
@@ -81,6 +81,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 return null;
             }
         };
+        //adapter.setOnlyOneTypeItem(false);
         vpCompress.setAdapter(adapter);
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,5 +190,11 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.gc();
     }
 }

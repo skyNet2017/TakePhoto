@@ -63,7 +63,7 @@ public class ResultActivity extends Activity {
         adapter = new SuperPagerAdapter<Activity>(this) {
             @Override
             protected SuperPagerHolder generateNewHolder(Activity context, ViewGroup viewGroup, int i) {
-                return new BigPagerHolder(context);
+                return new BigPagerHolder(context,viewGroup);
             }
 
             @Override

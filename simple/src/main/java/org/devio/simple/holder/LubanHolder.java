@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.hss01248.lubanturbo.TurboCompressor;
@@ -20,8 +21,10 @@ import java.io.File;
  */
 
 public class LubanHolder extends SinglePicHolder{
-    public LubanHolder(Activity context) {
-        super(context);
+
+
+    public LubanHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
     }
 
     @Override

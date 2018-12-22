@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -39,9 +40,10 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     @BindView(R.id.ll_compress)
     LinearLayout llCompress;
 
-    public CpHolder(Activity context) {
-        super(context);
+    public CpHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
     }
+
 
     @Override
     protected int setLayoutRes() {

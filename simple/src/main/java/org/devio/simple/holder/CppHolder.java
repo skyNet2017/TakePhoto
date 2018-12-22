@@ -1,6 +1,7 @@
 package org.devio.simple.holder;
 
 import android.app.Activity;
+import android.view.ViewGroup;
 
 import com.light.body.CompressArgs;
 import com.light.body.Light;
@@ -16,8 +17,10 @@ import java.io.File;
  */
 
 public class CppHolder extends SinglePicHolder {
-    public CppHolder(Activity context) {
-        super(context);
+
+
+    public CppHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.devio.simple.holder;
 
 import android.app.Activity;
 import android.os.Environment;
+import android.view.ViewGroup;
 
 import com.hss01248.lubanturbo.TurboCompressor;
 
@@ -16,8 +17,10 @@ import java.io.File;
  */
 
 public class TuborOriginalHolder extends SinglePicHolder {
-    public TuborOriginalHolder(Activity context) {
-        super(context);
+
+
+    public TuborOriginalHolder(Activity context, ViewGroup parent) {
+        super(context, parent);
     }
 
     @Override
