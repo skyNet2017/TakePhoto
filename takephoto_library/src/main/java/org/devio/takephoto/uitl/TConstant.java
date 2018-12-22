@@ -44,6 +44,8 @@ public class TConstant {
      **/
     public final static int RC_PICK_MULTIPLE = 1008;
 
+    public final static int RC_PICK_MULTIPLE_BY_ZHIHU = 1009;
+
 
     /**
      * requestCode 请求权限

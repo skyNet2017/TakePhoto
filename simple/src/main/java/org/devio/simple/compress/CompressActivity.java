@@ -78,7 +78,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
 
     private String formatImages(ArrayList<TImage> images) {
         selectedDir = new File(images.get(0).getOriginalPath()).getParentFile();
-        return selectedDir.getAbsolutePath() + ",total count:" + getFileCount(selectedDir) + ",selected count:" + images.size();
+        String str =  selectedDir.getAbsolutePath() + ",total count:" + getFileCount(selectedDir) + ",selected count:" + images.size();
+        return str + "\n"+images.get(0).getOriginalPath()+"  等等....";
     }
 
     private int getFileCount(File dir) {
@@ -106,15 +107,14 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_selected:
-                getTakePhoto().onPickMultiple(65535);
+                getTakePhoto().onPickMultipleByMultiSelectLib(65535);
                 break;
             case R.id.btn_start_compress:{
                 if (rbCompressall.isChecked()) {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
-                            String name = pathname.getName();
-                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")|| name.endsWith(".JPG");
+                            return isCompressFile(pathname);
                         }
                     });
                     compressAllFiles(new ArrayList<File>(Arrays.asList(files)));
@@ -134,8 +134,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
-                            String name = pathname.getName();
-                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")|| name.endsWith(".JPG");
+                            return isCompressFile(pathname);
                         }
                     });
                     this.files = new ArrayList<File>(Arrays.asList(files));
@@ -170,11 +169,35 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         }
     }
 
+    /**
+     * 不压缩png,因为会变黑,效果不好
+     * @param pathname
+     * @return
+     */
+    private boolean isCompressFile(File pathname) {
+        String name = pathname.getName();
+        int idx = name.lastIndexOf(".");
+        if(idx <0 || idx >= name.length()-1){
+            return false;
+        }
+        String suffix = name.substring(idx+1);
+        boolean isJpg = suffix.equalsIgnoreCase("jpg")
+                || suffix.equalsIgnoreCase("jpeg");
+        if(!isJpg){
+            return false;
+        }
+        int quality = PhotoUtil.getQuality(pathname.getAbsolutePath());
+        Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
+        return  quality > PhotoUtil.DEFAULT_QUALITY;
+    }
+
     private ArrayList<File> getFiles(ArrayList<TImage> images) {
         ArrayList<File> list = new ArrayList<File>();
         for (TImage image : images) {
             File file = new File(image.getOriginalPath());
-            list.add(file);
+            if(isCompressFile(file)){
+                list.add(file);
+            }
         }
         return list;
     }
@@ -188,6 +211,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setProgress(0);
+        dialog.setMessage("正在压缩中...");
         //dialog.setIndeterminate(false);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.show();
@@ -245,23 +269,35 @@ public class CompressActivity extends TakePhotoFragmentActivity {
 
 
     private String getoutputDesc(ArrayList<File> files) {
+        if(files.isEmpty()){
+            return "";
+        }
         long originalSize = 0;
+        long sizeAfterCompressed = 0;
+        boolean isAll = rbCompressall.isChecked();
         for (File file : files) {
             originalSize += file.length();
-        }
-        File dir = new File(files.get(0).getParentFile(), files.get(0).getParentFile().getName() + "-compressed-quality-" + quality);
-        File[] files1 = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                String name = file.getName();
-                return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg") || name.endsWith(".JPG");
+            File file1 = new File(PhotoUtil.getCompressedFilePath(file.getAbsolutePath(),false));
+            if(file1.exists()){
+                sizeAfterCompressed += file1.length();
             }
-        });
 
-        long sizeAfterCompressed = 0;
-        for (File file : files1){
-            sizeAfterCompressed += file.length();
         }
+
+
+        /*if(isAll){
+            File dir = new File(files.get(0).getParentFile(), files.get(0).getParentFile().getName() + "-compressed-quality-" + quality);
+            File[] files1 = dir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return isCompressFile(file);
+                }
+            });
+            for (File file : files1){
+                sizeAfterCompressed += file.length();
+            }
+        }*/
+
 
 
         return "compressed quality:"+quality+",cost time total:"+(System.currentTimeMillis() - startTime)/1000f+"s\n"+

@@ -37,9 +37,15 @@ public interface TakePhoto {
     /**
      * 图片多选
      *
-     * @param limit 最多选择图片张数的限制
+     * @param limit 最多选择图片张数的限制,默认使用知乎
      */
     void onPickMultiple(int limit);
+
+    /**
+     * 底层是MultiSelectLib
+     * @param limit
+     */
+    void onPickMultipleByMultiSelectLib(int limit);
 
     /**
      * 图片多选，并裁切

@@ -120,6 +120,24 @@ public class PhotoUtil {
         return formatImagInfo(path);
     }
 
+    public static int getQuality(String path){
+        if(TextUtils.isEmpty(path)){
+            return 0;
+        }
+        File file = new File(path);
+        if(!file.exists()){
+            return 0;
+        }
+        ExifInterface exif = new ExifInterface();
+        try {
+            exif.readExif( path, ExifInterface.Options.OPTION_ALL );
+            return exif.getQualityGuess();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     public static String getCompressedFilePath(String path,boolean needFileExistFirst){
         File file = new File(path);
         String name = file.getName();

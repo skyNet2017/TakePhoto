@@ -28,13 +28,13 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     @BindView(R.id.tv_original)
     TextView tvOriginal;
     @BindView(R.id.rl_original)
-    RelativeLayout rlOriginal;
+    LinearLayout rlOriginal;
     @BindView(R.id.iv_compressed)
     SubsamplingScaleImageView ivCompressed;
     @BindView(R.id.tv_compressed)
     TextView tvCompressed;
     @BindView(R.id.rl_compressed)
-    RelativeLayout rlCompressed;
+    LinearLayout rlCompressed;
     @BindView(R.id.ll_compress)
     LinearLayout llCompress;
 
@@ -61,8 +61,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         PhotoUtil.setPathToPreview(ivOriginal,originalPath);
         tvOriginal.setText(PhotoUtil.formatImagInfo(originalPath));
         if(!TextUtils.isEmpty(compressedPath)){
-            PhotoUtil.setPathToPreview(ivCompressed,originalPath);
-            tvCompressed.setText(PhotoUtil.formatImagInfo(originalPath));
+            PhotoUtil.setPathToPreview(ivCompressed,compressedPath);
+            tvCompressed.setText(PhotoUtil.formatImagInfo(compressedPath));
         }
 
 

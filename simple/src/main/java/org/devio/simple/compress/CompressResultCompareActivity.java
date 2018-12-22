@@ -1,25 +1,38 @@
 package org.devio.simple.compress;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
 
+import org.apache.commons.io.FileUtils;
+import org.devio.simple.PhotoUtil;
 import org.devio.simple.R;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by hss on 2018/12/16.
@@ -36,6 +49,14 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     @BindView(R.id.tv_progress)
     TextView tvProgress;
     int size;
+    @BindView(R.id.iv_back)
+    ImageView ivBack;
+    @BindView(R.id.fb_override_single)
+    FloatingActionButton fbOverrideSingle;
+    @BindView(R.id.fb_override_all)
+    FloatingActionButton fbOverrideAll;
+    @BindView(R.id.menu)
+    FloatingActionMenu menu;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,16 +75,23 @@ public class CompressResultCompareActivity extends AppCompatActivity {
             }
         };
         vpCompress.setAdapter(adapter);
+        ivBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
 
         size = files.size();
         sbar.setMax(size);
-        tvProgress.setText("0/"+size);
+        sbar.setProgress(1);
+        tvProgress.setText("1/" + size);
 
         sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                tvProgress.setText(i+"/"+size);
+                tvProgress.setText(i + "/" + size);
             }
 
             @Override
@@ -85,7 +113,8 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                sbar.setProgress(position);
+                CompressResultCompareActivity.this.position = position;
+                sbar.setProgress(position + 1);
             }
 
             @Override
@@ -95,12 +124,60 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         });
         adapter.refresh(getFilePaths(files));
     }
+    int position = 1;
 
-    private List getFilePaths(ArrayList<File> files) {
+    private List<String> getFilePaths(ArrayList<File> files) {
         ArrayList<String> paths = new ArrayList<>();
         for (File file : files) {
-            paths.add(file.getAbsolutePath());
+            if(file.exists()){
+                paths.add(file.getAbsolutePath());
+            }
+
         }
         return paths;
+    }
+
+
+    @OnClick({R.id.fb_override_single, R.id.fb_override_all})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.fb_override_single:
+                copyAndDelte(files.get(position));
+                Toast.makeText(this,"替换完成",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.fb_override_all:
+                final ProgressDialog dialog = new ProgressDialog(this);
+                dialog.setMax(files.size());
+                dialog.setCancelable(true);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.setProgress(0);
+                dialog.setMessage("正在替换中...");
+                //dialog.setIndeterminate(false);
+                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.show();
+                for (int i = 0;i<files.size();i++) {
+                    File file = files.get(i);
+                    copyAndDelte(file);
+                    dialog.setProgress(i+1);
+                }
+                dialog.dismiss();
+                Toast.makeText(this,"替换完成",Toast.LENGTH_LONG).show();
+                break;
+        }
+    }
+
+    private void copyAndDelte(File file) {
+        String path = PhotoUtil.getCompressedFilePath(file.getAbsolutePath(),true);
+        if(TextUtils.isEmpty(path)){
+            Log.w("dd","file not exist:"+path);
+            return;
+        }
+        try {
+            File file1 = new File(path);
+            FileUtils.copyFile(file1,file);
+            file1.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

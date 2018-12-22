@@ -89,7 +89,7 @@ Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass 
         return false;
     }
 
-    BYTE r, g, b;
+    BYTE a,r, g, b;
     int color;
     data = malloc((size_t) (width * height * 3));
     tempData = data;
@@ -97,9 +97,16 @@ Java_com_hss01248_lubanturbo_TurboCompressor_nativeCompress(JNIEnv *env, jclass 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             color = *((int *) pixelColor);
+            //a = (BYTE) ((color & 0xFF000000) >> 24);
             r = (BYTE) ((color & 0x00FF0000) >> 16);
             g = (BYTE) ((color & 0x0000FF00) >> 8);
             b = (BYTE) (color & 0X000000FF);
+            //解决完全透明的像素点压缩后变黑的bug:还是会有部分变黑
+            /*if(a == 0 && r ==0 && g ==0 && b ==0){
+                r = 0X000000FF;
+                g = 0X000000FF;
+                b = 0X000000FF;
+            }*/
 
             *data = b;
             *(data + 1) = g;
