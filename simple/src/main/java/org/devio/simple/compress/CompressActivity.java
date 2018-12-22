@@ -134,7 +134,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
-                            return isCompressFile(pathname);
+                            //return isCompressFile(pathname);
+                            return true;
                         }
                     });
                     this.files = new ArrayList<File>(Arrays.asList(files));
@@ -195,9 +196,9 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         ArrayList<File> list = new ArrayList<File>();
         for (TImage image : images) {
             File file = new File(image.getOriginalPath());
-            if(isCompressFile(file)){
+            //if(isCompressFile(file)){
                 list.add(file);
-            }
+           // }
         }
         return list;
     }

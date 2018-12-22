@@ -21,7 +21,6 @@ import org.devio.takephoto.model.TExceptionType;
 import org.devio.takephoto.model.TImage;
 import org.devio.takephoto.model.TIntentWap;
 import org.devio.takephoto.permission.PermissionManager;
-import org.devio.takephoto.uitl.Glide4Engine;
 import org.devio.takephoto.uitl.TUriParse;
 import org.devio.takephoto.compress.CompressConfig;
 import org.devio.takephoto.model.CropOptions;
@@ -308,7 +307,7 @@ public class TakePhotoImpl implements TakePhoto {
                 //.gridExpectedSize(contextWrap.getActivity().getResources().getDimensionPixelSize(R.dimen.grid_expected_size))
                 .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
                 .thumbnailScale(0.8f)
-                .imageEngine(new Glide4Engine())
+                //.imageEngine(new Glide4Engine())
                 .forResult(TConstant.RC_PICK_MULTIPLE_BY_ZHIHU);
     }
 

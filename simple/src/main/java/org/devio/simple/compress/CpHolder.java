@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.adapter.SuperPagerHolder;
+import com.hss01248.imginfo.ImageInfoFormater;
 
 import org.devio.simple.PhotoUtil;
 import org.devio.simple.R;
@@ -59,10 +60,10 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         String originalPath = s;
         String compressedPath = PhotoUtil.getCompressedFilePath(s,true);
         PhotoUtil.setPathToPreview(ivOriginal,originalPath);
-        tvOriginal.setText(PhotoUtil.formatImagInfo(originalPath));
+        tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
         if(!TextUtils.isEmpty(compressedPath)){
             PhotoUtil.setPathToPreview(ivCompressed,compressedPath);
-            tvCompressed.setText(PhotoUtil.formatImagInfo(compressedPath));
+            tvCompressed.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
         }
 
 
