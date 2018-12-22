@@ -4,7 +4,7 @@
     android:padding="15dp"
     android:layout_height="match_parent">
 
-    <Button
+    <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_selected"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,12 +29,12 @@
         android:text="压缩质量:70%"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <Button
+    <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_start_compress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="开始压缩" />
-    <Button
+    <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_pick_img"
         android:visibility="gone"
         android:layout_width="match_parent"
@@ -49,13 +49,13 @@
         android:text=""
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <Button
+    <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_preview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="预览选中的图片,以及对比压缩效果" />
 
-    <Button
+    <com.gc.materialdesign.views.ButtonRectangle
         android:visibility="gone"
         android:id="@+id/btn_sendBroadcast"
         android:layout_width="match_parent"

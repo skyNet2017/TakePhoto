@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
           package="org.devio.simple">
-    <uses-sdk tools:overrideLibrary="com.hss01248.lib,com.hss01248.adapter,com.hss01248.notifyutil"/>
+    <uses-sdk tools:overrideLibrary="com.hss01248.lib,com.hss01248.adapter,com.hss01248.notifyutil,com.gc.materialdesign"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

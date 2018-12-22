@@ -19,8 +19,15 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy.force 'com.android.support:support-v4:27.1.1'
+    resolutionStrategy.force 'com.android.support:design:27.1.1'
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:design:27.1.1'
+
     compile project(':takephoto_library')
    // compile 'com.github.hss01248:SuperAdapter:2.2.4'
     api project(':superadapter')
@@ -31,6 +38,17 @@ dependencies {
     compile project(':lubanturbo')
     implementation 'com.jakewharton:butterknife:8.6.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
-    compile 'com.github.clans:fab:1.6.4'//https://github.com/Clans/FloatingActionButton
-    compile 'com.github.hss01248:NotifyUtil:1.0.1'
+    compile 'com.github.clans:fab:1.6.4'
+    //https://github.com/Clans/FloatingActionButton
+    compile ('com.github.hss01248:NotifyUtil:1.0.1'){
+        exclude group: 'com.android.support'
+    }
+    //implementation 'com.github.lygttpod:SuperTextView:2.1.8'
+    implementation 'com.github.skyNet2017:MaterialDesignLibrary:2.0.0'
+
+
+    /*compile ('com.github.navasmdc:MaterialDesign:1.5@aar'){
+        exclude group: 'com.android.support'
+    }*/
+   // implementation 'com.github.apl-devs:appintro:v4.2.3'//https://github.com/paolorotolo/AppIntro
 }

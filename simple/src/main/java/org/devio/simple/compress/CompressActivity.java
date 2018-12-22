@@ -16,6 +16,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.gc.materialdesign.views.ButtonRectangle;
 import com.hss01248.lubanturbo.TurboCompressor;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -42,13 +43,13 @@ import java.util.Arrays;
 public class CompressActivity extends TakePhotoFragmentActivity {
 
     @BindView(R.id.btn_selected)
-    Button btnSelected;
+    ButtonRectangle btnSelected;
     @BindView(R.id.tv_dir_info)
     TextView tvDirInfo;
     @BindView(R.id.btn_preview)
-    Button btnPreview;
+    ButtonRectangle btnPreview;
     @BindView(R.id.btn_start_compress)
-    Button btnStartCompress;
+    ButtonRectangle btnStartCompress;
     @BindView(R.id.ll_dirs)
     LinearLayout llDirs;
     @BindView(R.id.iv_preview)
@@ -127,6 +128,9 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                 getTakePhoto().onPickMultipleByMultiSelectLib(65535);
                 break;
             case R.id.btn_start_compress:{
+                if(selectedDir == null){
+                    return;
+                }
                 if (rbCompressall.isChecked()) {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
@@ -147,6 +151,9 @@ public class CompressActivity extends TakePhotoFragmentActivity {
 
                 break;
             case R.id.btn_preview:
+                if(selectedDir == null){
+                    return;
+                }
                 if (rbCompressall.isChecked()) {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
