@@ -2,6 +2,11 @@ package org.devio.simple;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.text.TextUtils;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +29,21 @@ public class PhotoUtil {
         String size = formatFileSize(new File(path).length());
         int [] wh = getImageWidthHeight(path);
         return "path:"+path+",\nw:"+wh[0]+",h:"+wh[1]+",filesize:"+size;
+    }
+
+    public static void setPathToPreview(SubsamplingScaleImageView imageView,String filePath){
+        if(TextUtils.isEmpty(filePath)){
+            return;
+        }
+        Uri uri = null;
+        File file = new File(filePath);
+        if(file.exists()){
+            uri = Uri.fromFile(file);
+        }else {
+            uri = Uri.parse(filePath);
+        }
+        imageView.setImage(ImageSource.uri(uri));
+
     }
 
 

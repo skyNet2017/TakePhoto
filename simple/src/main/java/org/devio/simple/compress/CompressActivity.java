@@ -185,6 +185,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     private void compressAllFiles(final ArrayList<File> files) {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMax(files.size());
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
         dialog.setProgress(0);
         //dialog.setIndeterminate(false);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
