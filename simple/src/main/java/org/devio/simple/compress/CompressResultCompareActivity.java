@@ -35,6 +35,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by hss on 2018/12/16.
@@ -166,13 +171,40 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 //dialog.setIndeterminate(false);
                 dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 dialog.show();
-                for (int i = 0;i<files.size();i++) {
-                    File file = files.get(i);
-                    copyAndDelte(file);
-                    dialog.setProgress(i+1);
-                }
-                dialog.dismiss();
-                Toast.makeText(this,"替换完成",Toast.LENGTH_LONG).show();
+                final int[] i = {0};
+                Observable.fromIterable(files)
+                        .observeOn(Schedulers.io())
+                        .doOnNext(new Consumer<File>() {
+                            @Override
+                            public void accept(File file) throws Exception {
+                                try {
+                                    copyAndDelte(file);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }).subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<File>() {
+                            @Override
+                            public void accept(File file) throws Exception {
+                                i[0]++;
+                                dialog.setProgress(i[0]);
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                throwable.printStackTrace();
+                            }
+                        }, new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                dialog.dismiss();
+                                Toast.makeText(CompressResultCompareActivity.this,"替换完成",Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+
                 break;
         }
     }

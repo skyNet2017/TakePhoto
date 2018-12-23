@@ -17,6 +17,8 @@ import com.hss01248.imginfo.ImageInfoFormater;
 import org.devio.simple.PhotoUtil;
 import org.devio.simple.R;
 
+import java.io.File;
+
 import butterknife.BindView;
 
 /**
@@ -60,12 +62,24 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     @Override
     public void assingDatasAndEvents(Activity context, @Nullable String s, int i) {
         String originalPath = s;
+       File file = new File(s);
+       if(file.exists()){
+           rlOriginal.setVisibility(View.VISIBLE);
+           PhotoUtil.setPathToPreview(ivOriginal,originalPath);
+           tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+       }else {
+           rlOriginal.setVisibility(View.GONE);
+       }
+
+
+
         String compressedPath = PhotoUtil.getCompressedFilePath(s,true);
-        PhotoUtil.setPathToPreview(ivOriginal,originalPath);
-        tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
         if(!TextUtils.isEmpty(compressedPath)){
             PhotoUtil.setPathToPreview(ivCompressed,compressedPath);
             tvCompressed.setText(ImageInfoFormater.formatImagInfo(compressedPath,true));
+            rlCompressed.setVisibility(View.VISIBLE);
+        }else {
+            rlCompressed.setVisibility(View.GONE);
         }
 
 

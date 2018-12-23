@@ -92,6 +92,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         super.takeSuccess(result);
         images = result.getImages();
         tvDirInfo.setText(formatImages(images));
+        btnStartCompress.setVisibility(View.VISIBLE);
+        btnPreview.setVisibility(View.VISIBLE);
     }
 
     private String formatImages(ArrayList<TImage> images) {
