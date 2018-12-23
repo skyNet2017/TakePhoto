@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,12 +28,18 @@ import android.widget.Toast;
 
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomImageSelectAdapter;
+import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
+import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
+
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by Darshan on 4/18/2015.
@@ -55,6 +62,7 @@ public class ImageSelectActivity extends HelperActivity {
     private ContentObserver observer;
     private Handler handler;
     private Thread thread;
+    private boolean isSelectAll;
 
     private final String[] projection = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.DATA };
 
@@ -234,13 +242,17 @@ public class ImageSelectActivity extends HelperActivity {
             }
         }
     }
-
+    Menu menu;
     private ActionMode.Callback callback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            ImageSelectActivity.this.menu = menu;
             MenuInflater menuInflater = mode.getMenuInflater();
             menuInflater.inflate(R.menu.menu_contextual_action_bar, menu);
 
+            if(PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))){
+                menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
+            }
             actionMode = mode;
             countSelected = 0;
 
@@ -256,6 +268,19 @@ public class ImageSelectActivity extends HelperActivity {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {int i = item.getItemId();
             if (i == R.id.menu_item_add_image) {
                 sendIntent();
+                return true;
+            }
+            if (i == R.id.menu_item_select_all) {
+                isSelectAll = ! isSelectAll;
+                for (Image image :images){
+                    image.isSelected = isSelectAll;
+                }
+                if (actionMode != null) {
+                    countSelected = isSelectAll ? images.size() : 0;
+                    actionMode.setTitle(countSelected + " " + getString(R.string.selected));
+                }
+                adapter.notifyDataSetChanged();
+
                 return true;
             }
             return false;
@@ -308,10 +333,65 @@ public class ImageSelectActivity extends HelperActivity {
     }
 
     private void sendIntent() {
-        Intent intent = new Intent();
+        /*Intent intent = new Intent();
         intent.putParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES, getSelected());
         setResult(RESULT_OK, intent);
-        finish();
+        finish();*/
+        final ArrayList<Image> images  = getSelected();
+        if(images == null || images.isEmpty()){
+            Toast.makeText(this, R.string.c_mot_selected,Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(!PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))){
+            List<File> files = new ArrayList<>();
+            for (Image image : images){
+                files.add(new File(image.path));
+            }
+            PhotoCompressHelper.compressAllFiles(files, this, new Subscriber<String>() {
+                @Override
+                public void onSubscribe(Subscription s) {
+
+                }
+
+                @Override
+                public void onNext(String s) {
+                    ArrayList<String> paths = new ArrayList<>();
+                    for (Image image : images) {
+                        paths.add(image.path);
+                    }
+                    CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths);
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    t.printStackTrace();
+                    if("1".equalsIgnoreCase(t.getMessage())){//全部都被压缩过了
+                        menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
+                        ArrayList<String> paths = new ArrayList<>();
+                        for (Image image : images) {
+                            paths.add(image.path);
+                        }
+                        CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths);
+                    }
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            });
+            return;
+        }
+
+
+
+        ArrayList<String> paths = new ArrayList<>();
+        for (Image image : images) {
+            paths.add(image.path);
+        }
+        CompressResultCompareActivity.lauch(this,paths);
+
+
     }
 
     private void loadImages() {
@@ -374,6 +454,7 @@ public class ImageSelectActivity extends HelperActivity {
                     }
 
                     file = new File(path);
+                    Log.i("path",path);
                     if (file.exists()) {
                         temp.add(new Image(id, name, path, isSelected));
                     }

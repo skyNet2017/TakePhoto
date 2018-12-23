@@ -15,7 +15,6 @@ import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.gc.materialdesign.views.ButtonRectangle;
 
-import org.devio.simple.PhotoCompressHelper;
 import org.devio.simple.R;
 import org.devio.takephoto.app.TakePhotoFragmentActivity;
 import org.devio.takephoto.model.TImage;

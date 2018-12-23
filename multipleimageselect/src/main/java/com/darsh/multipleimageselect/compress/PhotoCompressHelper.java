@@ -1,34 +1,39 @@
-package org.devio.simple;
+package com.darsh.multipleimageselect.compress;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.darsh.multipleimageselect.R;
+import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.lubanturbo.TurboCompressor;
 
 import org.apache.commons.io.FileUtils;
-import org.devio.simple.compress.CompressResultCompareActivity;
 import org.reactivestreams.Subscriber;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -37,8 +42,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import it.sephiroth.android.library.exif2.ExifInterface;
-import it.sephiroth.android.library.exif2.ExifTag;
 
 /**
  * Created by hss on 2018/12/15.
@@ -69,7 +72,7 @@ public class PhotoCompressHelper {
      * @param pathname
      * @return
      */
-    public static boolean shouldCompress(File pathname) {
+    public static boolean shouldCompress(File pathname,boolean checkQuality) {
 
         String name = pathname.getName();
         int idx = name.lastIndexOf(".");
@@ -80,47 +83,88 @@ public class PhotoCompressHelper {
         boolean isJpg = suffix.equalsIgnoreCase("jpg")
                 || suffix.equalsIgnoreCase("jpeg");
         if(!isJpg){
+            if(suffix.equalsIgnoreCase("png")){
+                return true;
+            }
             return false;
         }
-        return true;
-        /*int quality = PhotoCompressHelper.getQuality(pathname.getAbsolutePath());
+        if(!checkQuality){
+            return true;
+        }
+
+        int quality = ImageInfoFormater.getQuality(pathname.getAbsolutePath());
         Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
-        return  quality > PhotoCompressHelper.DEFAULT_QUALITY;*/
+        return  quality > PhotoCompressHelper.DEFAULT_QUALITY;
     }
 
 
 
 
-    public static void compressAllFiles(final List<File> files, Activity activity, final Subscriber<String> subscriber){
+    public static void compressAllFiles(final List<File> files, final Activity activity, final Subscriber<String> subscriber){
         if(files == null || files.isEmpty()){
             subscriber.onError(new Throwable("files is empty"));
             return;
         }
-        if(isACompressedDr(files.get(0))){
+        /*if(isACompressedDr(files.get(0))){
             subscriber.onError(new Throwable("files has already been compressed"));
             return;
+        }*/
+
+        //提示用户有多少需要压缩,有多少不需要
+        final List<File> files2 = new ArrayList<>(files);
+        int total = files2.size();
+        int compressedNum = 0;
+        Iterator<File> iterator = files2.iterator();
+        while (iterator.hasNext()){
+            File file = iterator.next();
+            if(!shouldCompress(file,true)){
+                compressedNum++;
+                iterator.remove();
+            }
         }
+        if(files2.isEmpty()){
+            Toast.makeText(activity, R.string.all_has_been_compressed,Toast.LENGTH_SHORT).show();
+            subscriber.onError(new Throwable("1"));
+            return;
+        }
+
+        String str = activity.getString(R.string.c_total_selected)+total+", "+compressedNum+activity.getString(R.string.c_doyouwant_to_compressleft)+"("
+                +(total - compressedNum)+")";
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(R.string.c_alert_title)
+                .setMessage(str)
+                .setPositiveButton(R.string.c_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        compressLeft(files2,files,activity,subscriber);
+                    }
+                }).setNegativeButton(R.string.c_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).show();
+
+    }
+
+    private static void compressLeft(final List<File> files2, final List<File> files, final Activity activity, final Subscriber<String> subscriber) {
         final ProgressDialog dialog = new ProgressDialog(activity);
-        dialog.setMax(files.size());
+        dialog.setMax(files2.size());
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setProgress(0);
-        dialog.setMessage("正在压缩中...");
+        dialog.setMessage(activity.getString(R.string.compressing));
         //dialog.setIndeterminate(false);
         final int[] progress = {0};
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.show();
-       final long startTime = System.currentTimeMillis();
-        Flowable.fromIterable(files)
+        final long startTime = System.currentTimeMillis();
+        Flowable.fromIterable(files2)
                 .observeOn(Schedulers.io())
                 .doOnNext(new Consumer<File>() {
                     @Override
                     public void accept(File file) throws Exception {
-
                         compressOneFile(file);
-
-
-
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -140,10 +184,26 @@ public class PhotoCompressHelper {
                     @Override
                     public void run() throws Exception {
                         dialog.dismiss();
-                       String str = getoutputDesc(files,startTime);
-                       subscriber.onNext(str);
+                        String str = getoutputDesc(files2,startTime,activity);
+                        showDesc(str,activity,subscriber);
+                        //subscriber.onNext(str);
                     }
                 });
+    }
+
+    private static void showDesc(final String str, Activity activity, final Subscriber<String> subscriber) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+       Dialog dialog =  builder.setTitle(R.string.c_alert_title)
+                .setMessage(str)
+                .setPositiveButton(R.string.c_preview, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        subscriber.onNext(str);
+                    }
+                }).show();
+       dialog.setCancelable(false);
+       dialog.setCanceledOnTouchOutside(false);
     }
 
     public static void compressOneFile(File file) {
@@ -161,7 +221,7 @@ public class PhotoCompressHelper {
         Log.w("dd", cost + filen);
     }
 
-    private static String getoutputDesc(List<File> files,long startTime) {
+    private static String getoutputDesc(List<File> files,long startTime,Activity activity) {
         if(files.isEmpty()){
             return "";
         }
@@ -176,10 +236,10 @@ public class PhotoCompressHelper {
 
         }
 
-        return "compressed quality:"+quality+",cost time total:"+(System.currentTimeMillis() - startTime)/1000f+"s\n"+
-                "original dir size:"+ PhotoCompressHelper.formatFileSize(originalSize)+"\n"+
-                "sizeAfterCompressed:"+ PhotoCompressHelper.formatFileSize(sizeAfterCompressed)+"\n"+
-                "save disk space:"+ PhotoCompressHelper.formatFileSize(originalSize - sizeAfterCompressed);
+        return activity.getString(R.string.c_compressquality)+quality+activity.getString(R.string.c_costtime)+(System.currentTimeMillis() - startTime)/1000f+"s\n"+
+                activity.getString(R.string.c_origin_disk_size)+ PhotoCompressHelper.formatFileSize(originalSize)+"\n"+
+                activity.getString(R.string.c_sieze_after)+ PhotoCompressHelper.formatFileSize(sizeAfterCompressed)+"\n"+
+                activity.getString(R.string.c_save_disk_space)+ PhotoCompressHelper.formatFileSize(originalSize - sizeAfterCompressed);
     }
 
     public static void replaceAllFiles(List<File> files, final Activity activity){
@@ -188,7 +248,7 @@ public class PhotoCompressHelper {
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setProgress(0);
-        dialog.setMessage("正在替换中...");
+        dialog.setMessage(activity.getString(R.string.c_replacing));
         //dialog.setIndeterminate(false);
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.show();
@@ -221,7 +281,6 @@ public class PhotoCompressHelper {
                     @Override
                     public void run() throws Exception {
                         dialog.dismiss();
-                        Toast.makeText(activity.getApplicationContext(),"替换完成",Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -229,17 +288,23 @@ public class PhotoCompressHelper {
 
     public static void copyAndDelte(File file) {
         String path = PhotoCompressHelper.getCompressedFilePath(file.getAbsolutePath(),true);
-        if(isACompressedDr(file)){
+        /*if(isACompressedDr(file)){
             path = getOriginalPath(file,false);
-        }
+        }*/
+
 
         if(TextUtils.isEmpty(path)){
             Log.w("dd","file not exist:"+path);
             return;
         }
+
         try {
             File file1 = new File(path);
-            FileUtils.copyFile(file1,file);
+            if(shouldCompress(file,true)){
+                FileUtils.copyFile(file1,file);
+            }else {
+
+            }
             file1.delete();
         } catch (IOException e) {
             e.printStackTrace();

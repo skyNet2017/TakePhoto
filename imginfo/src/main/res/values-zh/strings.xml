@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="c_quality_info">, 质量:</string>
+    <string name="c_not_compressed">(未压缩)</string>
+    <string name="t_compressed">(已压缩)</string>
+</resources>

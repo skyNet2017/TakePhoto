@@ -13,7 +13,6 @@ import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
 
-import org.devio.simple.PhotoCompressHelper;
 import org.devio.simple.R;
 
 import java.io.File;

@@ -23,7 +23,7 @@ public class Constants {
     public static final String INTENT_EXTRA_ALBUM = "album";
     public static final String INTENT_EXTRA_IMAGES = "images";
     public static final String INTENT_EXTRA_LIMIT = "limit";
-    public static final int DEFAULT_LIMIT = 10;
+    public static final int DEFAULT_LIMIT = Integer.MAX_VALUE;
 
     //Maximum number of images that can be selected at a time
     public static int limit;

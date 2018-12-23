@@ -1,13 +1,10 @@
 package org.devio.simple.compress;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -22,25 +19,17 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
 
-import org.apache.commons.io.FileUtils;
-import org.devio.simple.PhotoCompressHelper;
 import org.devio.simple.R;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by hss on 2018/12/16.
