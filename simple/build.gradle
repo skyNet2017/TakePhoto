@@ -45,7 +45,7 @@ dependencies {
     }
     //implementation 'com.github.lygttpod:SuperTextView:2.1.8'
     implementation 'com.github.skyNet2017:MaterialDesignLibrary:2.0.0'
-
+    implementation 'com.github.hss01248.TestTools:testtool:1.0.5'
 
     /*compile ('com.github.navasmdc:MaterialDesign:1.5@aar'){
         exclude group: 'com.android.support'

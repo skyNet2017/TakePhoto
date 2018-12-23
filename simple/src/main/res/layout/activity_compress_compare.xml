@@ -82,20 +82,20 @@
         fab:menu_labels_position="left"
         fab:menu_openDirection="up"
         fab:menu_backgroundColor="@android:color/transparent"
-        fab:menu_fab_label="your_label_here">
+        fab:menu_fab_label="">
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fb_override_single"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_size="mini"
-            fab:fab_label="覆盖此张" />
+            fab:fab_label="压缩/覆盖此张" />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fb_override_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             fab:fab_size="mini"
-            fab:fab_label="覆盖所有" />
+            fab:fab_label="压缩/覆盖整个文件夹" />
 
     </com.github.clans.fab.FloatingActionMenu>
 

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.adapter.CommonViewHolder;
+import com.hss01248.imginfo.ImageInfoFormater;
 
 import org.devio.takephoto.model.TImage;
 
@@ -81,6 +82,6 @@ public abstract class SinglePicHolder extends CommonViewHolder<String,Activity> 
 
     protected void displayImageAndInfo(String path,long duration) {
         imageView.setImage(ImageSource.uri(path));
-        tvInfo.setText(PhotoUtil.formatExifs(path)+"\n cost:"+duration+"ms");
+        tvInfo.setText(ImageInfoFormater.formatExifs(path)+"\n cost:"+duration+"ms");
     }
 }

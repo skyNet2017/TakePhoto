@@ -1,15 +1,12 @@
 package org.devio.simple.compress;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -17,19 +14,16 @@ import butterknife.OnClick;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.gc.materialdesign.views.ButtonRectangle;
-import com.hss01248.lubanturbo.TurboCompressor;
-import io.reactivex.Flowable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
-import org.devio.simple.PhotoUtil;
+
+import org.devio.simple.PhotoCompressHelper;
 import org.devio.simple.R;
 import org.devio.takephoto.app.TakePhotoFragmentActivity;
 import org.devio.takephoto.model.TImage;
 import org.devio.takephoto.model.TResult;
 import org.devio.takephoto.wrap.TakeOnePhotoListener;
 import org.devio.takephoto.wrap.TakePhotoUtil;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -60,7 +54,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     File selectedDir;
     ArrayList<File> files;
 
-    int quality  = PhotoUtil.DEFAULT_QUALITY;
+    int quality  = PhotoCompressHelper.DEFAULT_QUALITY;
     @BindView(R.id.tv_end)
     TextView tvEnd;
 
@@ -92,13 +86,15 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         super.takeSuccess(result);
         images = result.getImages();
         tvDirInfo.setText(formatImages(images));
-        btnStartCompress.setVisibility(View.VISIBLE);
+        if(!PhotoCompressHelper.isACompressedDr(selectedDir)){
+            btnStartCompress.setVisibility(View.VISIBLE);
+        }
         btnPreview.setVisibility(View.VISIBLE);
     }
 
     private String formatImages(ArrayList<TImage> images) {
         selectedDir = new File(images.get(0).getOriginalPath()).getParentFile();
-        String str =  selectedDir.getAbsolutePath() + ",total count:" + getFileCount(selectedDir) + ",selected count:" + images.size();
+        String str =  selectedDir.getAbsolutePath() + ",\ntotal count:" + getFileCount(selectedDir) + ",selected count:" + images.size();
         return str + "\n"+images.get(0).getOriginalPath()+"  等等....";
     }
 
@@ -137,7 +133,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
-                            return isCompressFile(pathname);
+                            return PhotoCompressHelper.shouldCompress(pathname);
                         }
                     });
                     compressAllFiles(new ArrayList<File>(Arrays.asList(files)));
@@ -160,7 +156,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
-                            return isCompressFile(pathname);
+                            return PhotoCompressHelper.shouldCompress(pathname);
                             //return true;
                         }
                     });
@@ -196,146 +192,54 @@ public class CompressActivity extends TakePhotoFragmentActivity {
             case R.id.btn_sendBroadcast:
                 getWindow().getDecorView().setDrawingCacheEnabled(true);
                 Bitmap bitmap = getWindow().getDecorView().getDrawingCache();
-                PhotoUtil.saveImageToGallery(this,bitmap);
+                PhotoCompressHelper.saveImageToGallery(this,bitmap);
                 break;
         }
     }
 
-    /**
-     * 不压缩png,因为会变黑,效果不好
-     * @param pathname
-     * @return
-     */
-    private boolean isCompressFile(File pathname) {
-        String name = pathname.getName();
-        int idx = name.lastIndexOf(".");
-        if(idx <0 || idx >= name.length()-1){
-            return false;
-        }
-        String suffix = name.substring(idx+1);
-        boolean isJpg = suffix.equalsIgnoreCase("jpg")
-                || suffix.equalsIgnoreCase("jpeg");
-        if(!isJpg){
-            return false;
-        }
-        return true;
-        /*int quality = PhotoUtil.getQuality(pathname.getAbsolutePath());
-        Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
-        return  quality > PhotoUtil.DEFAULT_QUALITY;*/
-    }
+
 
     private ArrayList<File> getFiles(ArrayList<TImage> images) {
         ArrayList<File> list = new ArrayList<File>();
         for (TImage image : images) {
             File file = new File(image.getOriginalPath());
-            //if(isCompressFile(file)){
+            //if(shouldCompress(file)){
                 list.add(file);
            // }
         }
         return list;
     }
 
-   volatile int progress;
-    long startTime;
+
 
     private void compressAllFiles(final ArrayList<File> files) {
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMax(files.size());
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setProgress(0);
-        dialog.setMessage("正在压缩中...");
-        //dialog.setIndeterminate(false);
-        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        dialog.show();
-        startTime = System.currentTimeMillis();
-        Flowable.fromIterable(files)
-                .observeOn(Schedulers.io())
-                .doOnNext(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) throws Exception {
+        PhotoCompressHelper.compressAllFiles(files, this, new Subscriber<String>() {
+            @Override
+            public void onSubscribe(Subscription s) {
 
-                        String name = file.getName();
-                        File dir = new File(file.getParentFile(), file.getParentFile().getName() + "-compressed-quality-" + quality);
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
-                        String outPath = new File(dir, name).getAbsolutePath();
-                        long start = System.currentTimeMillis();
-                        boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
-                        String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
-                        String filen = file.getName() + ", original:" + PhotoUtil.formatImagInfo(file.getAbsolutePath()) +
-                                ",\ncompressedFile:" + PhotoUtil.formatImagInfo(outPath);
-                        Log.w("dd", cost + filen);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progress++;
-                                dialog.setProgress(progress);
-                            }
-                        });
+            }
 
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) throws Exception {
+            @Override
+            public void onNext(String s) {
+                btnStartCompress.setVisibility(View.GONE);
+                tvEnd.setText(s);
+            }
 
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        throwable.printStackTrace();
-                    }
-                }, new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        dialog.dismiss();
-                        tvEnd.setText(getoutputDesc(files));
-                    }
-                });
+            @Override
+            public void onError(Throwable t) {
+                tvEnd.setText(t.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
 
 
     }
 
 
 
-    private String getoutputDesc(ArrayList<File> files) {
-        if(files.isEmpty()){
-            return "";
-        }
-        long originalSize = 0;
-        long sizeAfterCompressed = 0;
-        boolean isAll = rbCompressall.isChecked();
-        for (File file : files) {
-            originalSize += file.length();
-            File file1 = new File(PhotoUtil.getCompressedFilePath(file.getAbsolutePath(),false));
-            if(file1.exists()){
-                sizeAfterCompressed += file1.length();
-            }
 
-        }
-
-
-        /*if(isAll){
-            File dir = new File(files.get(0).getParentFile(), files.get(0).getParentFile().getName() + "-compressed-quality-" + quality);
-            File[] files1 = dir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return isCompressFile(file);
-                }
-            });
-            for (File file : files1){
-                sizeAfterCompressed += file.length();
-            }
-        }*/
-
-
-
-        return "compressed quality:"+quality+",cost time total:"+(System.currentTimeMillis() - startTime)/1000f+"s\n"+
-                "original dir size:"+PhotoUtil.formatFileSize(originalSize)+"\n"+
-                "sizeAfterCompressed:"+PhotoUtil.formatFileSize(sizeAfterCompressed)+"\n"+
-                "save disk space:"+PhotoUtil.formatFileSize(originalSize - sizeAfterCompressed);
-    }
 }

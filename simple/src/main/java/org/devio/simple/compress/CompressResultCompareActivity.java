@@ -23,13 +23,14 @@ import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
 
 import org.apache.commons.io.FileUtils;
-import org.devio.simple.PhotoUtil;
+import org.devio.simple.PhotoCompressHelper;
 import org.devio.simple.R;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -131,6 +132,11 @@ public class CompressResultCompareActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 CompressResultCompareActivity.this.position = position;
                 sbar.setProgress(position + 1);
+                File file = files.get(position);
+                if(PhotoCompressHelper.isACompressedDr(file)){
+                    //fbOverrideSingle.setLabelText("替换此");
+                }
+
             }
 
             @Override
@@ -157,72 +163,61 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     @OnClick({R.id.fb_override_single, R.id.fb_override_all})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.fb_override_single:
-                copyAndDelte(files.get(position));
-                Toast.makeText(this,"替换完成",Toast.LENGTH_LONG).show();
+            case R.id.fb_override_single:{
+                File file = files.get(position);
+                if(PhotoCompressHelper.isACompressedDr(file)){
+                    //替换
+                    PhotoCompressHelper.copyAndDelte(file);
+                    Toast.makeText(getApplicationContext(),"替换完成",Toast.LENGTH_LONG).show();
+                    //finish();
+                }else {
+                    //压缩
+                    PhotoCompressHelper.compressOneFile(file);
+                    Toast.makeText(getApplicationContext(),"压缩完成",Toast.LENGTH_LONG).show();
+                }
+
+            }
+
                 break;
             case R.id.fb_override_all:
-                final ProgressDialog dialog = new ProgressDialog(this);
-                dialog.setMax(files.size());
-                dialog.setCancelable(true);
-                dialog.setCanceledOnTouchOutside(false);
-                dialog.setProgress(0);
-                dialog.setMessage("正在替换中...");
-                //dialog.setIndeterminate(false);
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.show();
-                final int[] i = {0};
-                Observable.fromIterable(files)
-                        .observeOn(Schedulers.io())
-                        .doOnNext(new Consumer<File>() {
-                            @Override
-                            public void accept(File file) throws Exception {
-                                try {
-                                    copyAndDelte(file);
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                File file = files.get(position);
+                if(PhotoCompressHelper.isACompressedDr(file)){
+                    //替换
+                    PhotoCompressHelper.replaceAllFiles(files,this);
+                    Toast.makeText(getApplicationContext(),"替换完成",Toast.LENGTH_LONG).show();
+                    finish();
+                }else {
+                    //压缩
+                    PhotoCompressHelper.compressAllFiles(files, this, new Subscriber<String>() {
+                        @Override
+                        public void onSubscribe(Subscription s) {
 
-                            }
-                        }).subscribeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<File>() {
-                            @Override
-                            public void accept(File file) throws Exception {
-                                i[0]++;
-                                dialog.setProgress(i[0]);
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                throwable.printStackTrace();
-                            }
-                        }, new Action() {
-                            @Override
-                            public void run() throws Exception {
-                                dialog.dismiss();
-                                Toast.makeText(CompressResultCompareActivity.this,"替换完成",Toast.LENGTH_LONG).show();
-                            }
-                        });
+                        }
+
+                        @Override
+                        public void onNext(String s) {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable t) {
+
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            Toast.makeText(CompressResultCompareActivity.this,"压缩完成",Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
 
 
                 break;
         }
     }
 
-    private void copyAndDelte(File file) {
-        String path = PhotoUtil.getCompressedFilePath(file.getAbsolutePath(),true);
-        if(TextUtils.isEmpty(path)){
-            Log.w("dd","file not exist:"+path);
-            return;
-        }
-        try {
-            File file1 = new File(path);
-            FileUtils.copyFile(file1,file);
-            file1.delete();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     @Override
     protected void onDestroy() {

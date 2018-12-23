@@ -9,12 +9,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
 
-import org.devio.simple.PhotoUtil;
+import org.devio.simple.PhotoCompressHelper;
 import org.devio.simple.R;
 
 import java.io.File;
@@ -65,7 +64,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
        File file = new File(s);
        if(file.exists()){
            rlOriginal.setVisibility(View.VISIBLE);
-           PhotoUtil.setPathToPreview(ivOriginal,originalPath);
+           PhotoCompressHelper.setPathToPreview(ivOriginal,originalPath);
            tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
        }else {
            rlOriginal.setVisibility(View.GONE);
@@ -73,9 +72,9 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
 
 
-        String compressedPath = PhotoUtil.getCompressedFilePath(s,true);
+        String compressedPath = PhotoCompressHelper.getCompressedFilePath(s,true);
         if(!TextUtils.isEmpty(compressedPath)){
-            PhotoUtil.setPathToPreview(ivCompressed,compressedPath);
+            PhotoCompressHelper.setPathToPreview(ivCompressed,compressedPath);
             tvCompressed.setText(ImageInfoFormater.formatImagInfo(compressedPath,true));
             rlCompressed.setVisibility(View.VISIBLE);
         }else {
