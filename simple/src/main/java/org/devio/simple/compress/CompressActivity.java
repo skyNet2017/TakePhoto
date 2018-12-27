@@ -5,10 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.TextView;
+import android.widget.*;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -41,26 +38,47 @@ public class CompressActivity extends TakePhotoFragmentActivity {
 
     @BindView(R.id.btn_selected)
     Button btnSelected;
+
     @BindView(R.id.tv_dir_info)
     TextView tvDirInfo;
+
     @BindView(R.id.btn_preview)
     Button btnPreview;
+
     @BindView(R.id.btn_start_compress)
     Button btnStartCompress;
+
     @BindView(R.id.ll_dirs)
     LinearLayout llDirs;
+
     @BindView(R.id.iv_preview)
     SubsamplingScaleImageView ivPreview;
 
     ArrayList<TImage> images;
+
     @BindView(R.id.rb_compressall)
     RadioButton rbCompressall;
+
     File selectedDir;
+
     ArrayList<File> files;
 
-    int quality  = PhotoUtil.DEFAULT_QUALITY;
+    int quality = PhotoUtil.DEFAULT_QUALITY;
+
     @BindView(R.id.tv_end)
     TextView tvEnd;
+
+    @BindView(R.id.sb_quality)
+    SeekBar sbQuality;
+
+    @BindView(R.id.btn_pick_img)
+    Button btnPickImg;
+
+    @BindView(R.id.btn_pick_img_2)
+    Button btnPickImg2;
+
+    @BindView(R.id.iv_preview2)
+    SubsamplingScaleImageView ivPreview2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +96,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
 
     private String formatImages(ArrayList<TImage> images) {
         selectedDir = new File(images.get(0).getOriginalPath()).getParentFile();
-        return selectedDir.getAbsolutePath() + ",total count:" + getFileCount(selectedDir) + ",selected count:" + images.size();
+        return selectedDir.getAbsolutePath() + ",total count:" + getFileCount(selectedDir) + ",selected count:" + images
+                .size();
     }
 
     private int getFileCount(File dir) {
@@ -102,19 +121,20 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         Log.e("dd", "quality:" + quality);*/
     }
 
-    @OnClick({R.id.btn_selected, R.id.btn_preview, R.id.btn_start_compress,R.id.btn_pick_img})
+    @OnClick({R.id.btn_selected, R.id.btn_preview, R.id.btn_start_compress, R.id.btn_pick_img, R.id.btn_pick_img_2})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_selected:
                 getTakePhoto().onPickMultiple(65535);
                 break;
-            case R.id.btn_start_compress:{
+            case R.id.btn_start_compress: {
                 if (rbCompressall.isChecked()) {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
                             String name = pathname.getName();
-                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")|| name.endsWith(".JPG");
+                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg") || name
+                                    .endsWith(".JPG");
                         }
                     });
                     compressAllFiles(new ArrayList<File>(Arrays.asList(files)));
@@ -128,14 +148,15 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                 intent.putExtra("images", images);
                 startActivity(intent);*/
 
-                break;
+            break;
             case R.id.btn_preview:
                 if (rbCompressall.isChecked()) {
                     File[] files = selectedDir.listFiles(new FileFilter() {
                         @Override
                         public boolean accept(File pathname) {
                             String name = pathname.getName();
-                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg")|| name.endsWith(".JPG");
+                            return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg") || name
+                                    .endsWith(".JPG");
                         }
                     });
                     this.files = new ArrayList<File>(Arrays.asList(files));
@@ -143,7 +164,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     this.files = getFiles(images);
                 }
                 CompressResultCompareActivity.files = this.files;
-                startActivity(new Intent(this,CompressResultCompareActivity.class));
+                startActivity(new Intent(this, CompressResultCompareActivity.class));
                 break;
 
             case R.id.btn_pick_img:
@@ -151,21 +172,41 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                 TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
                     @Override
                     public void onSuccess(String paths) {
-                        Log.i("success",paths);
+                        Log.i("success", paths);
                         ivPreview.setImage(ImageSource.uri(paths));
                     }
 
                     @Override
                     public void onFail(String paths, String msg) {
-                        Log.e("dd",msg);
+                        Log.e("dd", msg);
                     }
 
                     @Override
                     public void onCancel() {
-                        Log.w("dd","onCancel");
+                        Log.w("dd", "onCancel");
                     }
                 });
 
+                break;
+            case R.id.btn_pick_img_2:
+                TakePhotoUtil.setUseSystemAlbum(true);
+                TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
+                    @Override
+                    public void onSuccess(String paths) {
+                        Log.i("success", paths);
+                        ivPreview2.setImage(ImageSource.uri(paths));
+                    }
+
+                    @Override
+                    public void onFail(String paths, String msg) {
+                        Log.e("dd", msg);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.w("dd", "onCancel");
+                    }
+                });
                 break;
         }
     }
@@ -179,7 +220,8 @@ public class CompressActivity extends TakePhotoFragmentActivity {
         return list;
     }
 
-   volatile int progress;
+    volatile int progress;
+
     long startTime;
 
     private void compressAllFiles(final ArrayList<File> files) {
@@ -197,15 +239,18 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                     public void accept(File file) throws Exception {
 
                         String name = file.getName();
-                        File dir = new File(file.getParentFile(), file.getParentFile().getName() + "-compressed-quality-" + quality);
+                        File dir = new File(file.getParentFile(),
+                                file.getParentFile().getName() + "-compressed-quality-" + quality);
                         if (!dir.exists()) {
                             dir.mkdirs();
                         }
                         String outPath = new File(dir, name).getAbsolutePath();
                         long start = System.currentTimeMillis();
                         boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
-                        String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
-                        String filen = file.getName() + ", original:" + PhotoUtil.formatImagInfo(file.getAbsolutePath()) +
+                        String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start)
+                                + "ms,\n";
+                        String filen = file.getName() + ", original:" + PhotoUtil.formatImagInfo(file.getAbsolutePath())
+                                +
                                 ",\ncompressedFile:" + PhotoUtil.formatImagInfo(outPath);
                         Log.w("dd", cost + filen);
                         runOnUiThread(new Runnable() {
@@ -241,30 +286,31 @@ public class CompressActivity extends TakePhotoFragmentActivity {
     }
 
 
-
     private String getoutputDesc(ArrayList<File> files) {
         long originalSize = 0;
         for (File file : files) {
             originalSize += file.length();
         }
-        File dir = new File(files.get(0).getParentFile(), files.get(0).getParentFile().getName() + "-compressed-quality-" + quality);
+        File dir = new File(files.get(0).getParentFile(),
+                files.get(0).getParentFile().getName() + "-compressed-quality-" + quality);
         File[] files1 = dir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 String name = file.getName();
-                return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg") || name.endsWith(".JPG");
+                return name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".jpeg") || name
+                        .endsWith(".JPG");
             }
         });
 
         long sizeAfterCompressed = 0;
-        for (File file : files1){
+        for (File file : files1) {
             sizeAfterCompressed += file.length();
         }
 
-
-        return "compressed quality:"+quality+",cost time total:"+(System.currentTimeMillis() - startTime)/1000f+"s\n"+
-                "original dir size:"+PhotoUtil.formatFileSize(originalSize)+"\n"+
-                "sizeAfterCompressed:"+PhotoUtil.formatFileSize(sizeAfterCompressed)+"\n"+
-                "save disk space:"+PhotoUtil.formatFileSize(originalSize - sizeAfterCompressed);
+        return "compressed quality:" + quality + ",cost time total:" + (System.currentTimeMillis() - startTime) / 1000f
+                + "s\n" +
+                "original dir size:" + PhotoUtil.formatFileSize(originalSize) + "\n" +
+                "sizeAfterCompressed:" + PhotoUtil.formatFileSize(sizeAfterCompressed) + "\n" +
+                "save disk space:" + PhotoUtil.formatFileSize(originalSize - sizeAfterCompressed);
     }
 }
