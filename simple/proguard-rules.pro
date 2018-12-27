@@ -22,3 +22,14 @@
 
 -keepattributes InnerClasses
 -dontoptimize
+-keep class com.jph.takephoto.** { *; }
+-dontwarn com.jph.takephoto.**
+
+-keep class org.devio.takephoto.** { *; }
+-dontwarn org.devio.takephoto.**
+
+-keep class com.darsh.multipleimageselect.** { *; }
+-dontwarn com.darsh.multipleimageselect.**
+
+-keep class com.soundcloud.android.crop.** { *; }
+-dontwarn com.soundcloud.android.crop.**

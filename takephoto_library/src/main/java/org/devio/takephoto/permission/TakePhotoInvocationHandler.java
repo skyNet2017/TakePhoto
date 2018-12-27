@@ -33,7 +33,7 @@ public class TakePhotoInvocationHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-            PermissionManager.TPermissionType type = listener.invoke(new InvokeParam(proxy, method, args));
+            PermissionManager.TPermissionType type = listener.invoke(new InvokeParam(proxy, method, args));//检查权限的切面
             if (proxy instanceof TakePhoto) {
                 if (!PermissionManager.TPermissionType.NOT_NEED.equals(type)) {
                     ((TakePhoto) proxy).permissionNotify(type);

@@ -7,8 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.widget.Toast;
-
 import org.devio.takephoto.app.TakePhoto;
 import org.devio.takephoto.model.InvokeParam;
 import org.devio.takephoto.model.TContextWrap;
@@ -161,7 +159,7 @@ public class PermissionManager {
                 break;
         }
         if (tip != null) {
-            Toast.makeText(activity, tip, Toast.LENGTH_LONG).show();
+           // Toast.makeText(activity, tip, Toast.LENGTH_LONG).show();
         }
 
     }
