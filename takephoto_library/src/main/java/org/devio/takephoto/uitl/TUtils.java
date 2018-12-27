@@ -122,7 +122,14 @@ public class TUtils {
                 Toast.LENGTH_SHORT).show();
             throw new TException(TExceptionType.TYPE_NO_CAMERA);
         } else {
-            startActivityForResult(contextWrap, intentWap);
+            try {
+                startActivityForResult(contextWrap, intentWap);
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(contextWrap.getActivity(), contextWrap.getActivity().getResources().getText(R.string.tip_permission_camera),
+                        Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 

@@ -77,6 +77,10 @@ public class PermissionManager {
             ContextCompat.checkSelfPermission(contextWrap.getActivity(), TPermission.STORAGE.stringValue())
                 == PackageManager.PERMISSION_GRANTED ? true : false;
 
+        //https://stackoverflow.com/questions/43042725/revoked-permission-android-permission-camera/43070198
+        // Starting Android M (API 23), if your app has CAMERA permission declared in the manifest, then,
+        // it needs that CAMERA permission to be GRANTED in order to access ACTION_IMAGE_CAPTURE etc... too
+        // (which normally do not require the CAMERA permission on their own). If not, then it automatically raises a SecurityException.
         if (TextUtils.equals(methodName, "onPickFromCapture") || TextUtils.equals(methodName, "onPickFromCaptureWithCrop")) {
             cameraGranted = ContextCompat.checkSelfPermission(contextWrap.getActivity(), TPermission.CAMERA.stringValue())
                 == PackageManager.PERMISSION_GRANTED ? true : false;

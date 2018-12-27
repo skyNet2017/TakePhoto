@@ -32,12 +32,18 @@ public class TakePhotoInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        PermissionManager.TPermissionType type = listener.invoke(new InvokeParam(proxy, method, args));
-        if (proxy instanceof TakePhoto) {
-            if (!PermissionManager.TPermissionType.NOT_NEED.equals(type)) {
-                ((TakePhoto) proxy).permissionNotify(type);
+
+            PermissionManager.TPermissionType type = listener.invoke(new InvokeParam(proxy, method, args));
+            if (proxy instanceof TakePhoto) {
+                if (!PermissionManager.TPermissionType.NOT_NEED.equals(type)) {
+                    ((TakePhoto) proxy).permissionNotify(type);
+                }
             }
-        }
-        return method.invoke(delegate, args);
+            return method.invoke(delegate, args);
+        /*}catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }*/
+
     }
 }

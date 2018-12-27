@@ -37,8 +37,6 @@ public class SysTakeOnePhotoTransFragment extends TakePhotoFragment {
             }else {
                 getTakePhoto().onPickMultiple(1);
             }
-
-
         }
 
     }
@@ -53,7 +51,6 @@ public class SysTakeOnePhotoTransFragment extends TakePhotoFragment {
             }else {
                 listener.onSuccess(result.getImages().get(0).getOriginalPath());
             }
-
         }
     }
 

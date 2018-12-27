@@ -147,7 +147,7 @@ public class CompressActivity extends TakePhotoFragmentActivity {
                 break;
 
             case R.id.btn_pick_img:
-                TakePhotoUtil.setUseSystemAlbum(false);
+                TakePhotoUtil.setUseSystemAlbum(true);
                 TakePhotoUtil.startPickOneWitchDialog(this, new TakeOnePhotoListener() {
                     @Override
                     public void onSuccess(String paths) {

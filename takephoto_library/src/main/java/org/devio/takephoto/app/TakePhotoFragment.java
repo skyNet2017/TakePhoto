@@ -80,7 +80,12 @@ public class TakePhotoFragment extends Fragment implements TakePhoto.TakeResultL
 
     @Override
     public PermissionManager.TPermissionType invoke(InvokeParam invokeParam) {
-        PermissionManager.TPermissionType type = PermissionManager.checkPermission(TContextWrap.of(this), invokeParam.getMethod());
+        PermissionManager.TPermissionType type = PermissionManager.TPermissionType.DENIED;
+        try {
+             type = PermissionManager.checkPermission(TContextWrap.of(this), invokeParam.getMethod());
+        }catch (Throwable e){
+            e.printStackTrace();
+        }
         if (PermissionManager.TPermissionType.WAIT.equals(type)) {
             this.invokeParam = invokeParam;
         }

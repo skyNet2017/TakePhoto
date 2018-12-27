@@ -372,6 +372,7 @@ public class TakePhotoImpl implements TakePhoto {
     @Override
     public void onPickFromCapture(Uri outPutUri) {
         this.fromType = TImage.FromType.CAMERA;
+        //this.permissionType = PermissionManager.TPermissionType.NOT_NEED;
         if (PermissionManager.TPermissionType.WAIT.equals(permissionType)) {
             return;
         }
