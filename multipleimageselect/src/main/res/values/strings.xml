@@ -1,6 +1,7 @@
 <resources>
     <string name="album_view">Select photo album</string>
     <string name="image_view">Tap to select images</string>
+    <string name="image_preview">long press to select</string>
 
     <string name="add">compress</string>
     <string name="selected">selected</string>

@@ -40,6 +40,13 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
     LinearLayout llCompress;
 
+    public CpHolder setPreview(boolean preview) {
+        isPreview = preview;
+        return this;
+    }
+
+    boolean isPreview;
+
     public CpHolder(Activity context, ViewGroup parent) {
         super(context, parent);
     }
@@ -71,21 +78,31 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
        if(file.exists()){
            rlOriginal.setVisibility(View.VISIBLE);
            PhotoCompressHelper.setPathToPreview(ivOriginal,originalPath);
-           tvOriginal.setText("原图:\n"+ImageInfoFormater.formatImagInfo(originalPath,true));
+           if(isPreview){
+               tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+           }else {
+               tvOriginal.setText("原图:\n"+ImageInfoFormater.formatImagInfo(originalPath,true));
+           }
+
        }else {
            rlOriginal.setVisibility(View.GONE);
        }
 
 
+       if(!isPreview){
+           String compressedPath = PhotoCompressHelper.getCompressedFilePath(s,true);
+           if(!TextUtils.isEmpty(compressedPath)){
+               PhotoCompressHelper.setPathToPreview(ivCompressed,compressedPath);
+               tvCompressed.setText("压缩后:\n"+ImageInfoFormater.formatImagInfo(compressedPath,true));
+               rlCompressed.setVisibility(View.VISIBLE);
+           }else {
+               rlCompressed.setVisibility(View.GONE);
+           }
+       }else {
+           rlCompressed.setVisibility(View.GONE);
+       }
 
-        String compressedPath = PhotoCompressHelper.getCompressedFilePath(s,true);
-        if(!TextUtils.isEmpty(compressedPath)){
-            PhotoCompressHelper.setPathToPreview(ivCompressed,compressedPath);
-            tvCompressed.setText("压缩后:\n"+ImageInfoFormater.formatImagInfo(compressedPath,true));
-            rlCompressed.setVisibility(View.VISIBLE);
-        }else {
-            rlCompressed.setVisibility(View.GONE);
-        }
+
 
 
 

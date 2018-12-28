@@ -2,6 +2,7 @@
 <resources>
     <string name="compressing">正在压缩中…</string>
     <string name="c_alert_title">提示</string>
+    <string name="image_preview">长按可选择</string>
     <string name="c_sure">好的</string>
     <string name="c_cancel">取消</string>
     <string name="c_total_selected">共选择了:</string>

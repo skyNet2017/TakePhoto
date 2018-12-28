@@ -63,6 +63,7 @@ public class ImageSelectActivity extends HelperActivity {
     private Handler handler;
     private Thread thread;
     private boolean isSelectAll;
+    Toolbar toolbar;
 
     private final String[] projection = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.DATA };
 
@@ -72,7 +73,7 @@ public class ImageSelectActivity extends HelperActivity {
         setContentView(R.layout.activity_image_select);
         setView(findViewById(R.id.layout_image_select));
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+          toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
@@ -81,7 +82,7 @@ public class ImageSelectActivity extends HelperActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
 
             actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(R.string.image_view);
+            actionBar.setTitle(R.string.image_preview);
         }
 
         Intent intent = getIntent();
@@ -98,17 +99,51 @@ public class ImageSelectActivity extends HelperActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (actionMode == null) {
-                    actionMode = ImageSelectActivity.this.startActionMode(callback);
-                }
-                toggleSelection(position);
-                actionMode.setTitle(countSelected + " " + getString(R.string.selected));
+                if(isInSelectingMode){
+                    if (actionMode == null) {
+                        actionMode = ImageSelectActivity.this.startActionMode(callback);
+                    }
+                    toggleSelection(position);
+                    actionMode.setTitle(countSelected + " " + getString(R.string.selected));
 
-                if (countSelected == 0) {
-                    actionMode.finish();
+                    if (countSelected == 0) {
+                        actionMode.finish();
+                    }
+                }else {
+                    //点击去预览
+                    ArrayList<String> files = new ArrayList<>();
+                    for (Image image : images){
+                        files.add(image.path);
+                    }
+                    CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this,files,position);
                 }
+
             }
         });
+
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                isInSelectingMode = true;
+                toolbar.setTitle(R.string.image_view);
+                toggleSelection(position);
+                return true;
+            }
+        });
+    }
+
+    boolean isInSelectingMode;
+
+    @Override
+    public void onBackPressed() {
+        if(isInSelectingMode){
+            isInSelectingMode = false;
+            //取消所有选择
+            deselectAll();
+            toolbar.setTitle(R.string.image_preview);
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -291,6 +326,8 @@ public class ImageSelectActivity extends HelperActivity {
             if (countSelected > 0) {
                 deselectAll();
             }
+            isInSelectingMode = false;
+            toolbar.setTitle(R.string.image_preview);
             actionMode = null;
         }
     };

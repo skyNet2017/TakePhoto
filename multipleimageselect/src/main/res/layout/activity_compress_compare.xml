@@ -12,18 +12,26 @@
         android:layout_height="match_parent"/>
     <SeekBar
         android:id="@+id/sbar"
+        android:progressDrawable="@drawable/img_seekbar_bg"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_marginLeft="80dp"
         android:layout_marginRight="80dp"
+        android:layout_marginBottom="20dp"
+        android:maxHeight="4.0dip"
+        android:minHeight="4.0dip"
+        android:paddingLeft="16.0dip"
+        android:paddingRight="16.0dip"
         android:layout_height="wrap_content" />
     <TextView
         android:layout_width="wrap_content"
        android:layout_above="@id/sbar"
-        style="@style/c_textview_bg"
+        android:layout_marginBottom="8dp"
+       android:background="@drawable/c_text_bg"
+        android:textColor="#ffffff"
         android:gravity="center"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
         android:layout_centerHorizontal="true"
         android:id="@+id/tv_progress"
         android:layout_height="wrap_content" />
@@ -31,7 +39,6 @@
         android:id="@+id/iv_back"
         android:scaleType="centerInside"
         android:src="@drawable/ic_arrow_back"
-        android:layout_alignParentRight="true"
         android:layout_width="50dp"
         android:layout_height="50dp" />
 

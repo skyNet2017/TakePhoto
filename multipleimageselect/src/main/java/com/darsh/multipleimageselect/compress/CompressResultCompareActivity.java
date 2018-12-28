@@ -57,9 +57,19 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     FloatingActionMenu menu;
 
     ArrayList<String> paths ;
+    boolean isPreview;
+
     public static void lauch(Activity activity, ArrayList<String> paths){
         Intent intent = new Intent(activity,CompressResultCompareActivity.class);
         intent.putExtra("paths",paths);
+        activity.startActivity(intent);
+    }
+
+    public static void lauchForPreview(Activity activity, ArrayList<String> paths,int position){
+        Intent intent = new Intent(activity,CompressResultCompareActivity.class);
+        intent.putExtra("paths",paths);
+        intent.putExtra("position",position);
+        intent.putExtra("isPreview",true);
         activity.startActivity(intent);
     }
 
@@ -74,6 +84,13 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_compress_compare);
         initView();
         paths = getIntent().getStringArrayListExtra("paths");
+        position = getIntent().getIntExtra("position",0);
+        isPreview = getIntent().getBooleanExtra("isPreview",false);
+        if(isPreview){
+            menu.setVisibility(View.GONE);
+        }
+
+
         if(paths != null && !paths.isEmpty()){
             files = new ArrayList<>();
             for (String path : paths){
@@ -84,7 +101,9 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         adapter = new SuperPagerAdapter(this) {
             @Override
             protected SuperPagerHolder generateNewHolder(Context context, ViewGroup viewGroup, int i) {
-                return new CpHolder(CompressResultCompareActivity.this,viewGroup);
+                    return new CpHolder(CompressResultCompareActivity.this,viewGroup).setPreview(isPreview);
+
+
             }
 
             @Override
@@ -107,8 +126,8 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
         size = files.size();
         sbar.setMax(size);
-        sbar.setProgress(1);
-        tvProgress.setText("1/" + size);
+        sbar.setProgress(position+1);
+        tvProgress.setText(position+1+"/" + size);
 
         sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -150,6 +169,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
             }
         });
         adapter.refresh(getFilePaths(files));
+        vpCompress.setCurrentItem(position);
     }
 
     private void initView() {
