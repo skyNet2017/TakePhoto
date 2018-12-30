@@ -1,13 +1,17 @@
 package com.sznq.finalcompress;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
+import android.support.multidex.MultiDex;
+import android.util.Log;
 import android.view.View;
 
 import com.hss01248.adapter.IBindView;
 import com.hss01248.adapter.SuperHolderInitor;
+import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 
 
@@ -20,6 +24,14 @@ import butterknife.ButterKnife;
 public class BaseApp extends Application {
 
     //NewPhotoAddedReceiver receiver;
+    public static boolean isDebugable;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        Log.e("willz","App attachBaseContext");
+        MultiDex.install(this);
+    }
     @Override
     public void onCreate() {
         super.onCreate();
@@ -29,9 +41,14 @@ public class BaseApp extends Application {
                 ButterKnife.bind(o,view);
             }
         });*/
+       isDebugable = BuildConfig.DEBUG;
 
-        registerFileReceiver(this);
+        //registerFileReceiver(this);
         ImageInfoFormater.init(this);
+        ReportUtil.init(this,"UA-131503834-1",false,isDebugable);
+
+
+
 
 
     }
