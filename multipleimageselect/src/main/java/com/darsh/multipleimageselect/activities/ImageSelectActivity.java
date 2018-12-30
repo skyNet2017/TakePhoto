@@ -145,7 +145,13 @@ public class ImageSelectActivity extends HelperActivity {
     boolean isInSelectingMode;
 
     public void refresh(){
-        adapter.notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     @Override
