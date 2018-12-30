@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">imginfo</string>
-    <string name="c_quality_info">, quality:</string>
-    <string name="c_not_compressed">(not compressed)</string>
+    <string name="c_quality_info">, Q:</string>
+    <string name="c_not_compressed">(uncompressed)</string>
     <string name="t_compressed">(compressed)</string>
 </resources>

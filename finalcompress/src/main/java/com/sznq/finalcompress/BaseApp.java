@@ -1,4 +1,4 @@
-package com.hss01248.finalcompress;
+package com.sznq.finalcompress;
 
 import android.app.Application;
 import android.content.Intent;

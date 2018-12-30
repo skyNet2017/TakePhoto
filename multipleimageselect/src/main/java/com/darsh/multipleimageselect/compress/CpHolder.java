@@ -81,7 +81,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
            if(isPreview){
                tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
            }else {
-               tvOriginal.setText("原图:\n"+ImageInfoFormater.formatImagInfo(originalPath,true));
+               tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
            }
 
        }else {
@@ -93,7 +93,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
            String compressedPath = PhotoCompressHelper.getCompressedFilePath(s,true);
            if(!TextUtils.isEmpty(compressedPath)){
                PhotoCompressHelper.setPathToPreview(ivCompressed,compressedPath);
-               tvCompressed.setText("压缩后:\n"+ImageInfoFormater.formatImagInfo(compressedPath,true));
+               tvCompressed.setText(context.getResources().getString(R.string.c_compressed)+":"+ImageInfoFormater.formatImagInfo(compressedPath,true));
                rlCompressed.setVisibility(View.VISIBLE);
            }else {
                rlCompressed.setVisibility(View.GONE);
@@ -101,11 +101,5 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
        }else {
            rlCompressed.setVisibility(View.GONE);
        }
-
-
-
-
-
-
     }
 }

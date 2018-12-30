@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.hss01248.finalcompress">
+    package="com.sznq.finalcompress">
     <uses-sdk tools:overrideLibrary="com.hss01248.lib,
     com.hss01248.adapter,com.hss01248.notifyutil,
     com.gc.materialdesign,com.hss01248.testtool,
 com.orhanobut.logger,es.dmoral.toasty"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/icon_app"

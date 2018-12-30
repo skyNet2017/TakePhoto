@@ -6,7 +6,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.hss01248.finalcompress"
+        applicationId "com.sznq.finalcompress"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1

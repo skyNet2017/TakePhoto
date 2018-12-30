@@ -127,7 +127,7 @@ public class ImageSelectActivity extends HelperActivity {
                 if (actionMode == null) {
                     actionMode = ImageSelectActivity.this.startActionMode(callback);
                 }
-                toolbar.setTitle(R.string.image_view);
+                //toolbar.setTitle(R.string.image_view);
                 toggleSelection(position);
                 actionMode.setTitle(countSelected + " " + getString(R.string.selected));
 
