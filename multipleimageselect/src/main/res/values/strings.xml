@@ -21,7 +21,9 @@
     <string name="c_sure">sure</string>
     <string name="c_cancel">cancel</string>
     <string name="c_total_selected">total selected:</string>
-    <string name="c_doyouwant_to_compressleft">files has already been compressed,do you want to compress the left  pics?</string>
+    <string name="c_alreadycompressnum">already compressed count:</string>
+    <string name="c_left_count">number to compress:</string>
+    <string name="c_doyouwant_to_compressleft">do you want to compress the pics left?</string>
     <string name="all_has_been_compressed">all photos you selected has been compressed</string>
     <string name="c_mot_selected">not selected</string>
     <string name="c_preview">preview</string>

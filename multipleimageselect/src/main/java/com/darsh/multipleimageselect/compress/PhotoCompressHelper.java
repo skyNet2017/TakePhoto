@@ -97,6 +97,31 @@ public class PhotoCompressHelper {
         return  quality > PhotoCompressHelper.DEFAULT_QUALITY;
     }
 
+    /**
+     * 不压缩png,因为会变黑,效果不好
+     * @param pathname
+     * @return
+     */
+    public static boolean isImage(File pathname) {
+
+        if(pathname.isDirectory()){
+            return false;
+        }
+        String name = pathname.getName();
+        int idx = name.lastIndexOf(".");
+        if(idx <0 || idx >= name.length()-1){
+            return false;
+        }
+        String suffix = name.substring(idx+1);
+        boolean isJpg = suffix.equalsIgnoreCase("jpg")
+                || suffix.equalsIgnoreCase("jpeg")
+                || suffix.equalsIgnoreCase("png")
+                || suffix.equalsIgnoreCase("gif")
+                ||  suffix.equalsIgnoreCase("webp")
+                ||  suffix.equalsIgnoreCase("raw");
+        return  isJpg;
+    }
+
 
 
 
@@ -128,8 +153,10 @@ public class PhotoCompressHelper {
             return;
         }
 
-        String str = activity.getString(R.string.c_total_selected)+total+", "+compressedNum+activity.getString(R.string.c_doyouwant_to_compressleft)+"("
-                +(total - compressedNum)+")";
+        String str = activity.getString(R.string.c_total_selected)+total+"\n"
+                + activity.getString(R.string.c_alreadycompressnum)+compressedNum+"\n"
+                + activity.getString(R.string.c_left_count)+(total - compressedNum)+"\n"
+               +activity.getString(R.string.c_doyouwant_to_compressleft);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(R.string.c_alert_title)
                 .setMessage(str)
@@ -147,9 +174,9 @@ public class PhotoCompressHelper {
 
     }
 
-    private static void compressLeft(final List<File> files2, final List<File> files, final Activity activity, final Subscriber<String> subscriber) {
+    private static void compressLeft(final List<File> filesToCompress, final List<File> files, final Activity activity, final Subscriber<String> subscriber) {
         final ProgressDialog dialog = new ProgressDialog(activity);
-        dialog.setMax(files2.size());
+        dialog.setMax(filesToCompress.size());
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setProgress(0);
@@ -159,7 +186,7 @@ public class PhotoCompressHelper {
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.show();
         final long startTime = System.currentTimeMillis();
-        Flowable.fromIterable(files2)
+        Flowable.fromIterable(filesToCompress)
                 .observeOn(Schedulers.io())
                 .doOnNext(new Consumer<File>() {
                     @Override
@@ -184,14 +211,14 @@ public class PhotoCompressHelper {
                     @Override
                     public void run() throws Exception {
                         dialog.dismiss();
-                        String str = getoutputDesc(files2,startTime,activity);
-                        showDesc(str,activity,subscriber);
+                        String str = getoutputDesc(filesToCompress,startTime,activity);
+                        showDesc(str,activity,subscriber,filesToCompress);
                         //subscriber.onNext(str);
                     }
                 });
     }
 
-    private static void showDesc(final String str, Activity activity, final Subscriber<String> subscriber) {
+    private static void showDesc(final String str, final Activity activity, final Subscriber<String> subscriber, final List<File> filesToCompress) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
        Dialog dialog =  builder.setTitle(R.string.c_alert_title)
                 .setMessage(str)
@@ -201,9 +228,45 @@ public class PhotoCompressHelper {
                         dialog.dismiss();
                         subscriber.onNext(str);
                     }
-                }).show();
+                }).setNegativeButton(R.string.c_cancel, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       dialog.dismiss();
+                       //subscriber.onNext(str);
+                       //删除生成的压缩文件
+                       deleteAllFiles(filesToCompress,false);
+
+
+                   }
+               }).setNeutralButton(R.string.t_override_all, new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       dialog.dismiss();
+                       //subscriber.onNext(str);
+                       //替换生成的压缩文件
+                       replaceAllFiles(filesToCompress,activity);
+
+                   }
+               })
+               .show();
        dialog.setCancelable(false);
        dialog.setCanceledOnTouchOutside(false);
+    }
+
+    private static void deleteAllFiles(List<File> filesToCompress, boolean isOriginal) {
+        Observable.fromIterable(filesToCompress)
+                .observeOn(Schedulers.io())
+                .doOnNext(new Consumer<File>() {
+                    @Override
+                    public void accept(File file) throws Exception {
+                        try {
+                            File file1 = new File(PhotoCompressHelper.getCompressedFilePath(file.getAbsolutePath(),true));
+                            file1.delete();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }).subscribe();
     }
 
     public static void compressOneFile(File file) {
@@ -233,7 +296,6 @@ public class PhotoCompressHelper {
             if(file1.exists()){
                 sizeAfterCompressed += file1.length();
             }
-
         }
 
         return activity.getString(R.string.c_compressquality)+quality+activity.getString(R.string.c_costtime)+(System.currentTimeMillis() - startTime)/1000f+"s\n"+
@@ -281,6 +343,10 @@ public class PhotoCompressHelper {
                     @Override
                     public void run() throws Exception {
                         dialog.dismiss();
+                        if(activity instanceof ImageSelectActivity){
+                            ImageSelectActivity activity1 = (ImageSelectActivity) activity;
+                            activity1.refresh();
+                        }
                     }
                 });
 

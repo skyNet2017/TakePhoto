@@ -6,9 +6,12 @@ package com.darsh.multipleimageselect.models;
 public class Album {
     public String name;
     public String cover;
+    public int count;
+    public long fileSize;
 
     public Album(String name, String cover) {
         this.name = name;
         this.cover = cover;
+        this.count = count;
     }
 }

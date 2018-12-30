@@ -24,17 +24,21 @@ import android.widget.TextView;
 
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
+import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 
 /**
  * Created by Darshan on 4/14/2015.
  */
 public class AlbumSelectActivity extends HelperActivity {
+    private static final String COLUMN_COUNT = "count";
     private ArrayList<Album> albums;
 
     private TextView errorDisplay;
@@ -52,7 +56,7 @@ public class AlbumSelectActivity extends HelperActivity {
     private final String[] projection = new String[]{
             MediaStore.Images.Media.BUCKET_ID,
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Images.Media.DATA };
+            MediaStore.Images.Media.DATA};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,6 +267,7 @@ public class AlbumSelectActivity extends HelperActivity {
                     long albumId = cursor.getLong(cursor.getColumnIndex(projection[0]));
                     String album = cursor.getString(cursor.getColumnIndex(projection[1]));
                     String image = cursor.getString(cursor.getColumnIndex(projection[2]));
+                    //int size = cursor.getInt(cursor.getColumnIndex(COLUMN_COUNT));
 
                     if (!albumSet.contains(albumId)) {
                         /*
@@ -273,8 +278,22 @@ public class AlbumSelectActivity extends HelperActivity {
                          */
                         file = new File(image);
                         if (file.exists()) {
-                            temp.add(new Album(album, image));
+                            Album album1 = new Album(album,image);
+                            temp.add(album1);
                             albumSet.add(albumId);
+
+                            File dir = file.getParentFile();
+                            File[] files = dir.listFiles();
+                            int count = 0;
+                            long fileSize = 0;
+                            for (File file1 : files){
+                                if(PhotoCompressHelper.isImage(file1)){
+                                    count++;
+                                    fileSize = fileSize + file1.length();
+                                }
+                            }
+                            album1.count = count;
+                            album1.fileSize = fileSize;
                         }
                     }
 
@@ -287,6 +306,13 @@ public class AlbumSelectActivity extends HelperActivity {
             }
             albums.clear();
             albums.addAll(temp);
+            //按文件大小排序:
+            Collections.sort(albums, new Comparator<Album>() {
+                @Override
+                public int compare(Album o1, Album o2) {
+                    return (int) (o2.fileSize - o1.fileSize);
+                }
+            });
 
             sendMessage(Constants.FETCH_COMPLETED);
         }

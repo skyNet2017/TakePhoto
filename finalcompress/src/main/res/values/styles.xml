@@ -7,9 +7,4 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="c_textview_bg">
-        <item name="android:textColor">#ffffff</item>
-        <item name="android:background">@drawable/c_text_bg</item>
-        <item name="android:padding">3dp</item>
-    </style>
 </resources>

@@ -6,7 +6,9 @@
     <string name="c_sure">好的</string>
     <string name="c_cancel">取消</string>
     <string name="c_total_selected">共选择了:</string>
-    <string name="c_doyouwant_to_compressleft">个文件已经压缩过,你想要压缩选择的其他几个图片吗?</string>
+    <string name="c_alreadycompressnum">其中已压缩图片数:</string>
+    <string name="c_left_count">剩余待压缩数:</string>
+    <string name="c_doyouwant_to_compressleft">你想要压缩未压缩的图片吗?</string>
     <string name="all_has_been_compressed">你选择的所有图片都被压缩过了</string>
     <string name="c_mot_selected">没有选择图片</string>
     <string name="c_preview">预览</string>
@@ -33,8 +35,8 @@
     <string name="c_sieze_after">压缩后文件大小:</string>
     <string name="c_save_disk_space">节省磁盘空间:</string>
     <string name="c_replacing">正在替换文件</string>
-    <string name="t_override_all">替换所有选中文件</string>
-    <string name="c_overrider_sngle">替换此张</string>
+    <string name="t_override_all">压缩文件替换原文件(所有)</string>
+    <string name="c_overrider_sngle">压缩文件替换原文件(此张)</string>
     <string name="c_override_finished">替换完成</string>
 
 </resources>

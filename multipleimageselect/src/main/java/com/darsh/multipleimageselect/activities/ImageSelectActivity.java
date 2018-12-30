@@ -96,19 +96,18 @@ public class ImageSelectActivity extends HelperActivity {
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar_image_select);
         gridView = (GridView) findViewById(R.id.grid_view_image_select);
+        gridView.setFastScrollEnabled(true);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(isInSelectingMode){
-                    if (actionMode == null) {
-                        actionMode = ImageSelectActivity.this.startActionMode(callback);
-                    }
-                    toggleSelection(position);
-                    actionMode.setTitle(countSelected + " " + getString(R.string.selected));
 
-                    if (countSelected == 0) {
-                        actionMode.finish();
+                    toggleSelection(position);
+                    if(actionMode != null){
+                        actionMode.setTitle(countSelected + " " + getString(R.string.selected));
                     }
+
+
                 }else {
                     //点击去预览
                     ArrayList<String> files = new ArrayList<>();
@@ -125,14 +124,29 @@ public class ImageSelectActivity extends HelperActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 isInSelectingMode = true;
+                if (actionMode == null) {
+                    actionMode = ImageSelectActivity.this.startActionMode(callback);
+                }
                 toolbar.setTitle(R.string.image_view);
                 toggleSelection(position);
+                actionMode.setTitle(countSelected + " " + getString(R.string.selected));
+
+                if (countSelected == 0) {
+                    //actionMode.finish();
+
+                }
+
+
                 return true;
             }
         });
     }
 
     boolean isInSelectingMode;
+
+    public void refresh(){
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onBackPressed() {
@@ -245,6 +259,19 @@ public class ImageSelectActivity extends HelperActivity {
         }
         gridView.setOnItemClickListener(null);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 980 && resultCode == RESULT_CANCELED && data != null){
+            int positon = data.getIntExtra("position",-1);
+            if(positon >=0){
+                //gridView.smoothScrollToPosition(positon);
+            }
+        }
+    }
+
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -396,7 +423,7 @@ public class ImageSelectActivity extends HelperActivity {
                     for (Image image : images) {
                         paths.add(image.path);
                     }
-                    CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths);
+                    CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths,countSelected == images.size());
                 }
 
                 @Override
@@ -408,7 +435,7 @@ public class ImageSelectActivity extends HelperActivity {
                         for (Image image : images) {
                             paths.add(image.path);
                         }
-                        CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths);
+                        CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths,countSelected == images.size());
                     }
                 }
 
@@ -426,7 +453,7 @@ public class ImageSelectActivity extends HelperActivity {
         for (Image image : images) {
             paths.add(image.path);
         }
-        CompressResultCompareActivity.lauch(this,paths);
+        CompressResultCompareActivity.lauch(this,paths,countSelected == images.size());
 
 
     }

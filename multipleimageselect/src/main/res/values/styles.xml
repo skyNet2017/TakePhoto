@@ -16,7 +16,7 @@
         <item name="android:textColorPrimary">@color/multiple_image_select_toolbarPrimaryText</item>
     </style>
     <style name="c_textview_bg">
-        <item name="android:textColor">#ffffff</item>
-        <item name="android:background">@drawable/c_text_bg</item>
+        <item name="android:textColor">@color/img_tv_color</item>
+        <item name="android:background">@color/img_tv_bg</item>
     </style>
 </resources>

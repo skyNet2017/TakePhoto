@@ -58,11 +58,13 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
     ArrayList<String> paths ;
     boolean isPreview;
+    boolean isAllSelected;
 
-    public static void lauch(Activity activity, ArrayList<String> paths){
+    public static void lauch(Activity activity, ArrayList<String> paths,boolean isAllSelected){
         Intent intent = new Intent(activity,CompressResultCompareActivity.class);
         intent.putExtra("paths",paths);
-        activity.startActivity(intent);
+        intent.putExtra("isAllSelected",isAllSelected);
+        activity.startActivityForResult(intent,980);
     }
 
     public static void lauchForPreview(Activity activity, ArrayList<String> paths,int position){
@@ -70,7 +72,22 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         intent.putExtra("paths",paths);
         intent.putExtra("position",position);
         intent.putExtra("isPreview",true);
-        activity.startActivity(intent);
+        intent.putExtra("isAllSelected",true);
+        activity.startActivityForResult(intent,980);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isAllSelected){
+            //将position传回去:
+            Intent intent = new Intent();
+            intent.putExtra("position",position);
+            setResult(RESULT_CANCELED,intent);
+            finish();
+        }else {
+            super.onBackPressed();
+        }
+
     }
 
     @Override
@@ -86,6 +103,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         paths = getIntent().getStringArrayListExtra("paths");
         position = getIntent().getIntExtra("position",0);
         isPreview = getIntent().getBooleanExtra("isPreview",false);
+        isAllSelected = getIntent().getBooleanExtra("isAllSelected",false);
         if(isPreview){
             menu.setVisibility(View.GONE);
         }

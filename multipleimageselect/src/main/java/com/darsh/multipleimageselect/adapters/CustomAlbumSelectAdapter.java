@@ -1,6 +1,7 @@
 package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
+import android.graphics.ImageFormat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.models.Album;
+import com.hss01248.imginfo.ImageInfoFormater;
 
 import java.util.ArrayList;
 
@@ -37,10 +39,12 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<Album> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        Album album = arrayList.get(position);
         viewHolder.imageView.getLayoutParams().width = size;
         viewHolder.imageView.getLayoutParams().height = size;
+        String desc = album.name+"\n"+ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count;
 
-        viewHolder.textView.setText(arrayList.get(position).name);
+        viewHolder.textView.setText(desc);
         Glide.with(context)
                 .load(arrayList.get(position).cover)
                 .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
