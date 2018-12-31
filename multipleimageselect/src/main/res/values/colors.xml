@@ -17,4 +17,5 @@
     <color name="multiple_image_select_buttonText">#FFFFFF</color>
     <color name="img_tv_bg">#66000000</color>
     <color name="img_tv_color">#eeeeee</color>
+    <color name="img_tv_color_not_compressed">#ffb300</color>
 </resources>

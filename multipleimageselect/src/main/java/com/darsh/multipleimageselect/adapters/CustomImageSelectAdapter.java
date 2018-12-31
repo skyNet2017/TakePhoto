@@ -1,6 +1,7 @@
 package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -9,9 +10,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.R;
+import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.models.Image;
 import com.hss01248.imginfo.ImageInfoFormater;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -55,14 +58,40 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
             ((FrameLayout) convertView).setForeground(null);
         }
 
-        String path = arrayList.get(position).path;
+        Image image = arrayList.get(position);
         Glide.with(context)
-                .load(path)
+                .load(image.path)
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
 
-        viewHolder.tvInfo.setText(ImageInfoFormater.formatImagInfo(path,false));
+        String desc = formatImagInfo(image,false,viewHolder.imageView.getContext());
 
+        if(image.quality > PhotoCompressHelper.DEFAULT_QUALITY ){
+            viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color_not_compressed));
+        }else {
+            viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color));
+        }
+        viewHolder.tvInfo.setText(desc);
         return convertView;
+    }
+
+    public static String formatImagInfo(Image image, boolean showFullPath,Context context) {
+        String path = image.path;
+        File file = new File(path);
+        String size = ImageInfoFormater.formatFileSize(file.length());
+        int[] wh = ImageInfoFormater.getImageWidthHeight(path);
+        int quality = image.quality;
+        if(quality < 0){
+            quality = ImageInfoFormater.getQuality(path);
+            image.quality = quality;
+        }
+        String needCompress = quality > PhotoCompressHelper.DEFAULT_QUALITY ? context.getString(com.hss01248.imginfo.R.string.c_not_compressed) : context.getString(com.hss01248.imginfo.R.string.t_compressed);
+        String str = wh[0] + "x" + wh[1] + ", " + size + context.getString(com.hss01248.imginfo.R.string.c_quality_info) + quality + needCompress;
+        if (showFullPath) {
+            return str + "\n" + path;
+
+        } else {
+            return str;
+        }
     }
 
     private static class ViewHolder {

@@ -11,6 +11,7 @@ public class Image implements Parcelable {
     public String name;
     public String path;
     public boolean isSelected;
+    public int quality = -1;
 
     public Image(long id, String name, String path, boolean isSelected) {
         this.id = id;
