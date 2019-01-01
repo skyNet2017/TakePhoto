@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="20dp">
+    android:layout_height="match_parent">
 
     <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_selected"
@@ -19,11 +18,14 @@
         android:visibility="gone"
         android:text="@string/t_compress55"
         android:layout_height="wrap_content" />
-    <FrameLayout
-        android:id="@+id/fl_ad_container"
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad_banner"
+        android:layout_alignParentBottom="true"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="ca-app-pub-2335840373239478/2231698907">
+    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

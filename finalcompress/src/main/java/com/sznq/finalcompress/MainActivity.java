@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.gc.materialdesign.views.ButtonRectangle;
+import com.google.android.gms.ads.AdView;
 import com.hss01248.analytics.ad.AdUtil;
 import com.hss01248.analytics.ad.GoogleAdFullScreenActivity;
 
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        AdView adView = findViewById(R.id.ad_banner);
+        AdUtil.loadBannerAd(this,adView);
     }
 
     @OnClick(R.id.btn_selected)

@@ -12,6 +12,8 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.formats.MediaView;
@@ -28,21 +30,33 @@ public class AdUtil {
 
     private static String interstitialAdId;
     private static Application context;
-    private static String debugId = "ca-app-pub-3940256099942544/1033173712";
+    private static String fullScreenDebugId = "ca-app-pub-3940256099942544/1033173712";
     private static String nativeAdDebugId = "ca-app-pub-3940256099942544/2247696110";
+    private static String bannerDebugId = "ca-app-pub-3940256099942544/6300978111";
     private static boolean debug;
     private static Handler handler;
+
+
+    private static String fullScreenId = "ca-app-pub-2335840373239478/5498002409";
+    private static String homeBelowBtn = "ca-app-pub-2335840373239478/2231698907";
 
     public static Handler getHandler() {
         return handler;
     }
 
-    public static void init(Application application, boolean isDebug, String appId, String interstitialAd) {
+    public static void init(Application application, boolean isDebug, String appId) {
         MobileAds.initialize(application, appId);
-        interstitialAdId = interstitialAd;
+
         context = application;
         debug = isDebug;
         handler = new Handler();
+    }
+
+    public static void loadBannerAd(Activity activity,AdView adView){
+      /* adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId(debug? bannerDebugId : homeBelowBtn);*/
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
     }
 
     /**
@@ -50,16 +64,19 @@ public class AdUtil {
      *
      * @param activity
      */
-    public static void loadAd(Activity activity) {
+    public static void loadFullScreenAd(Activity activity) {
+        final ProgressDialog dialog = new ProgressDialog(activity);
         final InterstitialAd mInterstitialAd = new InterstitialAd(activity);
-        mInterstitialAd.setAdUnitId(debug ? debugId : interstitialAdId);
+        mInterstitialAd.setAdUnitId(debug ? fullScreenDebugId : fullScreenId);
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        dialog.show();
         mInterstitialAd.setImmersiveMode(true);
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
                 mInterstitialAd.show();
+                dialog.dismiss();
             }
 
             @Override
@@ -70,6 +87,7 @@ public class AdUtil {
             @Override
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
+                dialog.dismiss();
             }
 
             @Override
@@ -80,7 +98,7 @@ public class AdUtil {
 
     }
 
-    public static void loadFullScreenAd(final Activity hostActivity) {
+    public static void loadNativeFullScreenAd(final Activity hostActivity) {
 
 
         final ProgressDialog dialog = new ProgressDialog(hostActivity);
@@ -128,6 +146,9 @@ public class AdUtil {
         }
         return interstitialAdId;
     }
+
+
+
 
 
 }
