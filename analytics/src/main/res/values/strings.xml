@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">analytics</string>
+    <string name="ad_skip">skip</string>
 </resources>

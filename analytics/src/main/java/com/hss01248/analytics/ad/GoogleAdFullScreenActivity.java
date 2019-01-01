@@ -96,7 +96,8 @@ public class GoogleAdFullScreenActivity extends AppCompatActivity {
                             return;
                         }
                     }
-                    tvSkip.setText("跳过\n" + i + "s");
+                    String text = getString(R.string.ad_skip) +"\n"+ i + "s";
+                    tvSkip.setText(text);
                     showCount(i1, googleAdFullScreenActivity, tvSkip);
                 } else {
                     googleAdFullScreenActivity.finish();
