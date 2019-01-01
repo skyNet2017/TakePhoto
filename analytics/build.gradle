@@ -32,4 +32,8 @@ dependencies {
     api group: 'com.google.android.gms', name: 'play-services-analytics', version: '16.0.6'
     api 'com.google.firebase:firebase-perf:16.2.3'
     api 'com.crashlytics.sdk.android:crashlytics:2.9.8'
+    api 'com.google.firebase:firebase-ads:16.0.1'
+    api 'com.github.skyNet2017:Android-SplashView:1.0.1'
+
+
 }

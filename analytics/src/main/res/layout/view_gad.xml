@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.gms.ads.formats.UnifiedNativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- <LinearLayout
+         android:orientation="vertical"
+     ... >
+     <LinearLayout
+         android:orientation="horizontal"
+     ... >
+     <ImageView
+         android:id="@+id/ad_app_icon"
+     ... />
+     <TextView
+         android:id="@+id/ad_headline"
+     ... />
+ </LinearLayout>
+
+
+     </LinearLayout>-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.gms.ads.formats.MediaView
+            android:id="@+id/ad_media"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_ads"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_skip"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:layout_alignParentRight="true"
+            android:text="" />
+    </RelativeLayout>
+</com.google.android.gms.ads.formats.UnifiedNativeAdView>

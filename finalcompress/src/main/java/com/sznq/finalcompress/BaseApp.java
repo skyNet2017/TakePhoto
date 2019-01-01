@@ -7,15 +7,10 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.support.multidex.MultiDex;
 import android.util.Log;
-import android.view.View;
 
-import com.hss01248.adapter.IBindView;
-import com.hss01248.adapter.SuperHolderInitor;
+import com.hss01248.analytics.ad.AdUtil;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
-
-
-import butterknife.ButterKnife;
 
 /**
  * Created by hss on 2018/12/22.
@@ -46,6 +41,9 @@ public class BaseApp extends Application {
         //registerFileReceiver(this);
         ImageInfoFormater.init(this);
         ReportUtil.init(this,"UA-131503834-1",false,isDebugable);
+        AdUtil.init(this,true,"ca-app-pub-2335840373239478~2863497563",
+                "ca-app-pub-2335840373239478/4041558301");
+
 
 
 

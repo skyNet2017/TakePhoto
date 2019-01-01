@@ -3,11 +3,12 @@ package com.sznq.finalcompress;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.gc.materialdesign.views.ButtonRectangle;
+import com.hss01248.analytics.ad.AdUtil;
+import com.hss01248.analytics.ad.GoogleAdFullScreenActivity;
 
 
 import butterknife.BindView;
@@ -18,6 +19,20 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.btn_selected)
     ButtonRectangle btnSelected;
+
+    boolean firstIn = true;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(firstIn){
+            firstIn = false;
+            return;
+        }
+        AdUtil.loadFullScreenAd(this);
+        firstIn = true;
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
