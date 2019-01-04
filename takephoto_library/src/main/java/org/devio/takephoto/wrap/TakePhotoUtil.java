@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import org.devio.takephoto.R;
 
@@ -26,6 +27,7 @@ public class TakePhotoUtil {
 
         try {
             final Dialog dialog = new Dialog(activity);
+            dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
             dialog.setContentView(R.layout.t_activity_select_pic);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
