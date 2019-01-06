@@ -41,7 +41,7 @@ public class BaseApp extends Application {
         //registerFileReceiver(this);
         ImageInfoFormater.init(this);
         ReportUtil.init(this,"UA-131503834-1",false,isDebugable);
-        AdUtil.init(this,false,"ca-app-pub-2335840373239478~2863497563");
+       // AdUtil.init(this,false,"ca-app-pub-2335840373239478~2863497563");
 
 
 

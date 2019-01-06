@@ -14,8 +14,6 @@ import android.view.View;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.gc.materialdesign.views.ButtonRectangle;
-import com.google.android.gms.ads.AdView;
-import com.hss01248.analytics.ad.AdUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     ButtonRectangle btnShare;
     @BindView(R.id.btn_star)
     ButtonRectangle btnStar;
-    @BindView(R.id.ad_banner)
-    AdView adBanner;
+   /* @BindView(R.id.ad_banner)
+    AdView adBanner;*/
 
     static List<String> platforms;
     static {
@@ -69,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        AdView adView = findViewById(R.id.ad_banner);
-        AdUtil.loadBannerAd(this, adView);
+       /* AdView adView = findViewById(R.id.ad_banner);
+        AdUtil.loadBannerAd(this, adView);*/
     }
 
 

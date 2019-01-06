@@ -34,7 +34,7 @@
         android:visibility="gone"
         android:text="@string/t_compress55"
         android:layout_height="wrap_content" />
-    <com.google.android.gms.ads.AdView
+   <!-- <com.google.android.gms.ads.AdView
         android:id="@+id/ad_banner"
         android:layout_alignParentBottom="true"
         xmlns:ads="http://schemas.android.com/apk/res-auto"
@@ -42,6 +42,6 @@
         android:layout_height="wrap_content"
         ads:adSize="SMART_BANNER"
         ads:adUnitId="ca-app-pub-2335840373239478/2231698907">
-    </com.google.android.gms.ads.AdView>
+    </com.google.android.gms.ads.AdView>-->
 
 </RelativeLayout>
