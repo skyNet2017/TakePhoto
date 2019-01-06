@@ -59,18 +59,19 @@ android {
 
     buildTypes {
         release {
-            postprocessing {
+            zipAlignEnabled true
+            shrinkResources true
+            minifyEnabled true
+            //  debuggable true //正式包可debug.发包时注释掉
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            /*postprocessing {
                 removeUnusedCode false
                 removeUnusedResources false
                 obfuscate false
                 optimizeCode true
-                zipAlignEnabled true
-                shrinkResources true
-                minifyEnabled true
-                //  debuggable true //正式包可debug.发包时注释掉
-                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-                signingConfig signingConfigs.release
-            }
+
+            }*/
         }
     }
 
