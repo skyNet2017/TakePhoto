@@ -48,14 +48,28 @@ android {
         jumboMode = true
     }
 
+    signingConfigs {
+        release {
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+    }
+
     buildTypes {
         release {
             postprocessing {
                 removeUnusedCode false
                 removeUnusedResources false
                 obfuscate false
-                optimizeCode false
-                proguardFile 'proguard-rules.pro'
+                optimizeCode true
+                zipAlignEnabled true
+                shrinkResources true
+                minifyEnabled true
+                //  debuggable true //正式包可debug.发包时注释掉
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                signingConfig signingConfigs.release
             }
         }
     }
