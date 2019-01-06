@@ -5,4 +5,6 @@
     <string name="t_compress55">desc</string>
     <string name="t_share">分享</string>
     <string name="t_star">评分</string>
+    <string name="c_choose_share_platform">请选择分享平台</string>
+    <string name="c_share_text">分享一个超赞的图片无损压缩工具app-终极图片压缩</string>
 </resources>

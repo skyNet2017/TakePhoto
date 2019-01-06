@@ -1,8 +1,10 @@
 package com.darsh.multipleimageselect.compress;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -54,6 +56,10 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
     @Override
     protected int setLayoutRes() {
+        int oritation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        if(oritation == Surface.ROTATION_90 || oritation == Surface.ROTATION_270){
+            return R.layout.item_vp_compressed_landscape;
+        }
         return R.layout.item_vp_compressed;
     }
 
@@ -79,6 +85,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
             tvOriginal.setVisibility(View.GONE);
         }
     }
+
+
 
 
     @Override

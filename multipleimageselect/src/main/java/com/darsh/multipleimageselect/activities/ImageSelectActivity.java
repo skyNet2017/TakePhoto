@@ -112,6 +112,19 @@ public class ImageSelectActivity extends HelperActivity {
                 confirmDelete();
                 return true;
             }
+            if (i == R.id.menu_item_preview) {//预览选中项
+                getSelected();
+                if(countSelected <= 0){
+                    Toast.makeText(ImageSelectActivity.this, R.string.c_mot_selected, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                ArrayList<String> paths = new ArrayList<>();
+                for (File image : selected) {
+                    paths.add(image.getAbsolutePath());
+                }
+                CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, paths, 0);
+                return true;
+            }
             return false;
         }
 
@@ -373,8 +386,8 @@ public class ImageSelectActivity extends HelperActivity {
             return;
         }
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("警告")
-                .setMessage("是否删除所选文件?")
+                .setTitle(R.string.c_alert_title)
+                .setMessage(R.string.c_is_to_delete)
                 .setPositiveButton(R.string.c_sure, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -28,7 +28,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".compress.CompressResultCompareActivity"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 

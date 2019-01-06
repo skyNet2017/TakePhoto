@@ -4,4 +4,6 @@
     <string name="t_compress55">desc</string>
     <string name="t_share">share this app</string>
     <string name="t_star">star this app</string>
+    <string name="c_choose_share_platform">please choose platform</string>
+    <string name="c_share_text">recommend a incredible image compress app to you : FinalCompress</string>
 </resources>

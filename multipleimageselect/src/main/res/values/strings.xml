@@ -40,5 +40,6 @@
     <string name="c_compressed">compressed</string>
     <string name="c_delete">delete</string>
     <string name="todo">todo</string>
+    <string name="c_is_to_delete">is to delete the files selected?</string>
 
 </resources>
