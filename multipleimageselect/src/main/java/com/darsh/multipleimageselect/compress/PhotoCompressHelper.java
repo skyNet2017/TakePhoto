@@ -352,6 +352,64 @@ public class PhotoCompressHelper {
 
     }
 
+    public static void deleteAllFiles(List<File> files, final Activity activity){
+        if(files.size() < 20){
+            for (File file : files) {
+                file.delete();
+            }
+            if(activity instanceof ImageSelectActivity){
+                ImageSelectActivity activity1 = (ImageSelectActivity) activity;
+                activity1.refresh();
+            }
+            return;
+        }
+        final ProgressDialog dialog = new ProgressDialog(activity);
+        dialog.setMax(files.size());
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setProgress(0);
+        dialog.setMessage(activity.getString(R.string.c_replacing));
+        //dialog.setIndeterminate(false);
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.show();
+        final int[] i = {0};
+        Observable.fromIterable(files)
+                .observeOn(Schedulers.io())
+                .doOnNext(new Consumer<File>() {
+                    @Override
+                    public void accept(File file) throws Exception {
+                        try {
+                            file.delete();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+
+                    }
+                }).subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<File>() {
+                    @Override
+                    public void accept(File file) throws Exception {
+                        i[0]++;
+                        dialog.setProgress(i[0]);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
+                    }
+                }, new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        dialog.dismiss();
+                        if(activity instanceof ImageSelectActivity){
+                            ImageSelectActivity activity1 = (ImageSelectActivity) activity;
+                            activity1.refresh();
+                        }
+                    }
+                });
+
+    }
+
     public static void copyAndDelte(File file) {
         String path = PhotoCompressHelper.getCompressedFilePath(file.getAbsolutePath(),true);
         /*if(isACompressedDr(file)){

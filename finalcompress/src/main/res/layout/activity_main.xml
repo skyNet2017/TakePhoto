@@ -7,10 +7,26 @@
 
     <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_selected"
-        android:layout_centerInParent="true"
+       android:layout_centerHorizontal="true"
+        android:layout_marginTop="130dp"
         android:layout_width="250dp"
         android:layout_height="100dp"
         android:text="@string/t_start_com" />
+
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:id="@+id/btn_share"
+        android:layout_below="@id/btn_selected"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/t_share" />
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:id="@+id/btn_star"
+        android:layout_below="@id/btn_share"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/t_star" />
     <TextView
         android:layout_below="@id/btn_selected"
         android:layout_width="match_parent"

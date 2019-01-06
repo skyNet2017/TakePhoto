@@ -38,5 +38,7 @@
     <string name="c_override_finished">override finished</string>
     <string name="c_origianl">original</string>
     <string name="c_compressed">compressed</string>
+    <string name="c_delete">delete</string>
+    <string name="todo">todo</string>
 
 </resources>

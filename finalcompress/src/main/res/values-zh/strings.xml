@@ -3,4 +3,6 @@
     <string name="t_start_com">进入压缩</string>
     <string name="app_name">终极图片压缩</string>
     <string name="t_compress55">desc</string>
+    <string name="t_share">分享</string>
+    <string name="t_star">评分</string>
 </resources>

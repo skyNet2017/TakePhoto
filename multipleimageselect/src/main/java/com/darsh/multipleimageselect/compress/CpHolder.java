@@ -70,6 +70,16 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
     }
 
+    public void switchDec(boolean show){
+        if(show){
+            tvCompressed.setVisibility(View.VISIBLE);
+            tvOriginal.setVisibility(View.VISIBLE);
+        }else {
+            tvCompressed.setVisibility(View.GONE);
+            tvOriginal.setVisibility(View.GONE);
+        }
+    }
+
 
     @Override
     public void assingDatasAndEvents(Activity context, @Nullable String s, int i) {

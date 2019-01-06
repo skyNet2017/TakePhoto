@@ -1,9 +1,10 @@
 <resources>
+
     <style name="MultipleImageSelectTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/multiple_image_select_primary</item>
         <item name="colorPrimaryDark">@color/multiple_image_select_primaryDark</item>
         <item name="colorAccent">@color/multiple_image_select_accent</item>
-
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
         <item name="actionModeStyle">@style/CustomActionModeStyle</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
@@ -15,8 +16,19 @@
     <style name="CustomToolbarTheme" parent="Base.ThemeOverlay.AppCompat.ActionBar">
         <item name="android:textColorPrimary">@color/multiple_image_select_toolbarPrimaryText</item>
     </style>
+
     <style name="c_textview_bg">
         <item name="android:textColor">@color/img_tv_color</item>
         <item name="android:background">@color/img_tv_bg</item>
     </style>
+
+
+    <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+        <item name="android:popupBackground">@color/multiple_image_select_primary</item>
+    </style>
+
+
 </resources>

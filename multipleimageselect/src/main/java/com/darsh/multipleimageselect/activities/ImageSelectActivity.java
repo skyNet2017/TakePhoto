@@ -1,6 +1,7 @@
 package com.darsh.multipleimageselect.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
@@ -11,6 +12,8 @@ import android.os.Message;
 import android.os.Process;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -37,6 +40,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,27 +49,82 @@ import java.util.List;
  * Created by Darshan on 4/18/2015.
  */
 public class ImageSelectActivity extends HelperActivity {
+    private final String[] projection = new String[]{MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.DATA};
+    Toolbar toolbar;
+    boolean isInSelectingMode;
+    Menu menu;
+    List<File> selected;
     private ArrayList<Image> images;
     private String album;
-
     private TextView errorDisplay;
-
     private ProgressBar progressBar;
     private GridView gridView;
     private CustomImageSelectAdapter adapter;
-
     private ActionBar actionBar;
-
     private ActionMode actionMode;
     private int countSelected;
-
     private ContentObserver observer;
     private Handler handler;
     private Thread thread;
     private boolean isSelectAll;
-    Toolbar toolbar;
+    private ActionMode.Callback callback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            ImageSelectActivity.this.menu = menu;
+            MenuInflater menuInflater = mode.getMenuInflater();
+            menuInflater.inflate(R.menu.menu_contextual_action_bar, menu);
 
-    private final String[] projection = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.DATA };
+            if (PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))) {
+                menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
+            }
+            actionMode = mode;
+            countSelected = 0;
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            int i = item.getItemId();
+            if (i == R.id.menu_item_add_image) {//压缩图片
+                sendIntent();
+                return true;
+            }
+            if (i == R.id.menu_item_select_all) {//全选与取消全选
+                isSelectAll = !isSelectAll;
+                for (Image image : images) {
+                    image.isSelected = isSelectAll;
+                }
+                if (actionMode != null) {
+                    countSelected = isSelectAll ? images.size() : 0;
+                    actionMode.setTitle(countSelected + " " + getString(R.string.selected));
+                }
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+
+            if (i == R.id.menu_item_delete) {//删除选中项
+                confirmDelete();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            if (countSelected > 0) {
+                deselectAll();
+            }
+            isInSelectingMode = false;
+            toolbar.setTitle(R.string.image_preview);
+            actionMode = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +132,7 @@ public class ImageSelectActivity extends HelperActivity {
         setContentView(R.layout.activity_image_select);
         setView(findViewById(R.id.layout_image_select));
 
-          toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
@@ -100,21 +159,21 @@ public class ImageSelectActivity extends HelperActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(isInSelectingMode){
+                if (isInSelectingMode) {
 
                     toggleSelection(position);
-                    if(actionMode != null){
+                    if (actionMode != null) {
                         actionMode.setTitle(countSelected + " " + getString(R.string.selected));
                     }
 
 
-                }else {
+                } else {
                     //点击去预览
                     ArrayList<String> files = new ArrayList<>();
-                    for (Image image : images){
+                    for (Image image : images) {
                         files.add(image.path);
                     }
-                    CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this,files,position);
+                    CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
                 }
 
             }
@@ -142,9 +201,7 @@ public class ImageSelectActivity extends HelperActivity {
         });
     }
 
-    boolean isInSelectingMode;
-
-    public void refresh(){
+    public void refresh() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -156,7 +213,7 @@ public class ImageSelectActivity extends HelperActivity {
 
     @Override
     public void onBackPressed() {
-        if(isInSelectingMode){
+        if (isInSelectingMode) {
             isInSelectingMode = false;
             //取消所有选择
             deselectAll();
@@ -269,15 +326,13 @@ public class ImageSelectActivity extends HelperActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 980 && resultCode == RESULT_CANCELED && data != null){
-            int positon = data.getIntExtra("position",-1);
-            if(positon >=0){
+        if (requestCode == 980 && resultCode == RESULT_CANCELED && data != null) {
+            int positon = data.getIntExtra("position", -1);
+            if (positon >= 0) {
                 //gridView.smoothScrollToPosition(positon);
             }
         }
     }
-
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -310,60 +365,45 @@ public class ImageSelectActivity extends HelperActivity {
             }
         }
     }
-    Menu menu;
-    private ActionMode.Callback callback = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            ImageSelectActivity.this.menu = menu;
-            MenuInflater menuInflater = mode.getMenuInflater();
-            menuInflater.inflate(R.menu.menu_contextual_action_bar, menu);
 
-            if(PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))){
-                menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
-            }
-            actionMode = mode;
-            countSelected = 0;
-
-            return true;
+    private void confirmDelete() {
+        getSelected();
+        if (countSelected <= 0) {
+            Toast.makeText(this, R.string.c_mot_selected, Toast.LENGTH_SHORT).show();
+            return;
         }
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("警告")
+                .setMessage("是否删除所选文件?")
+                .setPositiveButton(R.string.c_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PhotoCompressHelper.deleteAllFiles(selected, ImageSelectActivity.this);
+                    }
+                }).setNegativeButton(R.string.c_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
+                    }
+                }).show();
+    }
 
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {int i = item.getItemId();
-            if (i == R.id.menu_item_add_image) {
-                sendIntent();
-                return true;
-            }
-            if (i == R.id.menu_item_select_all) {
-                isSelectAll = ! isSelectAll;
-                for (Image image :images){
-                    image.isSelected = isSelectAll;
+    /*** 通过反射，设置menu显示icon** @param view* @param menu* @return*/
+    /*@Override
+    protected boolean onPrepareOptionsPanel(View view, Menu menu) {
+        if (menu != null) {
+            if (menu.getClass() == MenuBuilder.class) {
+                try {
+                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                if (actionMode != null) {
-                    countSelected = isSelectAll ? images.size() : 0;
-                    actionMode.setTitle(countSelected + " " + getString(R.string.selected));
-                }
-                adapter.notifyDataSetChanged();
-
-                return true;
             }
-            return false;
         }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            if (countSelected > 0) {
-                deselectAll();
-            }
-            isInSelectingMode = false;
-            toolbar.setTitle(R.string.image_preview);
-            actionMode = null;
-        }
-    };
+        return super.onPrepareOptionsPanel(view, menu);
+    }*/
 
     private void toggleSelection(int position) {
         if (!images.get(position).isSelected && countSelected >= Constants.limit) {
@@ -394,9 +434,11 @@ public class ImageSelectActivity extends HelperActivity {
 
     private ArrayList<Image> getSelected() {
         ArrayList<Image> selectedImages = new ArrayList<>();
+        selected = new ArrayList<>();
         for (int i = 0, l = images.size(); i < l; i++) {
             if (images.get(i).isSelected) {
                 selectedImages.add(images.get(i));
+                selected.add(new File(images.get(i).path));
             }
         }
         return selectedImages;
@@ -407,14 +449,14 @@ public class ImageSelectActivity extends HelperActivity {
         intent.putParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES, getSelected());
         setResult(RESULT_OK, intent);
         finish();*/
-        final ArrayList<Image> images  = getSelected();
-        if(images == null || images.isEmpty()){
-            Toast.makeText(this, R.string.c_mot_selected,Toast.LENGTH_SHORT).show();
+        final ArrayList<Image> images = getSelected();
+        if (images == null || images.isEmpty()) {
+            Toast.makeText(this, R.string.c_mot_selected, Toast.LENGTH_SHORT).show();
             return;
         }
-        if(!PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))){
+        if (!PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))) {
             List<File> files = new ArrayList<>();
-            for (Image image : images){
+            for (Image image : images) {
                 files.add(new File(image.path));
             }
             PhotoCompressHelper.compressAllFiles(files, this, new Subscriber<String>() {
@@ -429,19 +471,19 @@ public class ImageSelectActivity extends HelperActivity {
                     for (Image image : images) {
                         paths.add(image.path);
                     }
-                    CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths,countSelected == images.size());
+                    CompressResultCompareActivity.lauch(ImageSelectActivity.this, paths, countSelected == images.size());
                 }
 
                 @Override
                 public void onError(Throwable t) {
                     t.printStackTrace();
-                    if("1".equalsIgnoreCase(t.getMessage())){//全部都被压缩过了
+                    if ("1".equalsIgnoreCase(t.getMessage())) {//全部都被压缩过了
                         menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
                         ArrayList<String> paths = new ArrayList<>();
                         for (Image image : images) {
                             paths.add(image.path);
                         }
-                        CompressResultCompareActivity.lauch(ImageSelectActivity.this,paths,countSelected == images.size());
+                        CompressResultCompareActivity.lauch(ImageSelectActivity.this, paths, countSelected == images.size());
                     }
                 }
 
@@ -454,93 +496,17 @@ public class ImageSelectActivity extends HelperActivity {
         }
 
 
-
         ArrayList<String> paths = new ArrayList<>();
         for (Image image : images) {
             paths.add(image.path);
         }
-        CompressResultCompareActivity.lauch(this,paths,countSelected == images.size());
+        CompressResultCompareActivity.lauch(this, paths, countSelected == images.size());
 
 
     }
 
     private void loadImages() {
         startThread(new ImageLoaderRunnable());
-    }
-
-    private class ImageLoaderRunnable implements Runnable {
-        @Override
-        public void run() {
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-            /*
-            If the adapter is null, this is first time this activity's view is
-            being shown, hence send FETCH_STARTED message to show progress bar
-            while images are loaded from phone
-             */
-            if (adapter == null) {
-                sendMessage(Constants.FETCH_STARTED);
-            }
-
-            File file;
-            HashSet<Long> selectedImages = new HashSet<>();
-            if (images != null) {
-                Image image;
-                for (int i = 0, l = images.size(); i < l; i++) {
-                    image = images.get(i);
-                    file = new File(image.path);
-                    if (file.exists() && image.isSelected) {
-                        selectedImages.add(image.id);
-                    }
-                }
-            }
-
-            Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " =?", new String[]{ album }, MediaStore.Images.Media.DATE_ADDED);
-            if (cursor == null) {
-                sendMessage(Constants.ERROR);
-                return;
-            }
-
-            /*
-            In case this runnable is executed to onChange calling loadImages,
-            using countSelected variable can result in a race condition. To avoid that,
-            tempCountSelected keeps track of number of selected images. On handling
-            FETCH_COMPLETED message, countSelected is assigned value of tempCountSelected.
-             */
-            int tempCountSelected = 0;
-            ArrayList<Image> temp = new ArrayList<>(cursor.getCount());
-            if (cursor.moveToLast()) {
-                do {
-                    if (Thread.interrupted()) {
-                        return;
-                    }
-
-                    long id = cursor.getLong(cursor.getColumnIndex(projection[0]));
-                    String name = cursor.getString(cursor.getColumnIndex(projection[1]));
-                    String path = cursor.getString(cursor.getColumnIndex(projection[2]));
-                    boolean isSelected = selectedImages.contains(id);
-                    if (isSelected) {
-                        tempCountSelected++;
-                    }
-
-                    file = new File(path);
-                    Log.i("path",path);
-                    if (file.exists()) {
-                        temp.add(new Image(id, name, path, isSelected));
-                    }
-
-                } while (cursor.moveToPrevious());
-            }
-            cursor.close();
-
-            if (images == null) {
-                images = new ArrayList<>();
-            }
-            images.clear();
-            images.addAll(temp);
-
-            sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
-        }
     }
 
     private void startThread(Runnable runnable) {
@@ -586,5 +552,80 @@ public class ImageSelectActivity extends HelperActivity {
     protected void hideViews() {
         progressBar.setVisibility(View.INVISIBLE);
         gridView.setVisibility(View.INVISIBLE);
+    }
+
+    private class ImageLoaderRunnable implements Runnable {
+        @Override
+        public void run() {
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            /*
+            If the adapter is null, this is first time this activity's view is
+            being shown, hence send FETCH_STARTED message to show progress bar
+            while images are loaded from phone
+             */
+            if (adapter == null) {
+                sendMessage(Constants.FETCH_STARTED);
+            }
+
+            File file;
+            HashSet<Long> selectedImages = new HashSet<>();
+            if (images != null) {
+                Image image;
+                for (int i = 0, l = images.size(); i < l; i++) {
+                    image = images.get(i);
+                    file = new File(image.path);
+                    if (file.exists() && image.isSelected) {
+                        selectedImages.add(image.id);
+                    }
+                }
+            }
+
+            Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
+                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " =?", new String[]{album}, MediaStore.Images.Media.DATE_ADDED);
+            if (cursor == null) {
+                sendMessage(Constants.ERROR);
+                return;
+            }
+
+            /*
+            In case this runnable is executed to onChange calling loadImages,
+            using countSelected variable can result in a race condition. To avoid that,
+            tempCountSelected keeps track of number of selected images. On handling
+            FETCH_COMPLETED message, countSelected is assigned value of tempCountSelected.
+             */
+            int tempCountSelected = 0;
+            ArrayList<Image> temp = new ArrayList<>(cursor.getCount());
+            if (cursor.moveToLast()) {
+                do {
+                    if (Thread.interrupted()) {
+                        return;
+                    }
+
+                    long id = cursor.getLong(cursor.getColumnIndex(projection[0]));
+                    String name = cursor.getString(cursor.getColumnIndex(projection[1]));
+                    String path = cursor.getString(cursor.getColumnIndex(projection[2]));
+                    boolean isSelected = selectedImages.contains(id);
+                    if (isSelected) {
+                        tempCountSelected++;
+                    }
+
+                    file = new File(path);
+                    Log.i("path", path);
+                    if (file.exists()) {
+                        temp.add(new Image(id, name, path, isSelected));
+                    }
+
+                } while (cursor.moveToPrevious());
+            }
+            cursor.close();
+
+            if (images == null) {
+                images = new ArrayList<>();
+            }
+            images.clear();
+            images.addAll(temp);
+
+            sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+        }
     }
 }

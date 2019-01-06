@@ -40,5 +40,7 @@
     <string name="c_override_finished">替换完成</string>
     <string name="c_origianl">原图</string>
     <string name="c_compressed">压缩后</string>
+    <string name="c_delete">删除</string>
+    <string name="todo">敬请期待</string>
 
 </resources>

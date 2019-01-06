@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +30,7 @@ import org.reactivestreams.Subscription;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Observable;
 
 
 /**
@@ -59,6 +60,8 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     ArrayList<String> paths ;
     boolean isPreview;
     boolean isAllSelected;
+    RelativeLayout rlRoot;
+    boolean isDescShow;
 
     public static void lauch(Activity activity, ArrayList<String> paths,boolean isAllSelected){
         Intent intent = new Intent(activity,CompressResultCompareActivity.class);
@@ -119,7 +122,8 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         adapter = new SuperPagerAdapter(this) {
             @Override
             protected SuperPagerHolder generateNewHolder(Context context, ViewGroup viewGroup, int i) {
-                    return new CpHolder(CompressResultCompareActivity.this,viewGroup).setPreview(isPreview);
+                CpHolder holder =  new CpHolder(CompressResultCompareActivity.this,viewGroup).setPreview(isPreview);
+                return holder;
 
 
             }
@@ -188,6 +192,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         });
         adapter.refresh(getFilePaths(files));
         vpCompress.setCurrentItem(position);
+
     }
 
     private void initView() {
@@ -211,6 +216,36 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 overrideAllFile();
             }
         });
+        rlRoot = findViewById(R.id.rl_root);
+        /*rlRoot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchDescUI();
+                return ;
+            }
+        });
+        isDescShow = isPreview;
+        switchDescUI();*/
+    }
+
+    private void switchDescUI() {
+        isDescShow = !isDescShow;
+        if(isDescShow){
+            sbar.setVisibility(View.VISIBLE);
+            tvProgress.setVisibility(View.VISIBLE);
+        }else {
+            sbar.setVisibility(View.GONE);
+            tvProgress.setVisibility(View.GONE);
+        }
+        int count =  vpCompress.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View view = vpCompress.getChildAt(i);
+            Object tag = view.getTag();
+            if (tag instanceof CpHolder) {
+                CpHolder holder = (CpHolder) tag;
+                holder.switchDec(isDescShow);
+            }
+        }
     }
 
     private void overrideAllFile() {
