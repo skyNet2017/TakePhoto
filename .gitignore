@@ -90,6 +90,6 @@ gradle-app.setting
 
 ###
 android-crop
-.gradle.properties
+gradle.properties
 
 
