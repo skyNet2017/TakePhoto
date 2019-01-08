@@ -122,9 +122,11 @@ public class TUtils {
                 //兼容4.4以下 https://stackoverflow.com/questions/24467696/android-file-provider-permission-denial
                 for (ResolveInfo resolveInfo : result) {
                     String packageName = resolveInfo.activityInfo.packageName;
-                    contextWrap.getActivity().grantUriPermission(packageName, uri,
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                    | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    if(contextWrap.getActivity() != null){
+                        contextWrap.getActivity().grantUriPermission(packageName, uri,
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                        | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
                 }
 
                 startActivityForResult(contextWrap, intentWap);
