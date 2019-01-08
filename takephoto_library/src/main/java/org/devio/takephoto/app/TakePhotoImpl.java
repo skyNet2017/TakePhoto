@@ -384,7 +384,7 @@ public class TakePhotoImpl implements TakePhoto {
 
         try {
             TUtils.captureBySafely(contextWrap,
-                new TIntentWap(IntentUtils.getCaptureIntent(this.outPutUri), TConstant.RC_PICK_PICTURE_FROM_CAPTURE));
+                new TIntentWap(IntentUtils.getCaptureIntent(this.outPutUri), TConstant.RC_PICK_PICTURE_FROM_CAPTURE),this.outPutUri);
         } catch (TException e) {
             takeResult(TResult.of(TImage.of("", fromType)), e.getDetailMessage());
             e.printStackTrace();
@@ -407,7 +407,7 @@ public class TakePhotoImpl implements TakePhoto {
 
         try {
             TUtils.captureBySafely(contextWrap,
-                new TIntentWap(IntentUtils.getCaptureIntent(this.tempUri), TConstant.RC_PICK_PICTURE_FROM_CAPTURE_CROP));
+                new TIntentWap(IntentUtils.getCaptureIntent(this.tempUri), TConstant.RC_PICK_PICTURE_FROM_CAPTURE_CROP),this.tempUri);
         } catch (TException e) {
             takeResult(TResult.of(TImage.of("", fromType)), e.getDetailMessage());
             e.printStackTrace();

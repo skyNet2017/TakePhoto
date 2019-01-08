@@ -5,22 +5,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.darsh.multipleimageselect.models.Image;
-import org.devio.takephoto.model.CropOptions;
-import org.devio.takephoto.model.TException;
-import org.devio.takephoto.model.TExceptionType;
-import org.devio.takephoto.model.TImage;
-import org.devio.takephoto.model.TIntentWap;
-import org.devio.takephoto.R;
-import org.devio.takephoto.model.TContextWrap;
 import com.soundcloud.android.crop.Crop;
+import org.devio.takephoto.R;
+import org.devio.takephoto.model.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -115,14 +110,23 @@ public class TUtils {
     /**
      * 拍照前检查是否有相机
      **/
-    public static void captureBySafely(TContextWrap contextWrap, TIntentWap intentWap) throws TException {
-        List result = contextWrap.getActivity().getPackageManager().queryIntentActivities(intentWap.getIntent(), PackageManager.MATCH_ALL);
-        if (result.isEmpty()) {
+    public static void captureBySafely(TContextWrap contextWrap, TIntentWap intentWap,Uri uri) throws TException {
+        List<ResolveInfo> result = contextWrap.getActivity().getPackageManager()
+                .queryIntentActivities(intentWap.getIntent(), PackageManager.MATCH_DEFAULT_ONLY);
+        if (result == null || result.isEmpty()) {
             Toast.makeText(contextWrap.getActivity(), contextWrap.getActivity().getResources().getText(R.string.tip_no_camera),
                 Toast.LENGTH_SHORT).show();
             throw new TException(TExceptionType.TYPE_NO_CAMERA);
         } else {
             try {
+                //兼容4.4以下 https://stackoverflow.com/questions/24467696/android-file-provider-permission-denial
+                for (ResolveInfo resolveInfo : result) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    contextWrap.getActivity().grantUriPermission(packageName, uri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                    | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
                 startActivityForResult(contextWrap, intentWap);
             }catch (Exception e){
                 e.printStackTrace();
