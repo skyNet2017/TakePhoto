@@ -156,14 +156,21 @@ public class TUriParse {
         if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
             Cursor cursor = activity.getContentResolver().query(uri, filePathColumn, null, null, null);//从系统表中查询指定Uri对应的照片
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            if (columnIndex >= 0) {
-                picturePath = cursor.getString(columnIndex);  //获取照片路径
-            } else if (TextUtils.equals(uri.getAuthority(), TConstant.getFileProviderName(activity))) {
-                picturePath = parseOwnUri(activity, uri);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                if (columnIndex >= 0) {
+                    picturePath = cursor.getString(columnIndex);  //获取照片路径
+                } else if (TextUtils.equals(uri.getAuthority(), TConstant.getFileProviderName(activity))) {
+                    picturePath = parseOwnUri(activity, uri);
+                }
+                cursor.close();
+            }else {
+                if (TextUtils.equals(uri.getAuthority(), TConstant.getFileProviderName(activity))) {
+                    picturePath = parseOwnUri(activity, uri);
+                }
             }
-            cursor.close();
+
         } else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             picturePath = uri.getPath();
         }

@@ -3,12 +3,10 @@ package com.hss01248.lubanturbo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import it.sephiroth.android.library.exif2.ExifInterface;
 
 import java.io.File;
 import java.io.IOException;
-
-import it.sephiroth.android.library.exif2.ExifInterface;
-import top.zibin.luban.IBitmapToFile;
 
 /**
  * Created by hss on 2018/12/14.

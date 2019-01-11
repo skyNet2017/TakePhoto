@@ -1,17 +1,10 @@
 package org.devio.simple.holder;
 
 import android.app.Activity;
-import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
-
-import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.hss01248.lubanturbo.TurboCompressor;
-
 import org.devio.simple.CommonCallback;
 import org.devio.simple.SinglePicHolder;
-import org.devio.takephoto.model.TImage;
 
 import java.io.File;
 
