@@ -15,14 +15,18 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.lubanturbo.TurboCompressor;
-
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
 
@@ -30,18 +34,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import io.reactivex.Flowable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by hss on 2018/12/15.
@@ -52,11 +48,19 @@ public class PhotoCompressHelper {
 
     public static final int DEFAULT_QUALITY = 70;
 
+    public static int getQuality() {
+        return quality;
+    }
+
+    public static void setQuality(int quality) {
+        PhotoCompressHelper.quality = quality;
+    }
+
     public static int quality = DEFAULT_QUALITY;
-    static final String NAME_COMPRESSED = "-compressed-quality-";
+    private static final String NAME_COMPRESSED = "-compressed";
 
     public static String getCompressedDirSuffix(){
-        return  NAME_COMPRESSED + quality;
+        return  NAME_COMPRESSED;
     }
 
     public static boolean isACompressedDr(File file){
@@ -94,7 +98,7 @@ public class PhotoCompressHelper {
 
         int quality = ImageInfoFormater.getQuality(pathname.getAbsolutePath());
         Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
-        return  quality > PhotoCompressHelper.DEFAULT_QUALITY;
+        return  quality > getQuality();
     }
 
     /**
@@ -277,7 +281,7 @@ public class PhotoCompressHelper {
         }
         String outPath = new File(dir, name).getAbsolutePath();
         long start = System.currentTimeMillis();
-        boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), DEFAULT_QUALITY, outPath);
+        boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
         String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
