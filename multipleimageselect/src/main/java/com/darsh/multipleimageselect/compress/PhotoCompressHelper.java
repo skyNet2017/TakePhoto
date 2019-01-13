@@ -11,9 +11,14 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.activities.ImageSelectActivity;
@@ -38,6 +43,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Created by hss on 2018/12/15.
@@ -69,6 +75,56 @@ public class PhotoCompressHelper {
             dir = file.getParentFile();
         }
         return dir.getName().contains(NAME_COMPRESSED);
+    }
+
+    public static Dialog showChooseQualityDialog(Activity activity, final Consumer<Integer> callback){
+        SeekBar seekBar = null;
+        View view = View.inflate(activity,R.layout.seek_quality,null);
+        seekBar = view .findViewById(R.id.sbar_quality);
+        final TextView textView = view.findViewById(R.id.tv_quality);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                textView.setText(progress+"/100");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        final SeekBar finalSeekBar = seekBar;
+        AlertDialog dialog = new AlertDialog.Builder(activity).setTitle(R.string.c_change_quality)
+                .setView(view)
+                .setPositiveButton(R.string.c_sure, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            callback.accept(finalSeekBar.getProgress());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).setNegativeButton(R.string.c_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).show();
+
+
+
+
+
+
+        return dialog;
+
     }
 
     /**
@@ -195,7 +251,7 @@ public class PhotoCompressHelper {
                 .doOnNext(new Consumer<File>() {
                     @Override
                     public void accept(File file) throws Exception {
-                        compressOneFile(file);
+                        compressOneFile(file,false);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -273,19 +329,30 @@ public class PhotoCompressHelper {
                 }).subscribe();
     }
 
-    public static void compressOneFile(File file) {
+
+
+    public static void compressOneFile(File file,boolean override) {
         String name = file.getName();
         File dir = new File(file.getParentFile(), file.getParentFile().getName() + getCompressedDirSuffix());
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        String outPath = new File(dir, name).getAbsolutePath();
+        File outFile = new File(dir, name);
+        String outPath = outFile.getAbsolutePath();
         long start = System.currentTimeMillis();
         boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
         String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
         Log.w("dd", cost + filen);
+        if(override){
+            try {
+                FileUtils.copyFile(outFile,file);
+                outFile.delete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static String getoutputDesc(List<File> files,long startTime,Activity activity) {

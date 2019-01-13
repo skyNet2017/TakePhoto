@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import io.reactivex.functions.Consumer;
+
 
 /**
  * Created by hss on 2018/12/16.
@@ -62,6 +64,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     boolean isAllSelected;
     RelativeLayout rlRoot;
     boolean isDescShow;
+    FloatingActionButton fbChangeQuality;
 
     public static void lauch(Activity activity, ArrayList<String> paths,boolean isAllSelected){
         Intent intent = new Intent(activity,CompressResultCompareActivity.class);
@@ -206,6 +209,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         fbOverrideSingle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                menu.close(false);
                 overrideSingle();
             }
         });
@@ -213,10 +217,26 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         fbOverrideAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                menu.close(false);
                 overrideAllFile();
             }
         });
         rlRoot = findViewById(R.id.rl_root);
+        fbChangeQuality = findViewById(R.id.fb_change_quality);
+        fbChangeQuality.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PhotoCompressHelper.showChooseQualityDialog(CompressResultCompareActivity.this, new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        menu.close(false);
+                        changeQuality(integer);
+                    }
+                });
+            }
+        });
+
+
         /*rlRoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,6 +246,21 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         });
         isDescShow = isPreview;
         switchDescUI();*/
+    }
+
+    private void changeQuality(int quality) {
+        File file = files.get(position);
+        PhotoCompressHelper.setQuality(quality);
+        PhotoCompressHelper.compressOneFile(file,false);
+        int count = vpCompress.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = vpCompress.getChildAt(i);
+            Object tag = child.getTag();
+            if(tag instanceof SuperPagerHolder){
+                SuperPagerHolder holder = (SuperPagerHolder) tag;
+                holder.assingDatasAndEvents(this,files.get(position).getAbsolutePath(),position);
+            }
+        }
     }
 
     private void switchDescUI() {
@@ -249,7 +284,6 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     }
 
     private void overrideAllFile() {
-        File file = files.get(position);
         PhotoCompressHelper.replaceAllFiles(files, this);
         Toast.makeText(getApplicationContext(), R.string.c_override_finished, Toast.LENGTH_LONG).show();
         /*if (PhotoCompressHelper.isACompressedDr(file)) {
@@ -319,6 +353,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        PhotoCompressHelper.setQuality(PhotoCompressHelper.DEFAULT_QUALITY);
         System.gc();
     }
 }

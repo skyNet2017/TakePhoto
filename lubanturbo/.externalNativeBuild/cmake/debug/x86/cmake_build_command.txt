@@ -1,15 +1,15 @@
-Executable : D:\devtool\android\android-sdk\cmake\3.6.4111459\bin\cmake.exe
+Executable : D:\dev\sdk\cmake\3.6.4111459\bin\cmake.exe
 arguments : 
--HD:\projects\Android\github\skynet\TakePhoto\lubanturbo
--BD:\projects\Android\github\skynet\TakePhoto\lubanturbo\.externalNativeBuild\cmake\debug\x86
+-HD:\projects\android\skynet\TakePhoto\lubanturbo
+-BD:\projects\android\skynet\TakePhoto\lubanturbo\.externalNativeBuild\cmake\debug\x86
 -DANDROID_ABI=x86
 -DANDROID_PLATFORM=android-14
--DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\projects\Android\github\skynet\TakePhoto\lubanturbo\build\intermediates\cmake\debug\obj\x86
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=D:\projects\android\skynet\TakePhoto\lubanturbo\build\intermediates\cmake\debug\obj\x86
 -DCMAKE_BUILD_TYPE=Debug
--DANDROID_NDK=D:\devtool\android\android-sdk\ndk-bundle
+-DANDROID_NDK=D:\dev\sdk\ndk-bundle
 -DCMAKE_CXX_FLAGS=
--DCMAKE_TOOLCHAIN_FILE=D:\devtool\android\android-sdk\ndk-bundle\build\cmake\android.toolchain.cmake
--DCMAKE_MAKE_PROGRAM=D:\devtool\android\android-sdk\cmake\3.6.4111459\bin\ninja.exe
+-DCMAKE_TOOLCHAIN_FILE=D:\dev\sdk\ndk-bundle\build\cmake\android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=D:\dev\sdk\cmake\3.6.4111459\bin\ninja.exe
 -GAndroid Gradle - Ninja
 jvmArgs : 
 

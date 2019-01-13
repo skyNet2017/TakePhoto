@@ -1,21 +1,21 @@
 {
   "buildFiles": [
-    "D:\\projects\\Android\\github\\skynet\\TakePhoto\\lubanturbo\\CMakeLists.txt"
+    "D:\\projects\\android\\skynet\\TakePhoto\\lubanturbo\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\github\\skynet\\TakePhoto\\lubanturbo\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target clean"
+    "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\TakePhoto\\lubanturbo\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target clean"
   ],
   "libraries": {
     "jpeg-Release-arm64-v8a": {
       "artifactName": "jpeg",
       "abi": "arm64-v8a",
-      "output": "D:\\projects\\Android\\github\\skynet\\TakePhoto\\lubanturbo\\libs\\arm64-v8a\\libjpeg-turbo.a"
+      "output": "D:\\projects\\android\\skynet\\TakePhoto\\lubanturbo\\libs\\arm64-v8a\\libjpeg-turbo.a"
     },
     "luban-Release-arm64-v8a": {
       "artifactName": "luban",
-      "buildCommand": "D:\\devtool\\android\\android-sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\Android\\github\\skynet\\TakePhoto\\lubanturbo\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target luban",
+      "buildCommand": "D:\\dev\\sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\projects\\android\\skynet\\TakePhoto\\lubanturbo\\.externalNativeBuild\\cmake\\release\\arm64-v8a --target luban",
       "abi": "arm64-v8a",
-      "output": "D:\\projects\\Android\\github\\skynet\\TakePhoto\\lubanturbo\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libluban.so"
+      "output": "D:\\projects\\android\\skynet\\TakePhoto\\lubanturbo\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libluban.so"
     }
   }
 }

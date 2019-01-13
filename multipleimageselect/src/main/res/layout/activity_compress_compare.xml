@@ -91,6 +91,12 @@
         fab:menu_fab_label="">
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fb_change_quality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_size="mini"
+            fab:fab_label="@string/c_change_quality" />
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fb_override_single"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
