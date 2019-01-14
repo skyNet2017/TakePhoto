@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import it.sephiroth.android.library.exif2.ExifInterface;
+import top.zibin.luban.IBitmapToFile;
 
 import java.io.File;
 import java.io.IOException;
