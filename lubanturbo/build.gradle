@@ -43,5 +43,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api project(':luban')
-    compile 'it.sephiroth.android.exif:library:+'
+    api ('it.sephiroth.android.exif:library:1.0.1'){
+        exclude group: 'org.apache.commons'
+    }
+    api 'commons-io:commons-io:1.3.2'
 }

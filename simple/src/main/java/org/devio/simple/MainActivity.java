@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.hss01248.lubanturbo.TurboCompressor;
 import org.devio.simple.compress.CompressActivity;
+import top.zibin.luban.Luban;
 
 
 /**
@@ -33,6 +35,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_layout);
+        Luban.init(TurboCompressor.getTurboCompressor());
     }
 
     @Override

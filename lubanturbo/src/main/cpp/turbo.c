@@ -38,10 +38,6 @@ int generateJpg(BYTE *data, int width, int height, int quality, const char *outf
     jcs.input_components = component;
     jcs.in_color_space = JCS_RGB;
     jcs.optimize_coding = TRUE;
-    //boolean optimize_coding：
-
-    //参数为TRUE时，图片压缩算法使用最优的哈夫曼编码表，它需要额外传递数据，因此会耗费CPU运算时间，以及开辟很多临时内存空间。
-    //参数为FALSE时，使用默认的哈夫曼编码表。在大多数情况，使用最优哈夫曼编码表相比默认哈夫曼编码表，能节省图像文件很大比例的大小。
 
     jpeg_set_defaults(&jcs);
     jpeg_set_quality(&jcs, quality, TRUE);
