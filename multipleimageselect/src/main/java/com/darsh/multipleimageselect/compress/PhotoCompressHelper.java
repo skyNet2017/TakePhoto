@@ -52,7 +52,7 @@ import java.util.concurrent.Callable;
 public class PhotoCompressHelper {
 
 
-    public static final int DEFAULT_QUALITY = 70;
+    public static final int DEFAULT_QUALITY = 80;
 
     public static int getQuality() {
         return quality;
@@ -335,7 +335,11 @@ public class PhotoCompressHelper {
         String name = file.getName();
         File dir = new File(file.getParentFile(), file.getParentFile().getName() + getCompressedDirSuffix());
         if (!dir.exists()) {
-            dir.mkdirs();
+          boolean canCreateDir =   dir.mkdirs();
+          if(!canCreateDir){
+              //可能是sd卡
+              Log.e("compressOneFile","can not CreateDir!!!");
+          }
         }
         File outFile = new File(dir, name);
         String outPath = outFile.getAbsolutePath();
@@ -344,15 +348,21 @@ public class PhotoCompressHelper {
         String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
-        Log.w("dd", cost + filen);
-        if(override){
-            try {
-                FileUtils.copyFile(outFile,file);
-                outFile.delete();
-            } catch (Exception e) {
-                e.printStackTrace();
+        if(success){
+            Log.w("success", cost + filen);
+            if(override){
+                try {
+                    FileUtils.copyFile(outFile,file);
+                    outFile.delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+        }else {
+            Log.e("fail", cost + filen);
+
         }
+
     }
 
     private static String getoutputDesc(List<File> files,long startTime,Activity activity) {
