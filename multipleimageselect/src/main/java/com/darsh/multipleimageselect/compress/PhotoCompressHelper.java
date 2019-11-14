@@ -329,19 +329,43 @@ public class PhotoCompressHelper {
                 }).subscribe();
     }
 
+    public static File getCompressDir(File file){
+        if(DocumentsUtils.isOnExtSdCard(file,StorageUtils.context)){
+            File dir = new File(StorageUtils.context.getExternalCacheDir(),file.getParentFile().getName() + getCompressedDirSuffix());
+            if (!dir.exists()) {
+                boolean canCreateDir =   dir.mkdirs();
+                if(!canCreateDir){
+                    //可能是sd卡
+                    Log.e("compressOneFile","can not CreateDir!!!");
+                    canCreateDir =   DocumentsUtils.mkdirs(StorageUtils.context,dir);
+                    Log.e("compressOneFile","canCreateDir by DocumentsUtils.mkdirs:"+canCreateDir);
+                }
+            }
+            return dir;
+
+        }else {
+            File dir = new File(file.getParentFile(), file.getParentFile().getName() + getCompressedDirSuffix());
+            if (!dir.exists()) {
+                boolean canCreateDir =   dir.mkdirs();
+                if(!canCreateDir){
+                    //可能是sd卡
+                    Log.e("compressOneFile","can not CreateDir!!!");
+                    canCreateDir =   DocumentsUtils.mkdirs(StorageUtils.context,dir);
+                    Log.e("compressOneFile","canCreateDir by DocumentsUtils.mkdirs:"+canCreateDir);
+                }
+            }
+            return dir;
+        }
+    }
+
 
 
     public static void compressOneFile(File file,boolean override) {
         String name = file.getName();
-        File dir = new File(file.getParentFile(), file.getParentFile().getName() + getCompressedDirSuffix());
-        if (!dir.exists()) {
-          boolean canCreateDir =   dir.mkdirs();
-          if(!canCreateDir){
-              //可能是sd卡
-              Log.e("compressOneFile","can not CreateDir!!!");
-          }
-        }
+        File dir = getCompressDir(file);
+
         File outFile = new File(dir, name);
+
         String outPath = outFile.getAbsolutePath();
         long start = System.currentTimeMillis();
         boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
@@ -356,6 +380,7 @@ public class PhotoCompressHelper {
                     outFile.delete();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    DocumentsUtils.renameTo(StorageUtils.context,file,outFile);
                 }
             }
         }else {
@@ -502,9 +527,9 @@ public class PhotoCompressHelper {
             Log.w("dd","file not exist:"+path);
             return;
         }
-
+        File file1 = new File(path);
         try {
-            File file1 = new File(path);
+
             if(shouldCompress(file,true)){
                 FileUtils.copyFile(file1,file);
             }else {
@@ -513,6 +538,7 @@ public class PhotoCompressHelper {
             file1.delete();
         } catch (IOException e) {
             e.printStackTrace();
+            DocumentsUtils.renameTo(StorageUtils.context,file1,file);
         }
     }
 
@@ -577,10 +603,7 @@ public class PhotoCompressHelper {
     public static String getCompressedFilePath(String path,boolean needFileExistFirst){
         File file = new File(path);
         String name = file.getName();
-        File dir = new File(file.getParentFile(), file.getParentFile().getName() + getCompressedDirSuffix());
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        File dir = getCompressDir(file);
         File fileCompressed = new File(dir,name);
         if(needFileExistFirst && !fileCompressed.exists()){
             return "";

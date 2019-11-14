@@ -7,11 +7,13 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
+import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.gc.materialdesign.views.ButtonRectangle;
 
@@ -69,8 +71,15 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
        /* AdView adView = findViewById(R.id.ad_banner);
         AdUtil.loadBannerAd(this, adView);*/
+
+        StorageUtils.requestOutSdCradWritePermission(this);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
+    }
 
     @OnClick({R.id.btn_share, R.id.btn_star, R.id.btn_selected})
     public void onViewClicked(View view) {
