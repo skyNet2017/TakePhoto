@@ -1,1 +1,1 @@
-include ':takephoto_library', ':luban', ':lubanturbo', ':multipleimageselect', ':imginfo', ':finalcompress', ':analytics'//':simple',
+include ':takephoto_library', ':luban', ':lubanturbo', ':multipleimageselect', ':imginfo', ':finalcompress', ':analytics'

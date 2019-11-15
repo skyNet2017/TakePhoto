@@ -33,7 +33,7 @@ public class ImageInfoFormater {
         String size = formatFileSize(file.length());
         int[] wh = getImageWidthHeight(path);
         int quality = getQuality(path);
-        String needCompress = quality > 70 ? context.getString(R.string.c_not_compressed) : context.getString(R.string.t_compressed);
+        String needCompress = quality > 80 ? context.getString(R.string.c_not_compressed) : context.getString(R.string.t_compressed);
         String str = wh[0] + "x" + wh[1] + ", " + size + context.getString(R.string.c_quality_info) + quality + needCompress;
         if (showFullPath) {
             return str + "\n" + path;

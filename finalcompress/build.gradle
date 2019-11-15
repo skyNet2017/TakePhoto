@@ -102,6 +102,9 @@ dependencies {
     compile project(':multipleimageselect')
     implementation 'com.github.skyNet2017:MaterialDesignLibrary:2.0.0'
 
+    debugCompile 'com.github.markzhai:blockcanary-android:1.5.0'
+   releaseCompile 'com.github.markzhai:blockcanary-no-op:1.5.0'
+
 
     //implementation 'com.google.android.gms:play-services:12.0.1'
     //implementation 'com.google.android.gms:play-services-base:15.0.1'

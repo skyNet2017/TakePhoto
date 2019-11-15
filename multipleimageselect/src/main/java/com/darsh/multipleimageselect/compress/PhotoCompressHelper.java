@@ -380,7 +380,7 @@ public class PhotoCompressHelper {
                     outFile.delete();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    DocumentsUtils.renameTo(StorageUtils.context,file,outFile);
+                    DocumentsUtils.renameTo2(StorageUtils.context,file,outFile);
                 }
             }
         }else {
@@ -531,14 +531,14 @@ public class PhotoCompressHelper {
         try {
 
             if(shouldCompress(file,true)){
-                FileUtils.copyFile(file1,file);
+             FileUtils.copyFile(file1,file);
             }else {
 
             }
             file1.delete();
         } catch (IOException e) {
             e.printStackTrace();
-            DocumentsUtils.renameTo(StorageUtils.context,file1,file);
+            DocumentsUtils.renameTo2(StorageUtils.context,file1,file);
         }
     }
 
@@ -605,6 +605,7 @@ public class PhotoCompressHelper {
         String name = file.getName();
         File dir = getCompressDir(file);
         File fileCompressed = new File(dir,name);
+        Log.d("getCompressedFilePath",fileCompressed.getAbsolutePath());
         if(needFileExistFirst && !fileCompressed.exists()){
             return "";
         }

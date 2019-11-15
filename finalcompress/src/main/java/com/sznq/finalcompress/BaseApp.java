@@ -19,6 +19,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
+import com.github.moduth.blockcanary.BlockCanary;
+import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.hss01248.analytics.ad.AdUtil;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
@@ -66,6 +68,12 @@ public class BaseApp extends Application {
         //registerContentObserver();
 
         observerCamera();
+        BlockCanary.install(this, new BlockCanaryContext(){
+            @Override
+            public int provideBlockThreshold() {
+                return 400;
+            }
+        }).start();
 
 
     }

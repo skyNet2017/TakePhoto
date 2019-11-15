@@ -10,6 +10,9 @@ import android.provider.DocumentsContract;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -219,6 +222,31 @@ public class DocumentsUtils {
         }
         return res;
     }
+
+    public static boolean renameTo2(Context context, File src, File dest){
+        boolean res = src.renameTo(dest);
+        if(res){
+            return true;
+        }else if (!res && isOnExtSdCard(dest, context)) {
+            OutputStream outputStream = getOutputStream(StorageUtils.context,dest);
+            if(outputStream == null){
+                Log.w("renameTo2",dest.getAbsolutePath()+" not writeable");
+                return false;
+            }
+            try {
+                IOUtils.copy(new FileInputStream(src),outputStream);
+                return true;
+            } catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }finally {
+                IOUtils.closeQuietly(outputStream);
+            }
+        }else {
+            return false;
+        }
+    }
+
 
     public static boolean renameTo(Context context, File src, File dest) {
         boolean res = src.renameTo(dest);
