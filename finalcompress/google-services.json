@@ -1,39 +1,37 @@
 {
   "project_info": {
-    "project_number": "537122201736",
-    "firebase_url": "https://final-compress.firebaseio.com",
-    "project_id": "final-compress",
-    "storage_bucket": "final-compress.appspot.com"
+    "project_number": "405941808385",
+    "firebase_url": "https://imagecompressor-9d694.firebaseio.com",
+    "project_id": "imagecompressor-9d694",
+    "storage_bucket": "imagecompressor-9d694.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:537122201736:android:ab6eafdfa82a239b",
+        "mobilesdk_app_id": "1:405941808385:android:fe9948a70d028a19927f00",
         "android_client_info": {
-          "package_name": "com.sznq.finalcompress"
+          "package_name": "com.hss01248.finalcompress"
         }
       },
       "oauth_client": [
         {
-          "client_id": "537122201736-hd0d4tu74ic0soccu193dho5n0pm49pl.apps.googleusercontent.com",
+          "client_id": "405941808385-f8j2t1s5ctnlki9e47pd45dkrfft8hj0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCKCuGwBzXrgbQFlKH3-fpwJuSjPrAeu6A"
+          "current_key": "AIzaSyDSymMmDgR4vaaLNe6L4zXUz3v62atw5bQ"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "405941808385-f8j2t1s5ctnlki9e47pd45dkrfft8hj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

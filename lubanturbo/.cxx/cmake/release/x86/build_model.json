@@ -1,0 +1,78 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/Users/hss/github/TakePhoto",
+      "sdkFolder": "/Users/hss/Library/Android/sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates",
+      "gradleModulePathName": ":lubanturbo",
+      "moduleRootFolder": "/Users/hss/github/TakePhoto/lubanturbo",
+      "makeFile": "/Users/hss/github/TakePhoto/lubanturbo/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "/Users/hss/github/TakePhoto/.cxx",
+      "cxxFolder": "/Users/hss/github/TakePhoto/lubanturbo/.cxx",
+      "ndkFolder": "/Users/hss/Documents/akulaku/sdk/android-ndk-r15c",
+      "ndkVersion": "15.2.4203891",
+      "ndkSupportedAbiList": [
+        "ARMEABI",
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "MIPS",
+        "MIPS64",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI",
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "MIPS",
+        "MIPS64",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [
+      ""
+    ],
+    "variantName": "release",
+    "soFolder": "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates/cmake/release/lib",
+    "objFolder": "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates/cmake/release/obj",
+    "jsonFolder": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release",
+    "gradleBuildOutputFolder": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release",
+    "isDebuggableEnabled": false,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "X86",
+  "abiPlatformVersion": 14,
+  "cxxBuildFolder": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86",
+  "jsonFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86",
+  "objFolder": "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates/cmake/release/obj/x86",
+  "buildCommandFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86/build_command.txt",
+  "buildOutputFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86/build_output.txt",
+  "modelOutputFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86/build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/CMakeLists.txt",
+    "toolchainWrapperFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/build_generation_state.json",
+    "cacheKeyFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/compiler_cache_key.json",
+    "compilerCacheUseFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/compiler_cache_use.json",
+    "compilerCacheWriteFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/release/x86/compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86/json_generation_record.json",
+  "compileCommandsJsonFile": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/x86/compile_commands.json"
+}

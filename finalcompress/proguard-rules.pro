@@ -76,7 +76,7 @@
 
 # 保持源码的行号与信息
 -renamesourcefileattribute SourceFile
--keepattributes SourceFile,LineNumberTable,Exceptions,InnerClasses,Signature, *Annotation*, *JavascriptInterface*, ...
+-keepattributes SourceFile,LineNumberTable,Exceptions,InnerClasses,Signature, *Annotation*, *JavascriptInterface*
 
 # 表示不混淆任何包含native方法的类名以及native方法名
 -keepclasseswithmembernames class * {

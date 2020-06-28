@@ -1,0 +1,46 @@
+
+{
+	"buildFiles" : [ "/Users/hss/github/TakePhoto/lubanturbo/CMakeLists.txt" ],
+	"cFileExtensions" : [ "c" ],
+	"cleanCommands" : 
+	[
+		"/Users/hss/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/debug/x86_64 --target clean"
+	],
+	"libraries" : 
+	{
+		"jpeg-Debug-x86_64" : 
+		{
+			"abi" : "x86_64",
+			"artifactName" : "jpeg",
+			"buildType" : "debug",
+			"output" : "/Users/hss/github/TakePhoto/lubanturbo/libs/x86_64/libjpeg-turbo.a",
+			"toolchain" : "12259626614840441887"
+		},
+		"luban-Debug-x86_64" : 
+		{
+			"abi" : "x86_64",
+			"artifactName" : "luban",
+			"buildCommand" : "/Users/hss/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/debug/x86_64 --target luban",
+			"buildType" : "debug",
+			"files" : 
+			[
+				
+				{
+					"flags" : "  --target=x86_64-none-linux-android --gcc-toolchain=/Users/hss/Documents/akulaku/sdk/android-ndk-r15c/toolchains/x86_64-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/hss/Documents/akulaku/sdk/android-ndk-r15c/sysroot -Dluban_EXPORTS -I../../../../src/main/cpp/include  -isystem /Users/hss/Documents/akulaku/sdk/android-ndk-r15c/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC      -c ",
+					"src" : "/Users/hss/github/TakePhoto/lubanturbo/src/main/cpp/turbo.c",
+					"workingDirectory" : "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/debug/x86_64"
+				}
+			],
+			"output" : "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates/cmake/debug/obj/x86_64/libluban.so",
+			"toolchain" : "12259626614840441887"
+		}
+	},
+	"toolchains" : 
+	{
+		"12259626614840441887" : 
+		{
+			"cCompilerExecutable" : "/Users/hss/Documents/akulaku/sdk/android-ndk-r15c/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+			"cppCompilerExecutable" : "/Users/hss/Documents/akulaku/sdk/android-ndk-r15c/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+		}
+	}
+}

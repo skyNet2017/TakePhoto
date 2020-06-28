@@ -1,0 +1,2 @@
+[1/2] Building C object CMakeFiles/luban.dir/src/main/cpp/turbo.c.o
+[2/2] Linking C shared library ../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libluban.so

@@ -1,0 +1,21 @@
+{
+  "buildFiles": [
+    "/Users/hss/github/TakePhoto/lubanturbo/CMakeLists.txt"
+  ],
+  "cleanCommands": [
+    "/Users/hss/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/armeabi-v7a --target clean"
+  ],
+  "libraries": {
+    "luban-Release-armeabi-v7a": {
+      "artifactName": "luban",
+      "buildCommand": "/Users/hss/Library/Android/sdk/cmake/3.6.4111459/bin/cmake --build /Users/hss/github/TakePhoto/lubanturbo/.cxx/cmake/release/armeabi-v7a --target luban",
+      "abi": "armeabi-v7a",
+      "output": "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates/cmake/release/obj/armeabi-v7a/libluban.so"
+    },
+    "jpeg-Release-armeabi-v7a": {
+      "artifactName": "jpeg",
+      "abi": "armeabi-v7a",
+      "output": "/Users/hss/github/TakePhoto/lubanturbo/libs/armeabi-v7a/libjpeg-turbo.a"
+    }
+  }
+}
