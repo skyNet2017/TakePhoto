@@ -12,6 +12,7 @@ import android.os.Message;
 import android.os.Process;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
+import android.support.v7.util.AdapterListUpdateCallback;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.MenuItem;
@@ -33,6 +34,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.internal.subscribers.BlockingBaseSubscriber;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Darshan on 4/14/2015.
@@ -124,9 +132,10 @@ public class AlbumSelectActivity extends HelperActivity {
                             progressBar.setVisibility(View.INVISIBLE);
                             gridView.setVisibility(View.VISIBLE);
                             orientationBasedUI(getResources().getConfiguration().orientation);
+                            calFileSize(albums,adapter);
 
                         } else {
-                            adapter.notifyDataSetChanged();
+                            calFileSize(albums,adapter);
                         }
                         break;
                     }
@@ -152,6 +161,49 @@ public class AlbumSelectActivity extends HelperActivity {
         getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
 
         checkPermission();
+    }
+
+    private void calFileSize(final ArrayList<Album> albums, final CustomAlbumSelectAdapter adapter) {
+        Observable.fromIterable(albums)
+                .doOnNext(new Consumer<Album>() {
+                    @Override
+                    public void accept(Album album) throws Exception {
+                        if(album.fileSize > 0){
+                            return;
+                        }
+                        File dir = new File(album.dir);
+                        File[] files = dir.listFiles();
+                        int count = 0;
+                        long fileSize = 0;
+                        for (File file1 : files){
+                            if(PhotoCompressHelper.isImage(file1)){
+                                count++;
+                                fileSize = fileSize + file1.length();
+                            }
+                        }
+                        album.count = count;
+                        album.fileSize = fileSize;
+                    }
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableObserver<Album>() {
+                    @Override
+                    public void onNext(Album album) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        adapter.notifyDataSetChanged();
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     @Override
@@ -284,16 +336,17 @@ public class AlbumSelectActivity extends HelperActivity {
 
                             File dir = file.getParentFile();
                             File[] files = dir.listFiles();
-                            int count = 0;
+                            /*int count = 0;
                             long fileSize = 0;
                             for (File file1 : files){
                                 if(PhotoCompressHelper.isImage(file1)){
                                     count++;
                                     fileSize = fileSize + file1.length();
                                 }
-                            }
-                            album1.count = count;
-                            album1.fileSize = fileSize;
+                            }*/
+                            album1.dir = dir.getAbsolutePath();
+                            album1.count = files == null ? 0 : files.length;
+                           // album1.fileSize = fileSize;
                         }
                     }
 
@@ -310,7 +363,7 @@ public class AlbumSelectActivity extends HelperActivity {
             Collections.sort(albums, new Comparator<Album>() {
                 @Override
                 public int compare(Album o1, Album o2) {
-                    return (int) (o2.fileSize - o1.fileSize);
+                    return (int) (o2.count - o1.count);
                 }
             });
 

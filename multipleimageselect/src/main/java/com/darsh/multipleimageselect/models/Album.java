@@ -7,6 +7,7 @@ public class Album {
     public String name;
     public String cover;
     public int count;
+    public String dir;
     public long fileSize;
 
     public Album(String name, String cover) {

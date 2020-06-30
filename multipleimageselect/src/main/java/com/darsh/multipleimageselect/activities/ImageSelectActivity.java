@@ -270,6 +270,8 @@ public class ImageSelectActivity extends HelperActivity {
                             gridView.setVisibility(View.VISIBLE);
                             orientationBasedUI(getResources().getConfiguration().orientation);
 
+
+
                         } else {
                             adapter.notifyDataSetChanged();
                             /*
@@ -306,6 +308,8 @@ public class ImageSelectActivity extends HelperActivity {
 
         checkPermission();
     }
+
+
 
     @Override
     protected void onStop() {
