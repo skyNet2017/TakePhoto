@@ -72,7 +72,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
                 .load(image.path)
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
-        viewHolder.tvInfo.setText("");
+        //viewHolder.tvInfo.setText("");
 
         Observable.just(viewHolder1)
                 .doOnNext(new Consumer<ViewHolder>() {
