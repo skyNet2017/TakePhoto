@@ -24,6 +24,7 @@ import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.hss01248.analytics.ad.AdUtil;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.simple.spiderman.SpiderMan;
 
 import java.io.File;
 
@@ -59,6 +60,7 @@ public class BaseApp extends Application {
         });*/
        handler = new Handler();
         isDebugable = BuildConfig.DEBUG;
+        SpiderMan.init(this);
 
         //registerFileReceiver(this);
         ImageInfoFormater.init(this);

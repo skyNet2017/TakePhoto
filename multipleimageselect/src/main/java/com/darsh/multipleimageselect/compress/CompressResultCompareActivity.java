@@ -59,7 +59,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
     FloatingActionMenu menu;
 
-    ArrayList<String> paths ;
+    static ArrayList<String> paths ;
     boolean isPreview;
     boolean isAllSelected;
     RelativeLayout rlRoot;
@@ -67,19 +67,38 @@ public class CompressResultCompareActivity extends AppCompatActivity {
     FloatingActionButton fbChangeQuality;
 
     public static void lauch(Activity activity, ArrayList<String> paths,boolean isAllSelected){
-        Intent intent = new Intent(activity,CompressResultCompareActivity.class);
-        intent.putExtra("paths",paths);
-        intent.putExtra("isAllSelected",isAllSelected);
-        activity.startActivityForResult(intent,980);
+        try {
+            Intent intent = new Intent(activity,CompressResultCompareActivity.class);
+            if(paths.size() > 1000){
+                CompressResultCompareActivity.paths = paths;
+            }else {
+                intent.putExtra("paths",paths);
+            }
+
+            intent.putExtra("isAllSelected",isAllSelected);
+            activity.startActivityForResult(intent,980);
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+
     }
 
     public static void lauchForPreview(Activity activity, ArrayList<String> paths,int position){
-        Intent intent = new Intent(activity,CompressResultCompareActivity.class);
-        intent.putExtra("paths",paths);
-        intent.putExtra("position",position);
-        intent.putExtra("isPreview",true);
-        intent.putExtra("isAllSelected",true);
-        activity.startActivityForResult(intent,980);
+        try {
+            Intent intent = new Intent(activity,CompressResultCompareActivity.class);
+            if(paths.size() > 1000){
+                CompressResultCompareActivity.paths = paths;
+            }else {
+                intent.putExtra("paths",paths);
+            }
+            intent.putExtra("position",position);
+            intent.putExtra("isPreview",true);
+            intent.putExtra("isAllSelected",true);
+            activity.startActivityForResult(intent,980);
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+
     }
 
     @Override
@@ -106,7 +125,10 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 WindowManager.LayoutParams. FLAG_FULLSCREEN);
         setContentView(R.layout.activity_compress_compare);
         initView();
-        paths = getIntent().getStringArrayListExtra("paths");
+        ArrayList<String> paths2 = getIntent().getStringArrayListExtra("paths");
+        if(paths2 != null){
+            paths = paths2;
+        }
         position = getIntent().getIntExtra("position",0);
         isPreview = getIntent().getBooleanExtra("isPreview",false);
         isAllSelected = getIntent().getBooleanExtra("isAllSelected",false);

@@ -17,6 +17,14 @@ import com.hss01248.imginfo.ImageInfoFormater;
 import java.io.File;
 import java.util.ArrayList;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by Darshan on 4/18/2015.
  */
@@ -27,7 +35,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.grid_view_item_image_select, null);
@@ -59,18 +67,51 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         }
 
         Image image = arrayList.get(position);
+        viewHolder.image = image;
         Glide.with(context)
                 .load(image.path)
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
+        ViewHolder viewHolder1 = viewHolder;
+        viewHolder.tvInfo.setText("");
 
-        String desc = formatImagInfo(image,false,viewHolder.imageView.getContext());
+        Observable.just(viewHolder1)
+                .doOnNext(new Consumer<ViewHolder>() {
+                    @Override
+                    public void accept(ViewHolder viewHolder) throws Exception {
+                        viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ViewHolder>() {
+                    @Override
+                    public void accept(ViewHolder viewHolder3) throws Exception {
+                        if(viewHolder3.image.equals(viewHolder.image)){
+                            if(viewHolder.image.quality > PhotoCompressHelper.DEFAULT_QUALITY ){
+                                viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color_not_compressed));
+                            }else {
+                                viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color));
+                            }
+                            viewHolder.tvInfo.setText(viewHolder.desc);
+                        }else {
+                            //viewHolder.tvInfo.setText("");
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
+
+       /* String desc = formatImagInfo(image,false,viewHolder.imageView.getContext());
 
         if(image.quality > PhotoCompressHelper.DEFAULT_QUALITY ){
             viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color_not_compressed));
         }else {
             viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color));
         }
-        viewHolder.tvInfo.setText(desc);
+        viewHolder.tvInfo.setText(desc);*/
         return convertView;
     }
 
@@ -98,5 +139,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         public ImageView imageView;
         public View view;
         public TextView tvInfo;
+        public Image image;
+        public String  desc;
     }
 }
