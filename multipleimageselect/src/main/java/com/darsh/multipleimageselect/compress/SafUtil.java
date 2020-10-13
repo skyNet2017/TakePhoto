@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,12 @@ import android.widget.Toast;
 
 import com.hss01248.activityresult.ActivityResultListener;
 import com.hss01248.activityresult.StartActivityUtil;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 
 public class SafUtil {
@@ -167,5 +174,46 @@ public class SafUtil {
         void onPermissionGet(DocumentFile dir);
 
         void onPermissionDenied(int resultCode, String msg);
+    }
+
+
+    private static String readFile(DocumentFile file,Context context) {
+        try {
+            //file.getUri()
+            InputStreamReader reader = new InputStreamReader(context.getContentResolver().openInputStream(file.getUri()));
+            BufferedReader bReader = new BufferedReader(reader);//new一个BufferedReader对象，将文件内容读取到缓存
+            StringBuilder sb = new StringBuilder();//定义一个字符串缓存，将字符串存放缓存中
+            String s = "";
+            while ((s =bReader.readLine()) != null) {//逐行读取文件内容，不读取换行符和末尾的空格
+                sb.append(s);//将读取的字符串添加换行符后累加存放在缓存中
+                System.out.println(s);
+            }
+            bReader.close();
+            String str = sb.toString();
+            System.out.println(str );
+            return str;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private static void alterDocument(Uri uri,String content,Context context) {
+        try {
+            ParcelFileDescriptor pfd = context.getContentResolver().
+                    openFileDescriptor(uri, "w");
+            FileOutputStream fileOutputStream =
+                    new FileOutputStream(pfd.getFileDescriptor());
+            fileOutputStream.write(content.getBytes());
+            fileOutputStream.flush();
+            // Let the document provider know you're done by closing the stream.
+            fileOutputStream.close();
+            pfd.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
