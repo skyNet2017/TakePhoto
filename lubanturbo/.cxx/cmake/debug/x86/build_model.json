@@ -5,7 +5,6 @@
       "sdkFolder": "/Users/hss/Library/Android/sdk",
       "isNativeCompilerSettingsCacheEnabled": false,
       "isBuildOnlyTargetAbiEnabled": true,
-      "ideBuildTargetAbi": "x86",
       "splitsAbiFilterSet": [],
       "intermediatesFolder": "/Users/hss/github/TakePhoto/lubanturbo/build/intermediates",
       "gradleModulePathName": ":lubanturbo",
@@ -48,7 +47,10 @@
     "gradleBuildOutputFolder": "/Users/hss/github/TakePhoto/lubanturbo/.cxx/cxx/debug",
     "isDebuggableEnabled": true,
     "validAbiList": [
-      "X86"
+      "ARMEABI_V7A",
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
     ],
     "buildTargetSet": []
   },

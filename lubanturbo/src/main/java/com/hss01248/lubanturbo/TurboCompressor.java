@@ -80,7 +80,7 @@ public class TurboCompressor {
         return false;
     }
 
-    private static boolean compressByAndroid(Bitmap bitmap, int quality, String outPath) {
+     static boolean compressByAndroid(Bitmap bitmap, int quality, String outPath) {
         try {
             File file = new File(outPath);
              new DefaultBitmapToFile().compressToFile(bitmap,file,false,quality);
@@ -119,7 +119,7 @@ public class TurboCompressor {
         return  (quality ==  0) ||  (quality > getQuality());
     }
 
-    private static int getQuality() {
+     static int getQuality() {
         return 80;
     }
 
