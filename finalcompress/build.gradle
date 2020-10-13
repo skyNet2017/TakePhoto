@@ -5,21 +5,21 @@ apply plugin: 'io.fabric'
 
 com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
 
 
     defaultConfig {
         applicationId "com.hss01248.finalcompress"
-        minSdkVersion 15
-        targetSdkVersion 28
+        minSdkVersion 16
+        targetSdkVersion 30
         versionCode 4
         versionName "1.0.3"
         multiDexEnabled true
         // testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             ndk {
-                abiFilters "armeabi-v7a", "arm64-v8a"//, "x86", "x86_64"
+                abiFilters "armeabi-v7a", "arm64-v8a","x86"//, "x86", "x86_64"
             }
 
             cmake {
@@ -112,3 +112,62 @@ dependencies {
 
 
 }
+/*
+configurations {
+    all*.exclude group: 'androidx.arch.core'
+    all*.exclude group: 'androidx.lifecycle'
+    all*.exclude group: 'androidx.paging'
+    all*.exclude group: 'androidx.room'
+    all*.exclude group: 'androidx.sqlite'
+    all*.exclude group: 'androidx.constraintlayout'
+    all*.exclude group: 'androidx.vectordrawable'
+    all*.exclude group: 'androidx.appcompat'
+    all*.exclude group: 'androidx.asynclayoutinflater'
+    all*.exclude group: 'androidx.cardview'
+    all*.exclude group: 'androidx.car'
+    all*.exclude group: 'androidx.collection'
+    all*.exclude group: 'androidx.coordinatorlayout'
+    all*.exclude group: 'androidx.cursoradapter'
+    all*.exclude group: 'androidx.browser'
+    all*.exclude group: 'androidx.customview'
+    all*.exclude group: 'com.google.android.material'
+    all*.exclude group: 'androidx.documentfile'
+    all*.exclude group: 'androidx.drawerlayout'
+    all*.exclude group: 'androidx.exifinterface'
+    all*.exclude group: 'androidx.gridlayout'
+    all*.exclude group: 'androidx.heifwriter'
+    all*.exclude group: 'androidx.interpolator'
+    all*.exclude group: 'androidx.leanback'
+    all*.exclude group: 'androidx.loader'
+    all*.exclude group: 'androidx.localbroadcastmanager'
+    all*.exclude group: 'androidx.media2'
+    all*.exclude group: 'androidx.mediarouter'
+    all*.exclude group: 'androidx.multidex'
+    all*.exclude group: 'androidx.palette'
+    all*.exclude group: 'androidx.percentlayout'
+    all*.exclude group: 'androidx.leanback'
+    all*.exclude group: 'androidx.legacy'
+    all*.exclude group: 'androidx.preference'
+    all*.exclude group: 'androidx.print'
+    all*.exclude group: 'androidx.recommendation'
+    all*.exclude group: 'androidx.recyclerview'
+    all*.exclude group: 'androidx.slice'
+    all*.exclude group: 'androidx.slidingpanelayout'
+    all*.exclude group: 'androidx.core'
+    all*.exclude group: 'androidx.contentpager'
+    all*.exclude group: 'androidx.legacy'
+    all*.exclude group: 'androidx.dynamicanimation'
+    all*.exclude group: 'androidx.emoji'
+    all*.exclude group: 'androidx.fragment'
+    all*.exclude group: 'androidx.media'
+    all*.exclude group: 'androidx.tvprovider'
+    all*.exclude group: 'androidx.vectordrawable'
+    all*.exclude group: 'androidx.swiperefreshlayout'
+    all*.exclude group: 'androidx.textclassifier'
+    all*.exclude group: 'androidx.transition'
+    all*.exclude group: 'androidx.versionedparcelable'
+    all*.exclude group: 'androidx.viewpager'
+    all*.exclude group: 'androidx.wear'
+    all*.exclude group: 'androidx.webkit'
+    // all*.exclude group: 'androidx.annotation'
+}*/

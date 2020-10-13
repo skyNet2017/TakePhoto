@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
+import com.darsh.multipleimageselect.compress.SafUtil;
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.gc.materialdesign.views.ButtonRectangle;
@@ -72,7 +74,18 @@ public class MainActivity extends AppCompatActivity {
        /* AdView adView = findViewById(R.id.ad_banner);
         AdUtil.loadBannerAd(this, adView);*/
 
-        StorageUtils.requestOutSdCradWritePermission(this);
+       // StorageUtils.requestOutSdCradWritePermission(this);
+        SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
+            @Override
+            public void onPermissionGet(DocumentFile dir) {
+
+            }
+
+            @Override
+            public void onPermissionDenied(int resultCode, String msg) {
+
+            }
+        });
     }
 
     @Override

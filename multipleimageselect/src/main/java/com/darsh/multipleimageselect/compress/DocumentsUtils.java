@@ -54,6 +54,9 @@ public class DocumentsUtils {
         if (sExtSdCardPaths.size() > 0) {
             return sExtSdCardPaths.toArray(new String[0]);
         }
+        if(context.getExternalFilesDirs("external") == null){
+            return null;
+        }
         for (File file : context.getExternalFilesDirs("external")) {
             if (file != null && !file.equals(context.getExternalFilesDir("external"))) {
                 int index = file.getAbsolutePath().lastIndexOf("/Android/data");

@@ -28,4 +28,6 @@ dependencies {
     compile project(':lubanturbo')
     compile 'com.github.clans:fab:1.6.4'
     compile 'me.shaohui.advancedluban:library:1.3.5'
+
+    api 'com.github.hss01248.StartActivityResult:activityresult:1.0.3-support'
 }

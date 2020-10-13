@@ -146,6 +146,9 @@ public class PhotoCompressHelper {
             if(suffix.equalsIgnoreCase("png")){
                 return true;
             }
+            if(suffix.equalsIgnoreCase("gif") || suffix.equalsIgnoreCase("webp")){
+                return false;
+            }
             return false;
         }
         if(!checkQuality){
@@ -369,17 +372,26 @@ public class PhotoCompressHelper {
         String outPath = outFile.getAbsolutePath();
         long start = System.currentTimeMillis();
         boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
+
         String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
         if(success){
             Log.w("success", cost + filen);
+
+            //文件覆盖
             if(override){
                 try {
-                    FileUtils.copyFile(outFile,file);
-                    outFile.delete();
+                    if(outFile.length() < file.length()){
+                        FileUtils.copyFile(outFile,file);
+                        outFile.delete();
+                    }else {
+
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
+                    //todo saf操作文件
                     DocumentsUtils.renameTo2(StorageUtils.context,file,outFile);
                 }
             }
