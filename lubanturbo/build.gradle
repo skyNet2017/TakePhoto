@@ -42,6 +42,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api project(':luban')
+    //api project(':luban')
     compile 'it.sephiroth.android.exif:library:+'
 }

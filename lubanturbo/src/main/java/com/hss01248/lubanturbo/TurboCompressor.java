@@ -5,12 +5,14 @@ import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import it.sephiroth.android.library.exif2.ExifInterface;
-import top.zibin.luban.DefaultBitmapToFile;
-import top.zibin.luban.IBitmapToFile;
+
+
 
 /**
  * Created by hss on 2018/12/14.
@@ -83,7 +85,7 @@ public class TurboCompressor {
      static boolean compressByAndroid(Bitmap bitmap, int quality, String outPath) {
         try {
             File file = new File(outPath);
-             new DefaultBitmapToFile().compressToFile(bitmap,file,false,quality);
+             defaultCompressToFile(bitmap,file,false,quality);
              return file.exists() && file.length() > 50;
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +93,19 @@ public class TurboCompressor {
         }
     }
 
-     static boolean shouldCompress(File pathname,boolean checkQuality) {
+    private static void defaultCompressToFile(Bitmap bitmap, File file, boolean focusAlpha, int quality) throws IOException{
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(focusAlpha ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG, quality, stream);
+        bitmap.recycle();
+
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(stream.toByteArray());
+        fos.flush();
+        fos.close();
+        stream.close();
+    }
+
+    static boolean shouldCompress(File pathname,boolean checkQuality) {
 
         String name = pathname.getName();
         int idx = name.lastIndexOf(".");
@@ -142,27 +156,5 @@ public class TurboCompressor {
     }
 
 
-    public static IBitmapToFile getTurboCompressor(){
-        return new IBitmapToFile() {
-            @Override
-            public void compressToFile(Bitmap tagBitmap, File tagImg, boolean focusAlpha, int quality) throws IOException {
-                Log.d("dd","TurboCompressor started");
-                long start = System.currentTimeMillis();
-                //boolean isSuccess = nativeCompress(tagBitmap,quality,tagImg.getAbsolutePath());
 
-                boolean success =  false;
-                try {
-                    success =  nativeCompress(tagBitmap,quality,tagImg.getAbsolutePath());
-                }catch (Throwable throwable){
-                    throwable.printStackTrace();
-                    success = compressByAndroid(tagBitmap,quality,tagImg.getAbsolutePath());
-                }
-
-                Log.d("dd","TurboCompressor ended,cost time:"+(System.currentTimeMillis() - start));
-                if(!success){
-                    throw new IOException("nativeCompress failed");
-                }
-            }
-        };
-    }
 }
