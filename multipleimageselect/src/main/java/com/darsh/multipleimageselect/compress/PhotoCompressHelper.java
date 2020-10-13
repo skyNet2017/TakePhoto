@@ -157,7 +157,7 @@ public class PhotoCompressHelper {
 
         int quality = ImageInfoFormater.getQuality(pathname.getAbsolutePath());
         Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
-        return  quality > getQuality();
+        return  (quality ==  0) ||  (quality > getQuality());
     }
 
     /**
