@@ -1,3 +1,0 @@
-D:/projects/android/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/luban.dir
-D:/projects/android/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/edit_cache.dir
-D:/projects/android/skynet/TakePhoto/lubanturbo/.externalNativeBuild/cmake/debug/armeabi-v7a/CMakeFiles/rebuild_cache.dir
