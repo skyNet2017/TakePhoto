@@ -106,19 +106,27 @@ public class MyImageWatcher {
     private static void doCompress(String fileName, File dir) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
 //根据JobService创建一个ComponentName对象
-            if(mServiceComponent == null){
-                mServiceComponent = new ComponentName(BaseApp.app, MyJobService.class);
-            }
-            JobInfo.Builder builder = new JobInfo.Builder(mJobId++, mServiceComponent);
-            builder.setMinimumLatency(500);//设置延迟调度时间
+            mServiceComponent = new ComponentName(BaseApp.app, MyJobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(++mJobId, mServiceComponent);
+           // builder.setMinimumLatency(200);//设置延迟调度时间
             //builder.setOverrideDeadline(2000);//设置该Job截至时间，在截至时间前肯定会执行该Job
             builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);//设置所需网络类型
             builder.setRequiresDeviceIdle(false);//设置在DeviceIdle时执行Job
             builder.setRequiresCharging(false);//设置在充电时执行Job
+            builder.setPersisted(true);
             PersistableBundle bundle = new PersistableBundle();
             bundle.putString("dir",dir.getAbsolutePath());
             bundle.putString("fileName",fileName);
             builder.setExtras(bundle);//设置一个额外的附加项
+
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                //builder.setMinimumLatency(200);
+            } else {
+               // builder.setPeriodic(200);
+            }
+
+
 
             JobInfo  mJobInfo = builder.build();
 
@@ -127,6 +135,7 @@ public class MyImageWatcher {
             }
 
             mJobScheduler.schedule(mJobInfo);//调度Job
+            Log.w("监听","发送任务: mJobScheduler.schedule: path: "+fileName);
             /*mBuilder = new JobInfo.Builder(id,new ComponentName(this, MyJobService.class));
 
             JobInfo  mJobInfo = mBuilder.build();
