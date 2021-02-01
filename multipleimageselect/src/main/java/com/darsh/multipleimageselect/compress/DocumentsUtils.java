@@ -54,6 +54,9 @@ public class DocumentsUtils {
         if (sExtSdCardPaths.size() > 0) {
             return sExtSdCardPaths.toArray(new String[0]);
         }
+        if(context == null){
+            return null;
+        }
         if(context.getExternalFilesDirs("external") == null){
             return null;
         }
