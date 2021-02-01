@@ -1,13 +1,19 @@
 package com.sznq.finalcompress;
 
+import android.app.Application;
+import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,6 +37,8 @@ public class MyImageWatcher {
    static Map<Object,String> descs = getDescs(FileObserver.class);
    static ExecutorService service;
     static Handler handler;
+
+
     /**
      *
      * @param dir 必须是最后一层的目录.
@@ -49,18 +57,24 @@ public class MyImageWatcher {
                 if(TextUtils.isEmpty(path)){
                     return;
                 }
-                if(path.endsWith(".tmp")){
+               /* if(path.endsWith(".tmp")){
                     return;
-                }
+                }*/
+
                 File file = new File(dir,path);
                 if(file.isDirectory()){
                     Log.w("监听","文件夹新建事件:"+file.getAbsolutePath());
                     return;
                 }
+                if(path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".JPG")
+                        || path.endsWith(".jpeg")){
+                    String fullPath = new File(dir,path).getAbsolutePath();
+                    Log.w("监听","文件新增,准备压缩-path:"+fullPath);
+                    doCompress(path,dir);
+                }else {
+                    Log.w("监听","其他类型的文件新建:"+file.getAbsolutePath());
+                }
 
-                String fullPath = new File(dir,path).getAbsolutePath();
-                Log.w("监听","文件新增,准备压缩-path:"+fullPath);
-                doCompress(path,dir);
             }
         };
         dcimObserver.startWatching();
@@ -86,22 +100,50 @@ public class MyImageWatcher {
         return valueToDesc;
     }
 
-
+    private static ComponentName mServiceComponent;
+    private static int mJobId;
+    static JobScheduler mJobScheduler;
     private static void doCompress(String fileName, File dir) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+//根据JobService创建一个ComponentName对象
+            if(mServiceComponent == null){
+                mServiceComponent = new ComponentName(BaseApp.app, MyJobService.class);
+            }
+            JobInfo.Builder builder = new JobInfo.Builder(mJobId++, mServiceComponent);
+            builder.setMinimumLatency(500);//设置延迟调度时间
+            //builder.setOverrideDeadline(2000);//设置该Job截至时间，在截至时间前肯定会执行该Job
+            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);//设置所需网络类型
+            builder.setRequiresDeviceIdle(false);//设置在DeviceIdle时执行Job
+            builder.setRequiresCharging(false);//设置在充电时执行Job
+            PersistableBundle bundle = new PersistableBundle();
+            bundle.putString("dir",dir.getAbsolutePath());
+            bundle.putString("fileName",fileName);
+            builder.setExtras(bundle);//设置一个额外的附加项
+
+            JobInfo  mJobInfo = builder.build();
+
+            if(mJobScheduler == null){
+                mJobScheduler = (JobScheduler) BaseApp.app.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            }
+
+            mJobScheduler.schedule(mJobInfo);//调度Job
+            /*mBuilder = new JobInfo.Builder(id,new ComponentName(this, MyJobService.class));
+
+            JobInfo  mJobInfo = mBuilder.build();
+            mJobScheduler.schedule(builder.build());//调度Job
+            mJobScheduler.cancel(jobId);//取消特定Job
+            mJobScheduler.cancelAll();//取消应用所有的Job*/
+        }
+
+    }
+
+    public static void doBg(String fileName, File dir){
         if(service == null){
             service = Executors.newSingleThreadExecutor();
         }
-
-
-
         service.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 File file = new File(dir,fileName);
                 boolean shouldCompress =  PhotoCompressHelper.shouldCompress(file,true);
                 if(shouldCompress){
@@ -114,18 +156,20 @@ public class MyImageWatcher {
 
             }
         });
-
     }
 
     private static void showToast(String fileName) {
-        if(handler != null){
+        if(handler == null){
+            handler = new Handler(Looper.getMainLooper());
+        }
+
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(BaseApp.app,fileName+ " compressed!",Toast.LENGTH_SHORT).show();
                 }
             });
-        }
+
     }
 
 

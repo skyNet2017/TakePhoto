@@ -13,8 +13,8 @@ android {
         applicationId "com.hss01248.finalcompress"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.1.0"
         multiDexEnabled true
         // testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
