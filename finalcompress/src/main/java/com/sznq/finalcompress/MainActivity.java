@@ -1,10 +1,12 @@
 package com.sznq.finalcompress;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import androidx.annotation.Nullable;
@@ -86,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},976);
+        }
     }
 
     @Override
