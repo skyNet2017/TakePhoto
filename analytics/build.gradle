@@ -27,7 +27,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
     // https://mvnrepository.com/artifact/com.google.android.gms/play-services-analytics
     api group: 'com.google.android.gms', name: 'play-services-analytics', version: '16.0.6'
     api 'com.google.firebase:firebase-perf:16.2.3'

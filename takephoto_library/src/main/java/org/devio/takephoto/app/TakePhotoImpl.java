@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.widget.Toast;
 
 import com.darsh.multipleimageselect.helpers.Constants;
@@ -37,7 +37,6 @@ import com.soundcloud.android.crop.Crop;
 import com.yalantis.ucrop.UCrop;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
 import java.util.ArrayList;

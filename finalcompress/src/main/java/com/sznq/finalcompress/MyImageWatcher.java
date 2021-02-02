@@ -1,6 +1,5 @@
 package com.sznq.finalcompress;
 
-import android.app.Application;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -9,12 +8,12 @@ import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -25,7 +24,6 @@ import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -36,7 +34,8 @@ public class MyImageWatcher {
     static Map<String, FileObserver> observerMap = new HashMap<>();
    static Map<Object,String> descs = getDescs(FileObserver.class);
    static ExecutorService service;
-    static Handler handler;
+    static Handler handler = new Handler(Looper.getMainLooper());
+
 
 
     /**
@@ -45,7 +44,7 @@ public class MyImageWatcher {
      */
     public static void addFileObserver(File dir){
         Log.w("FileObserver","监听文件夹path:"+dir.getAbsolutePath());
-       FileObserver dcimObserver = new FileObserver(dir,FileObserver.MOVED_TO |FileObserver.CREATE) {
+       FileObserver dcimObserver = new FileObserver(dir,FileObserver.MOVED_TO | FileObserver.CREATE) {
             //FileObserver.MOVED_TO |FileObserver.CREATE | FileObserver.MODIFY
             // FileObserver.CREATE | FileObserver.MODIFY | FileObserver. |FileObserver.CLOSE_WRITE
             @Override
@@ -57,28 +56,61 @@ public class MyImageWatcher {
                 if(TextUtils.isEmpty(path)){
                     return;
                 }
-               /* if(path.endsWith(".tmp")){
-                    return;
-                }*/
+               // if(event == FileObserver.MOVED_TO || event == FileObserver.CREATE){
+                    File file = new File(dir,path);
+                    if(file.isDirectory()){
+                        Log.w("监听","文件夹新建事件:"+file.getAbsolutePath());
+                        return;
+                    }
+                    if(path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".JPG")
+                            || path.endsWith(".jpeg")){
+                        String fullPath = new File(dir,path).getAbsolutePath();
+                        Log.d("监听",Thread.currentThread().getName()+" thread ,文件新增,准备压缩-path:"+fullPath);
+                        //doCompress(path,dir);
+                        // doCompressByWorkManager(path,dir);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                doCompressOnCurrent(path,dir);
+                            }
+                        },2500);
 
-                File file = new File(dir,path);
-                if(file.isDirectory()){
-                    Log.w("监听","文件夹新建事件:"+file.getAbsolutePath());
-                    return;
-                }
-                if(path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".JPG")
-                        || path.endsWith(".jpeg")){
-                    String fullPath = new File(dir,path).getAbsolutePath();
-                    Log.w("监听","文件新增,准备压缩-path:"+fullPath);
-                    doCompress(path,dir);
-                }else {
-                    Log.w("监听","其他类型的文件新建:"+file.getAbsolutePath());
-                }
+
+                    }else {
+                        Log.w("监听","其他类型的文件新建:"+file.getAbsolutePath());
+                    }
+                //}
+
+
 
             }
         };
         dcimObserver.startWatching();
         observerMap.put(dir.getAbsolutePath(),dcimObserver);
+    }
+
+    private static void doCompressOnCurrent(String fileName, File dir) {
+        /*try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        File file = new File(dir,fileName);
+        boolean shouldCompress =  PhotoCompressHelper.shouldCompress(file,true);
+        if(shouldCompress){
+            PhotoCompressHelper.compressOneFile(file,true);
+            refreshMediaCenter(BaseApp.app,file.getAbsolutePath());
+            showToast(fileName);
+        }else {
+            Log.w("dd","无需压缩:"+file.getAbsolutePath());
+        }
+    }
+
+    private static void doCompressByWorkManager(String path, File dir) {
+        /*WorkManager.getInstance(BaseApp.app)
+    .beginWith(Arrays.asList(new OneTimeWorkRequest.Builder().))
+                .then(workC)
+                .enqueue();*/
     }
 
 
@@ -110,9 +142,11 @@ public class MyImageWatcher {
             JobInfo.Builder builder = new JobInfo.Builder(++mJobId, mServiceComponent);
            // builder.setMinimumLatency(200);//设置延迟调度时间
             //builder.setOverrideDeadline(2000);//设置该Job截至时间，在截至时间前肯定会执行该Job
-            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);//设置所需网络类型
+           // builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);//设置所需网络类型
             builder.setRequiresDeviceIdle(false);//设置在DeviceIdle时执行Job
             builder.setRequiresCharging(false);//设置在充电时执行Job
+            builder.setOverrideDeadline(2000);//// 任务deadline，当到期没达到指定条件也会开始执行
+           // builder .setBackoffCriteria(3000,JobInfo.BACKOFF_POLICY_LINEAR); //设置退避/重试策略
             builder.setPersisted(true);
             PersistableBundle bundle = new PersistableBundle();
             bundle.putString("dir",dir.getAbsolutePath());
@@ -135,7 +169,7 @@ public class MyImageWatcher {
             }
 
             mJobScheduler.schedule(mJobInfo);//调度Job
-            Log.w("监听","发送任务: mJobScheduler.schedule: path: "+fileName);
+            Log.w("监听","发送任务: mJobScheduler.schedule: path: "+fileName+" , 任务id:"+mJobId);
             /*mBuilder = new JobInfo.Builder(id,new ComponentName(this, MyJobService.class));
 
             JobInfo  mJobInfo = mBuilder.build();

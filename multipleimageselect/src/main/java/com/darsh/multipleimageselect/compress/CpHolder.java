@@ -1,8 +1,8 @@
 package com.darsh.multipleimageselect.compress;
 
 import android.app.Activity;
-import android.content.pm.ActivityInfo;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.Surface;
 import android.view.View;

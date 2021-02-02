@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -24,13 +24,9 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 import io.reactivex.functions.Consumer;
 

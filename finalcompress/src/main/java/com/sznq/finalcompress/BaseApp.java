@@ -9,15 +9,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.FileObserver;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDex;
+import androidx.annotation.Nullable;
+import androidx.multidex.MultiDex;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.ForegroundNotification;
@@ -28,10 +25,6 @@ import com.hss01248.imginfo.ImageInfoFormater;
 import com.simple.spiderman.SpiderMan;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hss on 2018/12/22.

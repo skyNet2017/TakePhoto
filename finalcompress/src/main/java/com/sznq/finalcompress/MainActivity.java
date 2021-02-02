@@ -7,10 +7,10 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ShareCompat;
-import android.support.v4.provider.DocumentFile;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.core.app.ShareCompat;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
