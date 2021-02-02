@@ -1,5 +1,6 @@
 package com.sznq.finalcompress;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -66,12 +67,34 @@ public class BaseApp extends Application {
 
         //registerContentObserver();
 
-        observerCamera();
+      boolean  isMainProcess = getApplicationContext().getPackageName().equals
+                (getCurrentProcessName());
+
+      if(isMainProcess){
+          observerCamera();
+      }
 
 
 
 
 
+
+    }
+
+    /**
+     * 获取当前进程名
+     */
+    private String getCurrentProcessName() {
+        int pid = android.os.Process.myPid();
+        String processName = "";
+        ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService
+                (Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo process : manager.getRunningAppProcesses()) {
+            if (process.pid == pid) {
+                processName = process.processName;
+            }
+        }
+        return processName;
     }
 
     private void keepAlive() {
