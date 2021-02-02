@@ -47,12 +47,15 @@ public class MyImageWatcher {
        FileObserver dcimObserver = new FileObserver(dir,FileObserver.MOVED_TO | FileObserver.CREATE) {
             //FileObserver.MOVED_TO |FileObserver.CREATE | FileObserver.MODIFY
             // FileObserver.CREATE | FileObserver.MODIFY | FileObserver. |FileObserver.CLOSE_WRITE
+           Map<String,Runnable> map = new HashMap();
             @Override
             public void onEvent(int event, @Nullable String path) {
+                //连续两次响应的处理:
                 Log.i("监听","path:"+path+", event:"+event+", "+descs.get(event));
                 //FileObserver: 256,path:IMG_20190113_104421.jpg.tmp
                 //doCompress(path,new File(cameraDir));
                 //if(event == FileObserver.MOVED_TO || event == FileObserver.CREATE){
+
                 if(TextUtils.isEmpty(path)){
                     return;
                 }
@@ -65,17 +68,23 @@ public class MyImageWatcher {
                     if(path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".JPG")
                             || path.endsWith(".jpeg")){
                         String fullPath = new File(dir,path).getAbsolutePath();
-                        Log.d("监听",Thread.currentThread().getName()+" thread ,文件新增,准备压缩-path:"+fullPath);
+                        Log.d("监听",Thread.currentThread().getName()+" thread ,文件新增,准备几秒后压缩-path:"+fullPath);
                         //doCompress(path,dir);
                         // doCompressByWorkManager(path,dir);
-                        handler.postDelayed(new Runnable() {
+                        Runnable runnable = map.get(path);
+                        if(runnable != null){
+                            handler.removeCallbacks(runnable);
+                        }
+                         runnable = new Runnable() {
                             @Override
                             public void run() {
+                                map.remove(path);
+                                Log.d("监听",Thread.currentThread().getName()+" thread ,真正开始压缩-path:"+fullPath);
                                 doCompressOnCurrent(path,dir);
                             }
-                        },2500);
-
-
+                        };
+                        map.put(path,runnable);
+                        handler.postDelayed(runnable,4000);
                     }else {
                         Log.w("监听","其他类型的文件新建:"+file.getAbsolutePath());
                     }
