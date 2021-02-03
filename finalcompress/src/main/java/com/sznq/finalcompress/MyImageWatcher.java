@@ -24,8 +24,14 @@ import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,51 +50,61 @@ public class MyImageWatcher {
      */
     public static void addFileObserver(File dir){
         Log.w("FileObserver","监听文件夹path:"+dir.getAbsolutePath());
-       FileObserver dcimObserver = new FileObserver(dir,FileObserver.MOVED_TO | FileObserver.CREATE) {
+       FileObserver dcimObserver = new FileObserver(dir) {//,FileObserver.MOVED_TO | FileObserver.CREATE | FileObserver.CLOSE_NOWRITE
             //FileObserver.MOVED_TO |FileObserver.CREATE | FileObserver.MODIFY
             // FileObserver.CREATE | FileObserver.MODIFY | FileObserver. |FileObserver.CLOSE_WRITE
            Map<String,Runnable> map = new HashMap();
             @Override
-            public void onEvent(int event, @Nullable String path) {
+            public void onEvent(int event, @Nullable String fileName) {
                 //连续两次响应的处理:
-                Log.i("监听","path:"+path+", event:"+event+", "+descs.get(event));
+                Log.i("监听","path:"+fileName+", event:"+event+", "+descs.get(event));
                 //FileObserver: 256,path:IMG_20190113_104421.jpg.tmp
                 //doCompress(path,new File(cameraDir));
                 //if(event == FileObserver.MOVED_TO || event == FileObserver.CREATE){
 
-                if(TextUtils.isEmpty(path)){
+                if(TextUtils.isEmpty(fileName)){
                     return;
                 }
-               // if(event == FileObserver.MOVED_TO || event == FileObserver.CREATE){
-                    File file = new File(dir,path);
+                if(event == FileObserver.CLOSE_NOWRITE){
+                    runTask(1300);
+                }else if(event == FileObserver.MOVED_TO || event == FileObserver.CREATE){
+                    //event:16, close_nowrite 可能多次
+                    File file = new File(dir,fileName);
                     if(file.isDirectory()){
-                        Log.w("监听","文件夹新建事件:"+file.getAbsolutePath());
+                        Log.v("监听","文件夹新建事件:"+file.getAbsolutePath());
                         return;
                     }
-                    if(path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".JPG")
-                            || path.endsWith(".jpeg")){
-                        String fullPath = new File(dir,path).getAbsolutePath();
-                        Log.d("监听",Thread.currentThread().getName()+" thread ,文件新增,准备几秒后压缩-path:"+fullPath);
+                    if(fileName.endsWith(".jpg") || fileName.endsWith(".png") || fileName.endsWith(".JPG")
+                            || fileName.endsWith(".jpeg")){
+                        File file1 = new File(dir,fileName);
+                        String fullPath = file1.getAbsolutePath();
+
                         //doCompress(path,dir);
                         // doCompressByWorkManager(path,dir);
-                        Runnable runnable = map.get(path);
-                        if(runnable != null){
-                            handler.removeCallbacks(runnable);
+
+                        //doByMainHandler(map,path,dir);
+
+                        //加入等待队列
+                        ToCompressFileInfo fileInfo = new ToCompressFileInfo();
+                        fileInfo.file = file1;
+                        fileInfo.startTime = System.currentTimeMillis();
+                        if(!fileInfoQueue.contains(fileInfo)){
+                            fileInfoQueue.add(fileInfo);
+                            Log.d("监听",Thread.currentThread().getName()+" thread ,文件新增,加入等待队列,准备几秒后压缩-path:"+fullPath);
+                        }else {
+                            Log.v("监听","已经加入过压缩队列,不再加入:"+file.getAbsolutePath());
                         }
-                         runnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                map.remove(path);
-                                Log.d("监听",Thread.currentThread().getName()+" thread ,真正开始压缩-path:"+fullPath);
-                                doCompressOnCurrent(path,dir);
-                            }
-                        };
-                        map.put(path,runnable);
-                        handler.postDelayed(runnable,4000);
+                        //fileInfoQueue.add(fileInfo);
+
+
+                        //从队列头部取值,看是否有超过4s的任务,有的话,切割,将超过4s的任务全部执行掉:
+                        runTask(4000);
+
+
                     }else {
-                        Log.w("监听","其他类型的文件新建:"+file.getAbsolutePath());
+                        Log.v("监听","其他类型的文件新建:"+file.getAbsolutePath());
                     }
-                //}
+                }
 
 
 
@@ -98,20 +114,111 @@ public class MyImageWatcher {
         observerMap.put(dir.getAbsolutePath(),dcimObserver);
     }
 
+    private static void runTask(int time) {
+        if(fileInfoQueue.isEmpty()){
+            Log.w("监听",Thread.currentThread().getName()+" thread ,没有要压缩的任务 ");
+            return;
+        }
+        // 从队列头部取值,看是否有超过4s的任务,有的话,切割,将超过4s的任务全部执行掉:
+        List<ToCompressFileInfo> todoTasks = new ArrayList<>();
+        Iterator<ToCompressFileInfo> infoIterator = fileInfoQueue.iterator();
+        while (infoIterator.hasNext()){
+            ToCompressFileInfo fileInfo1 = infoIterator.next();
+            if(System.currentTimeMillis()  - fileInfo1.startTime >= time){
+                todoTasks.add(fileInfo1);
+                infoIterator.remove();
+            }
+        }
+        if(todoTasks.size() > 0){
+            for (ToCompressFileInfo todoTask : todoTasks) {
+                doCompressOnCurrent(todoTask.file.getName(),todoTask.file.getParentFile());
+            }
+            Log.w("监听",Thread.currentThread().getName()+" thread ,压"+todoTasks.size()+"张,还有"+fileInfoQueue.size()+"张在等待队列中");
+            if(fileInfoQueue.size() > 0){
+                //还剩下一些:  永远有一张在等待队列中
+                               /* try {
+                                    Thread.sleep(wait);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                for (ToCompressFileInfo todoTask : fileInfoQueue) {
+                                    doCompressOnCurrent(todoTask.file.getName(),todoTask.file.getParentFile());
+                                }
+                                Log.w("监听",Thread.currentThread().getName()+" thread ,4s已过,剩下压缩完成,队列清空x条:"+fileInfoQueue.size());
+                                fileInfoQueue.clear();*/
+            }
+        }else {
+            //都是要4s后压缩的:
+            Log.w("监听",Thread.currentThread().getName()+" thread ,都是要4s后压缩的 "+fileInfoQueue.size()+"张在等待队列中");
+                           /* try {
+                                Thread.sleep(wait);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            for (ToCompressFileInfo todoTask : fileInfoQueue) {
+                                doCompressOnCurrent(todoTask.file.getName(),todoTask.file.getParentFile());
+                            }
+                            Log.w("监听",Thread.currentThread().getName()+" thread ,4s已过,全部压缩完成,队列清空x条:"+fileInfoQueue.size());
+                            fileInfoQueue.clear();*/
+
+        }
+                        /*if(fileInfoQueue.size() == 1){
+                            try {
+                                Thread.sleep(wait);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            for (ToCompressFileInfo todoTask : fileInfoQueue) {
+                                doCompressOnCurrent(todoTask.file.getName(),todoTask.file.getParentFile());
+                            }
+                            Log.w("监听",Thread.currentThread().getName()+" thread ,4s已过,全部压缩完成,队列清空x条:"+fileInfoQueue.size());
+                            fileInfoQueue.clear();
+                        }*/
+
+
+    }
+
+    private static void doByMainHandler(Map<String, Runnable> map, String path, File dir) {
+        Runnable runnable = map.get(path);
+        if(runnable != null){
+            handler.removeCallbacks(runnable);
+        }
+        String fullPath = new File(dir,path).getAbsolutePath();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                map.remove(path);
+                Log.d("监听",Thread.currentThread().getName()+" thread ,真正开始压缩-path:"+fullPath);
+                //doCompressOnCurrent(path,dir);
+            }
+        };
+        map.put(path,runnable);
+        handler.postDelayed(runnable,4000);
+    }
+
+
+    static List<ToCompressFileInfo> fileInfoQueue = new LinkedList<ToCompressFileInfo>();
+
+    /**
+     * 需要自己维护任务等待队列
+     * @param fileName
+     * @param dir
+     */
     private static void doCompressOnCurrent(String fileName, File dir) {
-        /*try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         File file = new File(dir,fileName);
         boolean shouldCompress =  PhotoCompressHelper.shouldCompress(file,true);
         if(shouldCompress){
+            /*try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }*/
+            Log.d("监听",Thread.currentThread().getName()+" thread ,真正开始压缩-path:"+file.getAbsolutePath());
             PhotoCompressHelper.compressOneFile(file,true);
             refreshMediaCenter(BaseApp.app,file.getAbsolutePath());
             showToast(fileName);
         }else {
-            Log.w("dd","无需压缩:"+file.getAbsolutePath());
+            Log.v("监听","无需压缩:"+file.getAbsolutePath());
         }
     }
 
