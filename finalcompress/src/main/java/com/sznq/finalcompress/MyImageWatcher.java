@@ -50,7 +50,7 @@ public class MyImageWatcher {
      */
     public static void addFileObserver(File dir){
         Log.w("FileObserver","监听文件夹path:"+dir.getAbsolutePath());
-       FileObserver dcimObserver = new FileObserver(dir) {//,FileObserver.MOVED_TO | FileObserver.CREATE | FileObserver.CLOSE_NOWRITE
+       FileObserver dcimObserver = new FileObserver(dir,FileObserver.MOVED_TO | FileObserver.CREATE | FileObserver.CLOSE_NOWRITE) {//,FileObserver.MOVED_TO | FileObserver.CREATE | FileObserver.CLOSE_NOWRITE
             //FileObserver.MOVED_TO |FileObserver.CREATE | FileObserver.MODIFY
             // FileObserver.CREATE | FileObserver.MODIFY | FileObserver. |FileObserver.CLOSE_WRITE
            Map<String,Runnable> map = new HashMap();

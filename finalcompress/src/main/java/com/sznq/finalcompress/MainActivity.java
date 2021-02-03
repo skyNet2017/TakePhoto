@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.documentfile.provider.DocumentFile;
@@ -80,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
-
             }
 
             @Override
@@ -88,10 +89,19 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+        AutoStartUtil.showDialog(MainActivity.this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},976);
+            if(checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},976);
+                return;
+            }
         }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

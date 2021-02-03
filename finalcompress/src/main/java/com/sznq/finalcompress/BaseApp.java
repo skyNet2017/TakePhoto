@@ -99,7 +99,7 @@ public class BaseApp extends Application {
 
     private void keepAlive() {
         //定义前台服务的默认样式。即标题、描述和图标
-        ForegroundNotification foregroundNotification = new ForegroundNotification("保活测试keepalive","用于及时压缩截图拍照图片", R.mipmap.ic_launcher,
+        ForegroundNotification foregroundNotification = new ForegroundNotification("保活keepalive","用于及时全自动压缩截图/拍照图片", R.mipmap.ic_launcher,
                 //定义前台服务的通知点击事件
                 new ForegroundNotificationClickListener() {
 
