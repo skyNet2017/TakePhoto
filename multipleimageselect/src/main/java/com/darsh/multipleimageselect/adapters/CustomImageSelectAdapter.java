@@ -121,10 +121,10 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         String size = ImageInfoFormater.formatFileSize(file.length());
         int[] wh = ImageInfoFormater.getImageWidthHeight(path);
         int quality = image.quality;
-        if(quality < 0){
+        //if(quality < 0){
             quality = ImageInfoFormater.getQuality(path);
             image.quality = quality;
-        }
+       // }
         String needCompress = quality > PhotoCompressHelper.DEFAULT_QUALITY ? context.getString(com.hss01248.imginfo.R.string.c_not_compressed) : context.getString(com.hss01248.imginfo.R.string.t_compressed);
         String str = wh[0] + "x" + wh[1] + ", " + size + context.getString(com.hss01248.imginfo.R.string.c_quality_info) + quality + needCompress;
         if (showFullPath) {

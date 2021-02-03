@@ -217,6 +217,15 @@ public class ImageSelectActivity extends HelperActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d("select","do refresh:"+images.size());
+                //还要更新数据:
+                /*ArrayList<Image> images1 = new ArrayList<>();
+                images1.addAll(images);
+                images.clear();
+                images.addAll(images1);
+                if(images.size() > 0){
+                    images.get(0).name = "-"+images.get(0).name;
+                }*/
                 adapter.notifyDataSetChanged();
             }
         });

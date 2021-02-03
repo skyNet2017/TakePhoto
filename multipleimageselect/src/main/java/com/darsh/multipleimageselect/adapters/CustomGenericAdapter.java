@@ -10,14 +10,14 @@ import java.util.ArrayList;
  * Created by Darshan on 4/24/2015.
  */
 public abstract class CustomGenericAdapter<T> extends BaseAdapter {
-    protected ArrayList<T> arrayList;
+    protected ArrayList<T> arrayList = new ArrayList<>();
     protected Context context;
     protected LayoutInflater layoutInflater;
 
     protected int size;
 
     public CustomGenericAdapter(Context context, ArrayList<T> arrayList) {
-        this.arrayList = arrayList;
+        this.arrayList .addAll(arrayList);
         this.context = context;
         this.layoutInflater = LayoutInflater.from(this.context);
     }
@@ -43,5 +43,13 @@ public abstract class CustomGenericAdapter<T> extends BaseAdapter {
     public void releaseResources() {
         arrayList = null;
         context = null;
+    }
+
+    public void doRefresh(){
+        ArrayList<T> arrayList2 = new ArrayList<>();
+        arrayList2.addAll(arrayList);
+        arrayList.clear();
+        arrayList.addAll(arrayList2);
+        notifyDataSetChanged();
     }
 }
