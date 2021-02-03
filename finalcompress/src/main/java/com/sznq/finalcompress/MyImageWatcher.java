@@ -91,14 +91,16 @@ public class MyImageWatcher {
                         if(!fileInfoQueue.contains(fileInfo)){
                             fileInfoQueue.add(fileInfo);
                             Log.d("监听",Thread.currentThread().getName()+" thread ,文件新增,加入等待队列,准备几秒后压缩-path:"+fullPath);
+                            runTask(4000);
                         }else {
                             Log.v("监听","已经加入过压缩队列,不再加入:"+file.getAbsolutePath());
+                            runTask(3000);
                         }
                         //fileInfoQueue.add(fileInfo);
 
 
                         //从队列头部取值,看是否有超过4s的任务,有的话,切割,将超过4s的任务全部执行掉:
-                        runTask(4000);
+
 
 
                     }else {
