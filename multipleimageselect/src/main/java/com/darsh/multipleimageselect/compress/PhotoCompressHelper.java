@@ -50,7 +50,7 @@ import java.util.List;
 public class PhotoCompressHelper {
 
 
-    public static final int DEFAULT_QUALITY = 80;
+    public static final int DEFAULT_QUALITY = 85;
 
     public static int getQuality() {
         return quality;
@@ -126,7 +126,8 @@ public class PhotoCompressHelper {
     }
 
     /**
-     * 不压缩png,因为会变黑,效果不好
+     * 有透明度的png怎么判断?
+     * 只压质量在90以上的, 压到85
      * @param pathname
      * @return
      */
@@ -155,7 +156,7 @@ public class PhotoCompressHelper {
 
         int quality = ImageInfoFormater.getQuality(pathname.getAbsolutePath());
         Log.i("quality","quality:"+quality +":"+pathname.getAbsolutePath());
-        return  (quality ==  0) ||  (quality > getQuality());
+        return  (quality ==  0) ||  (quality > getQuality()+4);
     }
 
     /**
@@ -315,19 +316,29 @@ public class PhotoCompressHelper {
     }
 
     private static void deleteAllFiles(List<File> filesToCompress, boolean isOriginal) {
-        Observable.fromIterable(filesToCompress)
+        Observable.just(filesToCompress.get(0))
                 .observeOn(Schedulers.io())
                 .doOnNext(new Consumer<File>() {
                     @Override
                     public void accept(File file) throws Exception {
                         try {
-                            File file1 = new File(PhotoCompressHelper.getCompressedFilePath(file.getAbsolutePath(),true));
-                            file1.delete();
+                            File dir = getCompressDir(file);
+                            File[] files = dir.listFiles();
+                            if(files != null){
+                                for (File file1 : files) {
+                                    file1.delete();
+                                }
+                            }
                         }catch (Exception e){
                             e.printStackTrace();
                         }
                     }
-                }).subscribe();
+                }).subscribe(new Consumer<File>() {
+            @Override
+            public void accept(File file) throws Exception {
+
+            }
+        });
     }
 
     public static File getCompressDir(File file){

@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
         SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
-                //MyImageWatcher.init();
             }
 
             @Override
@@ -91,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         AutoStartUtil.showDialog(MainActivity.this);
+        MyImageWatcher.init();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if(checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 requestPermissions(new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},976);
