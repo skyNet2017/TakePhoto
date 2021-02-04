@@ -15,6 +15,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.AdapterListUpdateCallback;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,9 +35,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
@@ -136,6 +140,30 @@ public class AlbumSelectActivity extends HelperActivity {
                         } else {
                             calFileSize(albums,adapter);
                         }
+                        /*AlbumFinder.listAllAlbum(new Observer<List<Album>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<Album> albums0) {
+                                Log.d("监听","添加有图文件夹 完成 数量:"+albums0.size());
+                                albums.addAll(albums0);
+                                adapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });*/
                         break;
                     }
 
