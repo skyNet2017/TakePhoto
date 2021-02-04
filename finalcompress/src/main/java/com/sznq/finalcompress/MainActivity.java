@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
+                //MyImageWatcher.init();
             }
 
             @Override
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
+
     }
 
     @OnClick({R.id.btn_share, R.id.btn_star, R.id.btn_selected})

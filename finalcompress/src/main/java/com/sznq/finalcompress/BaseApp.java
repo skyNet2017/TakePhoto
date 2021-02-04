@@ -26,6 +26,7 @@ import com.hss01248.imginfo.ImageInfoFormater;
 import com.simple.spiderman.SpiderMan;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * Created by hss on 2018/12/22.
@@ -71,7 +72,8 @@ public class BaseApp extends Application {
                 (getCurrentProcessName());
 
       if(isMainProcess){
-          observerCamera();
+          //开启保活后,不再走oncreate
+          MyImageWatcher.init();
       }
 
 
@@ -132,30 +134,6 @@ public class BaseApp extends Application {
                     }
                 }
         );
-    }
-
-    private void observerCamera() {
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),"Camera");
-
-        File screenshots = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"Screenshots");
-
-        File bilibili = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"bili/screenshot");
-
-        File baidu = new File(Environment.getExternalStorageDirectory(),"BaiduNetdisk");
-
-        MyImageWatcher.addFileObserver(file);
-        MyImageWatcher.addFileObserver(screenshots);
-        MyImageWatcher.addFileObserver(bilibili);
-        MyImageWatcher.addFileObserver(baidu);
-
-        ///sdcard/BaiduNetdisk
-       /* String cameraDir = file.getAbsolutePath();
-        Log.w("FileObserver","path:"+cameraDir);
-        doObserver(file);
-        doObserver2(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));*/
-
-        //doObserver(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-
     }
 
 

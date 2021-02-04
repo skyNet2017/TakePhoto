@@ -1,5 +1,6 @@
 package com.sznq.finalcompress;
 
+import android.app.Application;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -42,6 +45,40 @@ public class MyImageWatcher {
    static ExecutorService service;
     static Handler handler = new Handler(Looper.getMainLooper());
 
+
+    public static void init(){
+        if(!observerMap.isEmpty()){
+            Iterator<Map.Entry<String, FileObserver>> iterator = observerMap.entrySet().iterator();
+            while (iterator.hasNext()){
+                iterator.next().getValue().stopWatching();
+            }
+            observerMap.clear();
+        }
+
+        watchDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
+        watchDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
+        addFileObserver(new File(Environment.getExternalStorageDirectory(),"BaiduNetdisk"));
+    }
+
+    private static void watchDir(File dcim) {
+        File[] files = dcim.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                boolean isFile =  name.contains(".") || name.contains("temp")
+                        || name.contains("-compressed") || name.equals("cache");
+                return !isFile;
+            }
+        });
+        if(files == null || files.length == 0){
+            return;
+        }
+        for (File file : files) {
+            if(file.isDirectory()){
+                MyImageWatcher.addFileObserver(file);
+                watchDir(file);
+            }
+        }
+    }
 
 
     /**
