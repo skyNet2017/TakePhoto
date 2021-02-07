@@ -8,6 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.provider.Settings;
 import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
@@ -91,10 +94,14 @@ public class MainActivity extends AppCompatActivity {
         });
         AutoStartUtil.showDialog(MainActivity.this);
         MyImageWatcher.init();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE},976);
-                return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // 先判断有没有权限
+            if (Environment.isExternalStorageManager()) {
+               // writeFile();
+            } else {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 976);
             }
         }
 
