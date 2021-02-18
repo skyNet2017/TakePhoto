@@ -131,25 +131,41 @@ public class SafUtil {
                             uriTree = Uri.parse(uriTree.toString().substring(0,uriTree.toString().length()-3));
                         }*/
                         Log.d(TAG, URLDecoder.decode(uriTree.toString()));
-                        // 创建所选目录的DocumentFile，可以使用它进行文件操作
-                        DocumentFile root = //DocumentFile.fromTreeUri(activity.getApplicationContext(), uriTree);
-                        DocumentFile.fromSingleUri(activity.getApplicationContext(),uriTree);
-                        // 比如使用它创建文件夹
+
+                        try {
+                            final int takeFlags = activity.getIntent().getFlags()
+                                    & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                activity.getContentResolver().takePersistableUriPermission(uriTree, takeFlags);
+                                DocumentFile root = DocumentFile.fromSingleUri(activity.getApplicationContext(), uriTree);
 
 
-                        Log.d(TAG,root.getUri()+"--");
-                        if(root == null){
-                            callback.onPermissionDenied(7,"DocumentFile.fromTreeUri return null");
-                            return;
+                                // 创建所选目录的DocumentFile，可以使用它进行文件操作
+                                // DocumentFile root = //DocumentFile.fromTreeUri(activity.getApplicationContext(), uriTree);
+                                // DocumentFile.fromSingleUri(activity.getApplicationContext(),uriTree);
+                                // 比如使用它创建文件夹
+
+
+                                Log.d(TAG,root.getUri()+"--");
+                                if(root == null){
+                                    callback.onPermissionDenied(7,"DocumentFile.fromTreeUri return null");
+                                    return;
+                                }
+                                sdRoot = root;
+                                // 保存获取的目录权限
+                                SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sp.edit();
+                                editor.putString("uriTree", URLDecoder.decode(uriTree.toString()));
+                                //editor.putString("uriTree", uriTree.toString());
+                                editor.commit();
+                                callback.onPermissionGet(root);
+                            }
+                        }catch (Throwable throwable){
+                            throwable.printStackTrace();
+                            callback.onPermissionDenied(resultCode,throwable.getMessage());
                         }
-                        sdRoot = root;
-                        // 保存获取的目录权限
-                        SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sp.edit();
-                        editor.putString("uriTree", URLDecoder.decode(uriTree.toString()));
-                        //editor.putString("uriTree", uriTree.toString());
-                        editor.commit();
-                        callback.onPermissionGet(root);
+
                     }else {
                         Log.w(TAG,"uri == null");
                         callback.onPermissionDenied(resultCode,"data in intent of reaultback is null");
