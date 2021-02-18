@@ -148,8 +148,8 @@ public class AutoStartUtil {
         }
 
         AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("应用启动权限")
-                .setMessage("请允许app自启动\n以在后台全自动压缩新拍照/截屏的图片")
+                .setTitle(R.string.a_auto_start_dialog_title)
+                .setMessage(R.string.a_auto_start_dialog_msg)
                 .setPositiveButton(R.string.c_sure, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -158,7 +158,7 @@ public class AutoStartUtil {
                 }).setNegativeButton(R.string.c_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(activity,"如果后续需要自动压缩功能,可以去系统应用管理界面开启自动启动功能",Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity,R.string.a_auto_start_extra_toast,Toast.LENGTH_LONG).show();
                     }
                 }).create();
         dialog.setCanceledOnTouchOutside(false);

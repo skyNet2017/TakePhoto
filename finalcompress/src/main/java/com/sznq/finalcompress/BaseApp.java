@@ -101,12 +101,17 @@ public class BaseApp extends Application {
 
     private void keepAlive() {
         //定义前台服务的默认样式。即标题、描述和图标
-        ForegroundNotification foregroundNotification = new ForegroundNotification("保活keepalive","用于及时全自动压缩截图/拍照图片", R.mipmap.ic_launcher,
+        ForegroundNotification foregroundNotification = new ForegroundNotification(
+                getResources().getString(R.string.a_notify_keep_alive),
+                getResources().getString(R.string.a_notify_keep_alive_desc), R.mipmap.ic_launcher,
                 //定义前台服务的通知点击事件
                 new ForegroundNotificationClickListener() {
 
                     @Override
                     public void foregroundNotificationClick(Context context, Intent intent) {
+                        Intent intent1 = new Intent(context,MainActivity.class);
+                        intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent1);
                     }
                 });
         //启动保活服务

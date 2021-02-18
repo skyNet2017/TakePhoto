@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         AdUtil.loadBannerAd(this, adView);*/
 
        // StorageUtils.requestOutSdCradWritePermission(this);
-        SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
+        /*SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
             }
@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity {
             public void onPermissionDenied(int resultCode, String msg) {
 
             }
-        });
+        });*/
         AutoStartUtil.showDialog(MainActivity.this);
         MyImageWatcher.init();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // 先判断有没有权限
             if (Environment.isExternalStorageManager()) {
                // writeFile();
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.setData(Uri.parse("package:" + getPackageName()));
                 startActivityForResult(intent, 976);
             }
-        }
+        }*/
 
     }
 
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
+        //StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
 
     }
 

@@ -17,7 +17,7 @@ public abstract class CustomGenericAdapter<T> extends BaseAdapter {
     protected int size;
 
     public CustomGenericAdapter(Context context, ArrayList<T> arrayList) {
-        this.arrayList .addAll(arrayList);
+        this.arrayList  = arrayList;
         this.context = context;
         this.layoutInflater = LayoutInflater.from(this.context);
     }
@@ -45,11 +45,5 @@ public abstract class CustomGenericAdapter<T> extends BaseAdapter {
         context = null;
     }
 
-    public void doRefresh(){
-        ArrayList<T> arrayList2 = new ArrayList<>();
-        arrayList2.addAll(arrayList);
-        arrayList.clear();
-        arrayList.addAll(arrayList2);
-        notifyDataSetChanged();
-    }
+
 }

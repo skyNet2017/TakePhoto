@@ -8,6 +8,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.provider.MediaStore;
@@ -42,6 +43,7 @@ import org.reactivestreams.Subscription;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -131,6 +133,10 @@ public class ImageSelectActivity extends HelperActivity {
         public void onDestroyActionMode(ActionMode mode) {
             if (countSelected > 0) {
                 deselectAll();
+            }
+            countSelected = 0;
+            if(selected != null){
+                selected.clear();
             }
             isInSelectingMode = false;
             toolbar.setTitle(R.string.image_preview);
@@ -226,7 +232,35 @@ public class ImageSelectActivity extends HelperActivity {
                 if(images.size() > 0){
                     images.get(0).name = "-"+images.get(0).name;
                 }*/
+                //deselectAll();
+                if(images.size()>0){
+                    Iterator<Image> iterator = images.iterator();
+                    while (iterator.hasNext()){
+                        Image image = iterator.next();
+                        if(new File(image.path).length() <=0){
+                            iterator.remove();
+                            image.isSelected = false;
+                        }else {
+                            image.isSelected = false;
+                        }
+                    }
+                }
+                Log.d("select","do refresh2:"+images.size());
                 adapter.notifyDataSetChanged();
+                actionMode.finish();
+
+                    /*isInSelectingMode = false;
+                    if (selected != null) {
+                        selected.clear();
+                    }
+                    countSelected = 0;
+                    if(actionMode != null){
+                        actionMode.setTitle(R.string.image_preview);
+
+                    }
+                actionMode.finish();
+                    toolbar.setTitle(R.string.image_preview);*/
+
             }
         });
 

@@ -7,4 +7,10 @@
     <string name="t_star">评分</string>
     <string name="c_choose_share_platform">请选择分享平台</string>
     <string name="c_share_text">分享一个超赞的图片无损压缩工具app-终极图片压缩</string>
+
+    <string name="a_notify_keep_alive">保活通知条</string>
+    <string name="a_notify_keep_alive_desc">用于全自动压缩截图/拍照图片</string>
+    <string name="a_auto_start_dialog_title">应用自启动权限</string>
+    <string name="a_auto_start_dialog_msg">请允许app自启动\n以在后台全自动压缩新拍照/截屏的图片</string>
+    <string name="a_auto_start_extra_toast">如果后续需要自动压缩功能,可以去系统应用管理界面开启自动启动功能</string>
 </resources>

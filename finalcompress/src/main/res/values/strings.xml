@@ -6,4 +6,10 @@
     <string name="t_star">star this app</string>
     <string name="c_choose_share_platform">please choose platform</string>
     <string name="c_share_text">recommend a incredible image compress app to you : FinalCompress</string>
+
+    <string name="a_notify_keep_alive">keep alive</string>
+    <string name="a_notify_keep_alive_desc">for auto compress images when snapshot or take photo</string>
+    <string name="a_auto_start_dialog_title">auto start app</string>
+    <string name="a_auto_start_dialog_msg">please permit auto start of this app to enable auto compress image in background when snapshot or take picture</string>
+    <string name="a_auto_start_extra_toast">if you need the auto compress function, you can enable the auto start function in system setting page of this app</string>
 </resources>
