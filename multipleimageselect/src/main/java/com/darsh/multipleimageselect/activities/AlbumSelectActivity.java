@@ -51,7 +51,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class AlbumSelectActivity extends HelperActivity {
     private static final String COLUMN_COUNT = "count";
-    private ArrayList<Album> albums;
+    private ArrayList<Album> albums = new ArrayList<>();
 
     private TextView errorDisplay;
 
@@ -177,27 +177,7 @@ public class AlbumSelectActivity extends HelperActivity {
 
                             }
                         });
-                        TfAlbumFinder.listAllAlbum(new Observer<List<Album>>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
 
-                            }
-
-                            @Override
-                            public void onNext(List<Album> albums) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
                         break;
                     }
 
@@ -305,7 +285,7 @@ public class AlbumSelectActivity extends HelperActivity {
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(null);
         }
-        albums = null;
+        //albums = null;
         if (adapter != null) {
             adapter.releaseResources();
         }

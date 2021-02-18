@@ -22,6 +22,7 @@ public class TfAlbumFinder {
 
     public static void listAllAlbum(final Observer<List<Album>> observer){
         if(SafUtil.sdRoot == null){
+            Log.w(SafUtil.TAG,Thread.currentThread().getName()+"  SafUtil.sdRoot is null");
             return;
         }
         final List<Album> albums = new ArrayList<>();
@@ -30,8 +31,9 @@ public class TfAlbumFinder {
                 .map(new Function<DocumentFile, List<Album>>() {
                     @Override
                     public List<Album> apply(DocumentFile file) throws Exception {
+                        Log.d(SafUtil.TAG,"d:"+file.getUri().toString());
                         getAlbums(file,albums);
-                        Log.d("donext",Thread.currentThread().getName()+", album--:"+albums.size());
+                        Log.d(SafUtil.TAG,Thread.currentThread().getName()+", album--:"+albums.size());
                         /*Collections.sort(albums, new Comparator<Album>() {
                             @Override
                             public int compare(Album o1, Album o2) {
@@ -57,6 +59,7 @@ public class TfAlbumFinder {
         boolean havePic = false;
         Album album = null;
         int count = 0;
+        Log.d(SafUtil.TAG,"展开文件夹:"+dir.getUri());
         for (DocumentFile file : files) {
             if(file.isDirectory()){
                 getAlbums(file,albums);
@@ -75,7 +78,7 @@ public class TfAlbumFinder {
                     album.cover2 = file.getUri();
                     album.dir2 = dir.getUri();
                     albums.add(album);
-                    Log.d("监听","添加有图文件夹:"+album.dir);
+                    Log.d(SafUtil.TAG,"添加有图文件夹:"+album.dir);
                 }
             }
         }

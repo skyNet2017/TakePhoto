@@ -90,7 +90,6 @@ gradle-app.setting
 
 ###
 android-crop
-gradle.properties
 *.jks
 *.hprof
 lubanturbo/.externalNativeBuild/

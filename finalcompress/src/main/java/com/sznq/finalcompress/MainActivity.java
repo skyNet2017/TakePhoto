@@ -18,13 +18,16 @@ import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
+import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.saf.SafUtil;
+import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.gc.materialdesign.views.ButtonRectangle;
 
 import java.util.ArrayList;
@@ -33,6 +36,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,11 +91,34 @@ public class MainActivity extends AppCompatActivity {
         SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
+                Log.w(SafUtil.TAG,"getRootDir:"+dir.getUri());
 
+                TfAlbumFinder.listAllAlbum(new Observer<List<Album>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<Album> albums) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
             }
 
             @Override
             public void onPermissionDenied(int resultCode, String msg) {
+                Log.w(SafUtil.TAG,"onPermissionDenied:"+resultCode+","+msg);
 
             }
         });

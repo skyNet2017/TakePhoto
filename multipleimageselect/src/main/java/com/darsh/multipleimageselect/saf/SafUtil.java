@@ -33,11 +33,13 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 
 public class SafUtil {
     public static DocumentFile sdRoot;
+    public static String TAG = "SAF2";
 
     public static DocumentFile getRoot(Activity activity){
         SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
@@ -52,7 +54,7 @@ public class SafUtil {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             activity.getContentResolver().takePersistableUriPermission(uri, takeFlags);
             DocumentFile root = DocumentFile.fromTreeUri(activity.getApplicationContext(), uri);
-            Log.d("dd5", uriTree);
+            Log.d(SafUtil.TAG, uriTree);
             return root;
         }
         return null;
@@ -63,27 +65,29 @@ public class SafUtil {
 
         ArrayList<StorageBean> storageData = getStorageData(activity.getApplicationContext());
         if(storageData ==null || storageData.size() ==1){
-            Log.d("dd","没有额外sd卡");
+            Log.w(SafUtil.TAG,"没有额外sd卡");
             return;
         }
 
 
         SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
         String uriTree = sp.getString("uriTree", "");
-        Log.d("dd",uriTree);
+        Log.d(SafUtil.TAG,URLDecoder.decode(uriTree)+"<---");
         if (TextUtils.isEmpty(uriTree)) {
             // 重新授权
+            Log.d(SafUtil.TAG,"重新授权申请");
             requestSaf(activity,callback);
         } else {
             try {
                 Uri uri = Uri.parse(uriTree);
+                Log.d(SafUtil.TAG,uri+"");
                 final int takeFlags = activity.getIntent().getFlags()
                         & (Intent.FLAG_GRANT_READ_URI_PERMISSION
                         | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     activity.getContentResolver().takePersistableUriPermission(uri, takeFlags);
-                    DocumentFile root = DocumentFile.fromTreeUri(activity.getApplicationContext(), uri);
-                    Log.d("dd2",uriTree);
+                    DocumentFile root = DocumentFile.fromSingleUri(activity.getApplicationContext(), uri);
+                    Log.d(SafUtil.TAG,uriTree);
                     if(root == null){
                         callback.onPermissionDenied(7,"DocumentFile.fromTreeUri return null");
                         return;
@@ -113,19 +117,27 @@ public class SafUtil {
         StartActivityUtil.goOutAppForResult((AppCompatActivity) activity, intent, new ActivityResultListener() {
             @Override
             public void onActivityResult(int requestCode, int resultCode, Intent data) {
+                Log.e(TAG,resultCode+"-"+data);
+                //onActivityResult: req:3593,result:-1,data:Intent { dat=content://com.android.externalstorage.documents/tree/0123-4567: flg=0xc3 }
                 if(resultCode == Activity.RESULT_OK){
                     Uri uriTree = null;
                     if (data != null) {
                         uriTree = data.getData();
                     }
                     if (uriTree != null) {
-                        Log.d("dd3",uriTree.toString());
+                        /*if(uriTree.toString().endsWith(":")){
+                            uriTree = Uri.parse(uriTree.toString().substring(0,uriTree.toString().length()-1));
+                        }else if(uriTree.toString().endsWith("%3A")){
+                            uriTree = Uri.parse(uriTree.toString().substring(0,uriTree.toString().length()-3));
+                        }*/
+                        Log.d(TAG, URLDecoder.decode(uriTree.toString()));
                         // 创建所选目录的DocumentFile，可以使用它进行文件操作
-                        DocumentFile root = DocumentFile.fromTreeUri(activity.getApplicationContext(), uriTree);
+                        DocumentFile root = //DocumentFile.fromTreeUri(activity.getApplicationContext(), uriTree);
+                        DocumentFile.fromSingleUri(activity.getApplicationContext(),uriTree);
                         // 比如使用它创建文件夹
 
 
-                        Log.d("dd3",root.getUri()+"");
+                        Log.d(TAG,root.getUri()+"--");
                         if(root == null){
                             callback.onPermissionDenied(7,"DocumentFile.fromTreeUri return null");
                             return;
@@ -134,11 +146,12 @@ public class SafUtil {
                         // 保存获取的目录权限
                         SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putString("uriTree", uriTree.toString());
-                        editor.apply();
+                        editor.putString("uriTree", URLDecoder.decode(uriTree.toString()));
+                        //editor.putString("uriTree", uriTree.toString());
+                        editor.commit();
                         callback.onPermissionGet(root);
                     }else {
-                        Log.w("dd4","uri == null");
+                        Log.w(TAG,"uri == null");
                         callback.onPermissionDenied(resultCode,"data in intent of reaultback is null");
                     }
                 }else {
@@ -241,7 +254,7 @@ public class SafUtil {
 
 
 
-    private static final String TAG = StorageUtils.class.getSimpleName();
+   // private static final String TAG = StorageUtils.class.getSimpleName();
 
     public static ArrayList<StorageBean> getStorageData(Context pContext) {
         final StorageManager storageManager = (StorageManager) pContext.getSystemService(Context.STORAGE_SERVICE);
