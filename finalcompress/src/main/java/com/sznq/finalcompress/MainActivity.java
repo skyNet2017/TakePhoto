@@ -21,9 +21,10 @@ import android.provider.Settings;
 import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
-import com.darsh.multipleimageselect.compress.SafUtil;
+
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
+import com.darsh.multipleimageselect.saf.SafUtil;
 import com.gc.materialdesign.views.ButtonRectangle;
 
 import java.util.ArrayList;
@@ -82,16 +83,17 @@ public class MainActivity extends AppCompatActivity {
         AdUtil.loadBannerAd(this, adView);*/
 
        // StorageUtils.requestOutSdCradWritePermission(this);
-        /*SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
+        SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
+
             }
 
             @Override
             public void onPermissionDenied(int resultCode, String msg) {
 
             }
-        });*/
+        });
         AutoStartUtil.showDialog(MainActivity.this);
         MyImageWatcher.init();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
+        StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
 
     }
 

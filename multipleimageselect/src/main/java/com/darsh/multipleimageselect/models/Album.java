@@ -1,5 +1,6 @@
 package com.darsh.multipleimageselect.models;
 
+import android.net.Uri;
 import android.os.Build;
 
 import java.util.Objects;
@@ -14,6 +15,10 @@ public class Album {
     public String dir;
     public long fileSize;
     public boolean fromFileApi;
+    public boolean fromSAFApi;
+
+    public Uri dir2;
+    public Uri cover2;
 
     public Album(String name, String cover) {
         this.name = name;

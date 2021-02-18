@@ -29,6 +29,7 @@ import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
+import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -168,6 +169,27 @@ public class AlbumSelectActivity extends HelperActivity {
                             @Override
                             public void onError(Throwable e) {
                                 e.printStackTrace();
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+                        TfAlbumFinder.listAllAlbum(new Observer<List<Album>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(List<Album> albums) {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
 
                             }
 
