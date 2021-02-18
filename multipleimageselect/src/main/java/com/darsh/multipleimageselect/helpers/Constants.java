@@ -21,6 +21,8 @@ public class Constants {
     public static final int PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 23;
 
     public static final String INTENT_EXTRA_ALBUM = "album";
+    public static final String INTENT_EXTRA_ALBUM_PATH = "albumPath";
+    public static final String INTENT_EXTRA_ALBUM_IS_FILE_API = "isFileApi";
     public static final String INTENT_EXTRA_IMAGES = "images";
     public static final String INTENT_EXTRA_LIMIT = "limit";
     public static final int DEFAULT_LIMIT = Integer.MAX_VALUE;

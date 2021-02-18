@@ -68,6 +68,7 @@ public class ImageSelectActivity extends HelperActivity {
     private Handler handler;
     private Thread thread;
     private boolean isSelectAll;
+    boolean isAlbumFromFileApi;
     private ActionMode.Callback callback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -143,6 +144,7 @@ public class ImageSelectActivity extends HelperActivity {
             actionMode = null;
         }
     };
+    private String albumDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +169,8 @@ public class ImageSelectActivity extends HelperActivity {
             finish();
         }
         album = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM);
+        albumDir = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM_PATH);
+        isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
 
         errorDisplay = (TextView) findViewById(R.id.text_view_error);
         errorDisplay.setVisibility(View.INVISIBLE);
@@ -639,12 +643,40 @@ public class ImageSelectActivity extends HelperActivity {
                 }
             }
 
-            Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " =?", new String[]{album}, MediaStore.Images.Media.DATE_ADDED);
-            if (cursor == null) {
-                sendMessage(Constants.ERROR);
-                return;
+            if (images == null) {
+                images = new ArrayList<>();
             }
+            images.clear();
+
+
+
+            if(isAlbumFromFileApi){
+                File[] files = new File(albumDir).listFiles();
+                if(files == null){
+                    sendMessage(Constants.ERROR);
+                    return;
+                }
+
+                ArrayList<Image> temp = new ArrayList<>(files.length);
+                int tempCountSelected = 0;
+
+                for (File file1 : files) {
+                    String name = file1.getName();
+                    if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
+                            || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
+                        temp.add(new Image(0, name, file1.getAbsolutePath(), false));
+                    }
+                }
+                images.addAll(temp);
+                sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+
+            }else {
+                Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
+                        MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " =?", new String[]{album}, MediaStore.Images.Media.DATE_ADDED);
+                if (cursor == null) {
+                    sendMessage(Constants.ERROR);
+                    return;
+                }
 
             /*
             In case this runnable is executed to onChange calling loadImages,
@@ -652,39 +684,36 @@ public class ImageSelectActivity extends HelperActivity {
             tempCountSelected keeps track of number of selected images. On handling
             FETCH_COMPLETED message, countSelected is assigned value of tempCountSelected.
              */
-            int tempCountSelected = 0;
-            ArrayList<Image> temp = new ArrayList<>(cursor.getCount());
-            if (cursor.moveToLast()) {
-                do {
-                    if (Thread.interrupted()) {
-                        return;
-                    }
+                int tempCountSelected = 0;
+                ArrayList<Image> temp = new ArrayList<>(cursor.getCount());
+                if (cursor.moveToLast()) {
+                    do {
+                        if (Thread.interrupted()) {
+                            return;
+                        }
 
-                    long id = cursor.getLong(cursor.getColumnIndex(projection[0]));
-                    String name = cursor.getString(cursor.getColumnIndex(projection[1]));
-                    String path = cursor.getString(cursor.getColumnIndex(projection[2]));
-                    boolean isSelected = selectedImages.contains(id);
-                    if (isSelected) {
-                        tempCountSelected++;
-                    }
+                        long id = cursor.getLong(cursor.getColumnIndex(projection[0]));
+                        String name = cursor.getString(cursor.getColumnIndex(projection[1]));
+                        String path = cursor.getString(cursor.getColumnIndex(projection[2]));
+                        boolean isSelected = selectedImages.contains(id);
+                        if (isSelected) {
+                            tempCountSelected++;
+                        }
 
-                    file = new File(path);
-                    Log.i("path", path);
-                    if (file.exists()) {
-                        temp.add(new Image(id, name, path, isSelected));
-                    }
+                        file = new File(path);
+                        Log.i("path", path);
+                        if (file.exists()) {
+                            temp.add(new Image(id, name, path, isSelected));
+                        }
 
-                } while (cursor.moveToPrevious());
+                    } while (cursor.moveToPrevious());
+                }
+                cursor.close();
+
+                images.addAll(temp);
+                sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
             }
-            cursor.close();
 
-            if (images == null) {
-                images = new ArrayList<>();
-            }
-            images.clear();
-            images.addAll(temp);
-
-            sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
         }
     }
 }

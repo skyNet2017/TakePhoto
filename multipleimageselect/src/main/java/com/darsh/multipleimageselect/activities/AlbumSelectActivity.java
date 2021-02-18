@@ -103,15 +103,16 @@ public class AlbumSelectActivity extends HelperActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), ImageSelectActivity.class);
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM, albums.get(position).name);
+                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, albums.get(position).dir);
+                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API, albums.get(position).fromFileApi);
                 startActivityForResult(intent, Constants.REQUEST_CODE);
             }
         });
+
+        loadData();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
+    private void loadData() {
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -135,12 +136,9 @@ public class AlbumSelectActivity extends HelperActivity {
                             progressBar.setVisibility(View.INVISIBLE);
                             gridView.setVisibility(View.VISIBLE);
                             orientationBasedUI(getResources().getConfiguration().orientation);
-                            calFileSize(albums,adapter);
 
-                        } else {
-                            calFileSize(albums,adapter);
                         }
-                        /*AlbumFinder.listAllAlbum(new Observer<List<Album>>() {
+                        AlbumFinder.listAllAlbum(new Observer<List<Album>>() {
                             @Override
                             public void onSubscribe(Disposable d) {
 
@@ -149,8 +147,22 @@ public class AlbumSelectActivity extends HelperActivity {
                             @Override
                             public void onNext(List<Album> albums0) {
                                 Log.d("监听","添加有图文件夹 完成 数量:"+albums0.size());
-                                albums.addAll(albums0);
+                                for (Album album : albums0) {
+                                    if(!albums.contains(album)){
+                                        albums.add(album);
+                                    }
+                                }
+                                //再次排序:按图片个数排:
+                                //按文件大小排序:
+                                Collections.sort(albums, new Comparator<Album>() {
+                                    @Override
+                                    public int compare(Album o1, Album o2) {
+                                        return (int) (o2.count - o1.count);
+                                    }
+                                });
                                 adapter.notifyDataSetChanged();
+
+                                calFileSize(albums,adapter);
                             }
 
                             @Override
@@ -163,7 +175,7 @@ public class AlbumSelectActivity extends HelperActivity {
                             public void onComplete() {
 
                             }
-                        });*/
+                        });
                         break;
                     }
 
@@ -188,6 +200,13 @@ public class AlbumSelectActivity extends HelperActivity {
         getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
 
         checkPermission();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
     }
 
     private void calFileSize(final ArrayList<Album> albums, final CustomAlbumSelectAdapter adapter) {
@@ -237,20 +256,29 @@ public class AlbumSelectActivity extends HelperActivity {
     protected void onStop() {
         super.onStop();
 
-        stopThread();
 
-        getContentResolver().unregisterContentObserver(observer);
-        observer = null;
-
-        if (handler != null) {
-            handler.removeCallbacksAndMessages(null);
-            handler = null;
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        //原onstop里做的
+        try {
+            stopThread();
+
+            getContentResolver().unregisterContentObserver(observer);
+            observer = null;
+
+            if (handler != null) {
+                handler.removeCallbacksAndMessages(null);
+                handler = null;
+            }
+        }catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+
 
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(null);
