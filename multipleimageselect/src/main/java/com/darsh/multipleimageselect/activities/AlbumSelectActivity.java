@@ -130,40 +130,51 @@ public class AlbumSelectActivity extends HelperActivity {
                     }
 
                     case Constants.FETCH_COMPLETED: {
-                        if (adapter == null) {
-                            adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
-                            gridView.setAdapter(adapter);
 
-                            progressBar.setVisibility(View.INVISIBLE);
-                            gridView.setVisibility(View.VISIBLE);
-                            orientationBasedUI(getResources().getConfiguration().orientation);
-
-                        }
-                        AlbumFinder.listAllAlbum(new Observer<List<Album>>() {
+                        AlbumFinder.listAllAlbum(new Observer<Album>() {
                             @Override
                             public void onSubscribe(Disposable d) {
 
                             }
 
                             @Override
-                            public void onNext(List<Album> albums0) {
-                                Log.d("监听","添加有图文件夹 完成 数量:"+albums0.size());
-                                for (Album album : albums0) {
-                                    if(!albums.contains(album)){
-                                        albums.add(album);
-                                    }
-                                }
-                                //再次排序:按图片个数排:
-                                //按文件大小排序:
-                                Collections.sort(albums, new Comparator<Album>() {
+                            public void onNext(Album album) {
+                                Log.d("监听","添加有图文件夹 完成 :"+album.dir);
+                                handler.post(new Runnable() {
                                     @Override
-                                    public int compare(Album o1, Album o2) {
-                                        return (int) (o2.count - o1.count);
+                                    public void run() {
+                                        if (adapter == null) {
+                                            adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
+                                            gridView.setAdapter(adapter);
+
+                                            progressBar.setVisibility(View.INVISIBLE);
+                                            gridView.setVisibility(View.VISIBLE);
+                                            orientationBasedUI(getResources().getConfiguration().orientation);
+
+                                        }
+                                        /*if(albums.contains(album)){
+                                            albums.remove(albums.indexOf(album));
+                                        }*/
+                                        albums.add(album);
+                                        //再次排序:按图片个数排:
+                                        //按文件大小排序:
+                                        /*Collections.sort(albums, new Comparator<Album>() {
+                                            @Override
+                                            public int compare(Album o1, Album o2) {
+                                                return (int) (o2.count - o1.count);
+                                            }
+                                        });*/
+                                        Collections.sort(albums, new Comparator<Album>() {
+                                            @Override
+                                            public int compare(Album o1, Album o2) {
+                                                return (o2.fileSize > o1.fileSize) ? 1: -1;
+                                            }
+                                        });
+                                        adapter.notifyDataSetChanged();
                                     }
                                 });
-                                adapter.notifyDataSetChanged();
 
-                                calFileSize(albums,adapter);
+                                //calFileSize(albums,adapter);
                             }
 
                             @Override
@@ -344,7 +355,8 @@ public class AlbumSelectActivity extends HelperActivity {
     }
 
     private void loadAlbums() {
-        startThread(new AlbumLoaderRunnable());
+        //startThread(new AlbumLoaderRunnable());
+        sendMessage(Constants.FETCH_COMPLETED);
     }
 
     private class AlbumLoaderRunnable implements Runnable {
