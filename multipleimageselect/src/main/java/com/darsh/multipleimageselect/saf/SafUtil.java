@@ -69,8 +69,8 @@ public class SafUtil {
             return;
         }
 
-
-        SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
+        requestSaf(activity,callback);
+        /*SharedPreferences sp = activity.getSharedPreferences("DirPermission", Context.MODE_PRIVATE);
         String uriTree = sp.getString("uriTree", "");
         Log.d(SafUtil.TAG,URLDecoder.decode(uriTree)+"<---");
         if (TextUtils.isEmpty(uriTree)) {
@@ -103,7 +103,7 @@ public class SafUtil {
                 // 重新授权
                 requestSaf(activity,callback);
             }
-        }
+        }*/
 
     /*    作者：唯鹿
         链接：https://juejin.im/post/6844904058743078919

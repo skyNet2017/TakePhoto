@@ -71,7 +71,7 @@ public class TfAlbumFinder {
 
    static  AtomicInteger countGet = new AtomicInteger(0);
     private static void getAlbums(final DocumentFile dir, final Observer<Album> observer) {
-        Log.d(SafUtil.TAG,"开始遍历当前文件夹,原子count计数:"+countGet.incrementAndGet()+", "+dir.getName());
+        Log.w(SafUtil.TAG,"开始遍历当前文件夹,原子count计数:"+countGet.incrementAndGet()+", "+dir.getName());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -81,7 +81,7 @@ public class TfAlbumFinder {
                     if(count0 ==0){
                         observer.onComplete();
                     }
-                    Log.d(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
+                    Log.w(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
                     return;
                 }
                 Album album = null;
@@ -100,6 +100,9 @@ public class TfAlbumFinder {
                         getAlbums(file,observer);
                     }else {
                         String name = file.getName();
+                        if(TextUtils.isEmpty(name)){
+                            continue;
+                        }
                         if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
                                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
                             count++;
@@ -126,7 +129,7 @@ public class TfAlbumFinder {
                 if(count0 ==0){
                     observer.onComplete();
                 }
-                Log.d(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
+                Log.w(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
             }
         });
 

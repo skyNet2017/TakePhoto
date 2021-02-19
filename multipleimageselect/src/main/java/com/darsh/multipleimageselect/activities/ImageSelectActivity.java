@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +20,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.documentfile.provider.DocumentFile;
 
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
@@ -617,7 +619,7 @@ public class ImageSelectActivity extends HelperActivity {
     private class ImageLoaderRunnable implements Runnable {
         @Override
         public void run() {
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             /*
             If the adapter is null, this is first time this activity's view is
             being shown, hence send FETCH_STARTED message to show progress bar
@@ -673,8 +675,23 @@ public class ImageSelectActivity extends HelperActivity {
                 //还是拿到根目录
 
                 try {
+                    //Uri uri = Uri.parse(albumDir);
                     long start = System.currentTimeMillis();
+                    /*final int takeFlags = getIntent().getFlags()
+                            & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        //getContentResolver().takePersistableUriPermission(uri, takeFlags);
+                    }*/
                     DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
+                    //androidx.documentfile.provider.TreeDocumentFile@96492fc
+
+                    //DocumentFile dir = DocumentFile.fromTreeUri(getApplicationContext(),uri);
+                    //DocumentFile.fromSingleUri(getApplicationContext(),uri);
+                    //java.lang.UnsupportedOperationException
+
+                    Log.w(SafUtil.TAG,"dir22:"+Uri.decode(dir.getUri().toString()));
+                    //Log.w(SafUtil.TAG,"dir222:"+dir.toString());
                     DocumentFile[] files = dir.listFiles();
                     if(files == null){
                         sendMessage(Constants.ERROR);
@@ -687,6 +704,9 @@ public class ImageSelectActivity extends HelperActivity {
                     int count = 0;
                     for (DocumentFile file1 : files) {
                         String name = file1.getName();
+                        if(TextUtils.isEmpty(name)){
+                            continue;
+                        }
                         //Log.d(SafUtil.TAG,"image name saf :"+name);
                         if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
                                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
@@ -718,7 +738,13 @@ public class ImageSelectActivity extends HelperActivity {
                 }catch (Throwable throwable){
                     throwable.printStackTrace();
                     sendMessage(Constants.ERROR);
-                    Toast.makeText(getApplicationContext(),throwable.getMessage(),Toast.LENGTH_LONG).show();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),throwable.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    });
+
                 }
 
 
