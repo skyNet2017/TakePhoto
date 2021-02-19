@@ -20,7 +20,8 @@ public class Album {
     public boolean fromSAFApi;
 
     public Uri dir2;
-    public DocumentFile dirSaf;
+
+    public transient DocumentFile dirSaf;
     public Uri cover2;
 
     public Album(String name, String cover) {

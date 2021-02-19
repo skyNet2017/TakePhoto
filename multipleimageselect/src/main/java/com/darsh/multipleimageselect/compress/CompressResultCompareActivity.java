@@ -211,7 +211,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
             }
         });
-        adapter.refresh(getFilePaths(files));
+        adapter.refresh(paths);
         vpCompress.setCurrentItem(position);
 
     }

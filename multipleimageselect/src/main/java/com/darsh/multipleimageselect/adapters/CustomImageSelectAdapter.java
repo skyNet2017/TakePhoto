@@ -2,6 +2,7 @@ package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -15,6 +16,8 @@ import com.darsh.multipleimageselect.models.Image;
 import com.hss01248.imginfo.ImageInfoFormater;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import io.reactivex.Observable;
@@ -78,7 +81,8 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
                 .doOnNext(new Consumer<ViewHolder>() {
                     @Override
                     public void accept(ViewHolder viewHolder) throws Exception {
-                        viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
+                        //viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
+                        viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.path,false);
                     }
                 })
                 .subscribeOn(Schedulers.io())
@@ -116,25 +120,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         return convertView;
     }
 
-    public static String formatImagInfo(Image image, boolean showFullPath,Context context) {
-        String path = image.path;
-        File file = new File(path);
-        String size = ImageInfoFormater.formatFileSize(file.length());
-        int[] wh = ImageInfoFormater.getImageWidthHeight(path);
-        int quality = image.quality;
-        //if(quality < 0){
-            quality = ImageInfoFormater.getQuality(path);
-            image.quality = quality;
-       // }
-        String needCompress = quality > PhotoCompressHelper.DEFAULT_QUALITY ? context.getString(com.hss01248.imginfo.R.string.c_not_compressed) : context.getString(com.hss01248.imginfo.R.string.t_compressed);
-        String str = wh[0] + "x" + wh[1] + ", " + size + context.getString(com.hss01248.imginfo.R.string.c_quality_info) + quality + needCompress;
-        if (showFullPath) {
-            return str + "\n" + path;
 
-        } else {
-            return str;
-        }
-    }
 
     private static class ViewHolder {
         public ImageView imageView;

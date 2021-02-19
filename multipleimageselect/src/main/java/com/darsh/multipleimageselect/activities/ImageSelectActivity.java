@@ -45,6 +45,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -180,7 +181,10 @@ public class ImageSelectActivity extends HelperActivity {
         isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
 
         albumDir2 = (Uri) intent.getExtras().get(Constants.INTENT_EXTRA_ALBUM_SAF_DIR);
-        Log.d(SafUtil.TAG,"albumDir2:"+ URLDecoder.decode(albumDir2.toString()));
+        if(albumDir2 != null){
+            Log.d(SafUtil.TAG,"albumDir2:"+ URLDecoder.decode(albumDir2.toString()));
+        }
+
         isAlbumFromSafApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_SAF_API,false);
 
         errorDisplay = (TextView) findViewById(R.id.text_view_error);
@@ -232,6 +236,8 @@ public class ImageSelectActivity extends HelperActivity {
                 return true;
             }
         });
+        initHandler();
+        loadImages();
     }
 
     public void refresh() {
@@ -293,95 +299,75 @@ public class ImageSelectActivity extends HelperActivity {
         super.onBackPressed();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+   void initHandler(){
+       handler = new Handler() {
+           @Override
+           public void handleMessage(Message msg) {
+               switch (msg.what) {
+                   case Constants.PERMISSION_GRANTED: {
+                       //loadImages();
+                       break;
+                   }
 
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case Constants.PERMISSION_GRANTED: {
-                        loadImages();
-                        break;
-                    }
+                   case Constants.FETCH_STARTED: {
+                       progressBar.setVisibility(View.VISIBLE);
+                       gridView.setVisibility(View.INVISIBLE);
+                       break;
+                   }
 
-                    case Constants.FETCH_STARTED: {
-                        progressBar.setVisibility(View.VISIBLE);
-                        gridView.setVisibility(View.INVISIBLE);
-                        break;
-                    }
-
-                    case Constants.FETCH_COMPLETED: {
+                   case Constants.FETCH_COMPLETED: {
                         /*
                         If adapter is null, this implies that the loaded images will be shown
                         for the first time, hence send FETCH_COMPLETED message.
                         However, if adapter has been initialised, this thread was run either
                         due to the activity being restarted or content being changed.
                          */
-                        if (adapter == null) {
-                            adapter = new CustomImageSelectAdapter(getApplicationContext(), images);
-                            gridView.setAdapter(adapter);
+                       if (adapter == null) {
+                           adapter = new CustomImageSelectAdapter(getApplicationContext(), images);
+                           gridView.setAdapter(adapter);
 
-                            progressBar.setVisibility(View.INVISIBLE);
-                            gridView.setVisibility(View.VISIBLE);
-                            orientationBasedUI(getResources().getConfiguration().orientation);
+                           progressBar.setVisibility(View.INVISIBLE);
+                           gridView.setVisibility(View.VISIBLE);
+                           orientationBasedUI(getResources().getConfiguration().orientation);
 
 
 
-                        } else {
-                            adapter.notifyDataSetChanged();
+                       } else {
+                           adapter.notifyDataSetChanged();
                             /*
                             Some selected images may have been deleted
                             hence update action mode title
                              */
-                            if (actionMode != null) {
-                                countSelected = msg.arg1;
-                                actionMode.setTitle(countSelected + " " + getString(R.string.selected));
-                            }
-                        }
-                        break;
-                    }
+                           if (actionMode != null) {
+                               countSelected = msg.arg1;
+                               actionMode.setTitle(countSelected + " " + getString(R.string.selected));
+                           }
+                       }
+                       break;
+                   }
 
-                    case Constants.ERROR: {
-                        progressBar.setVisibility(View.INVISIBLE);
-                        errorDisplay.setVisibility(View.VISIBLE);
-                        break;
-                    }
+                   case Constants.ERROR: {
+                       progressBar.setVisibility(View.INVISIBLE);
+                       errorDisplay.setVisibility(View.VISIBLE);
+                       break;
+                   }
 
-                    default: {
-                        super.handleMessage(msg);
-                    }
-                }
-            }
-        };
-        observer = new ContentObserver(handler) {
-            @Override
-            public void onChange(boolean selfChange) {
-                loadImages();
-            }
-        };
-        getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
+                   default: {
+                       super.handleMessage(msg);
+                   }
+               }
+           }
+       };
+       observer = new ContentObserver(handler) {
+           @Override
+           public void onChange(boolean selfChange) {
+               // loadImages();
+           }
+       };
+       getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
+      // checkPermission();
+   }
 
-        checkPermission();
-    }
-
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        stopThread();
-
-        getContentResolver().unregisterContentObserver(observer);
-        observer = null;
-
-        if (handler != null) {
-            handler.removeCallbacksAndMessages(null);
-            handler = null;
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -390,7 +376,7 @@ public class ImageSelectActivity extends HelperActivity {
         if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(null);
         }
-        images = null;
+        //images = null;
         if (adapter != null) {
             adapter.releaseResources();
         }
@@ -686,26 +672,55 @@ public class ImageSelectActivity extends HelperActivity {
                 //DocumentFile dir = DocumentFile.fromTreeUri(getApplicationContext(),albumDir2);
                 //还是拿到根目录
 
-                DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
-                DocumentFile[] files = dir.listFiles();
-                if(files == null){
-                    sendMessage(Constants.ERROR);
-                    return;
-                }
-
-                ArrayList<Image> temp = new ArrayList<>(files.length);
-                int tempCountSelected = 0;
-
-                for (DocumentFile file1 : files) {
-                    String name = file1.getName();
-                    Log.d(SafUtil.TAG,"image name saf :"+name);
-                    if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
-                            || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
-                        temp.add(new Image(0, name, file1.getUri().toString(), false));
+                try {
+                    long start = System.currentTimeMillis();
+                    DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
+                    DocumentFile[] files = dir.listFiles();
+                    if(files == null){
+                        sendMessage(Constants.ERROR);
+                        return;
                     }
+
+                    //ArrayList<Image> temp = new ArrayList<>(files.length);
+                    int tempCountSelected = 0;
+
+                    int count = 0;
+                    for (DocumentFile file1 : files) {
+                        String name = file1.getName();
+                        //Log.d(SafUtil.TAG,"image name saf :"+name);
+                        if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
+                                || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
+                            Image image = new Image(0, name, file1.getUri().toString(), false);
+                            //temp.add();
+                            count++;
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    images.add(image);
+                                }
+                            });
+                            if(count % 20 == 0){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+                                    }
+                                });
+                            }
+                            //new FileInputStream(getContentResolver().openFileDescriptor(file1.getUri(),"w"));
+                            //getContentResolver().openFileDescriptor()
+                        }
+                    }
+                    //images.addAll(temp);
+                    Log.w(SafUtil.TAG,"cost:(s) "+(System.currentTimeMillis()-start)/1000);
+                    //7-8s,太慢了
+                    sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+                }catch (Throwable throwable){
+                    throwable.printStackTrace();
+                    sendMessage(Constants.ERROR);
+                    Toast.makeText(getApplicationContext(),throwable.getMessage(),Toast.LENGTH_LONG).show();
                 }
-                images.addAll(temp);
-                sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+
 
             }else {
                 Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,

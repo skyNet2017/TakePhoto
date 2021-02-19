@@ -3,7 +3,10 @@ package com.darsh.multipleimageselect.compress;
 import android.app.Activity;
 
 import androidx.annotation.Nullable;
+
+import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +15,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.darsh.multipleimageselect.R;
+import com.darsh.multipleimageselect.saf.SafUtil;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
-
+import com.shizhefei.view.largeimage.LargeImageView;
+import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 
 /**
@@ -35,6 +42,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     RelativeLayout rlOriginal;
 
     SubsamplingScaleImageView ivCompressed;
+    LargeImageView ivOriginalSaf;
+    LargeImageView ivCompressedSaf;
 
     TextView tvCompressed;
 
@@ -73,6 +82,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         rlCompressed = (RelativeLayout) rootView.findViewById(R.id.rl_compressed);
         ivCompressed = (SubsamplingScaleImageView) rootView.findViewById(R.id.iv_compressed);
         tvCompressed = (TextView) rootView.findViewById(R.id.tv_compressed);
+        ivOriginalSaf = rootView.findViewById(R.id.iv_original_saf);
+        ivCompressedSaf = rootView.findViewById(R.id.iv_compressed_saf);
 
     }
 
@@ -92,6 +103,37 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     @Override
     public void assingDatasAndEvents(Activity context, @Nullable String s, int i) {
         String originalPath = s;
+        Log.d(SafUtil.TAG,"uri: "+s);
+        if(s.startsWith("content://")){
+            ivCompressed.setVisibility(View.GONE);
+            ivOriginal.setVisibility(View.GONE);
+            ivOriginalSaf.setVisibility(View.VISIBLE);
+            ivCompressedSaf.setVisibility(View.VISIBLE);
+            Uri uri = Uri.parse(s);
+            if(!isPreview){
+                rlCompressed.setVisibility(View.VISIBLE);
+                tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
+            }else {
+                rlCompressed.setVisibility(View.GONE);
+                tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+            }
+
+            //tvOriginal.setText(s);
+            try {
+                ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(
+                        new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor())));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+
+
+
+
+
+
        File file = new File(s);
        if(file.exists()){
            rlOriginal.setVisibility(View.VISIBLE);
