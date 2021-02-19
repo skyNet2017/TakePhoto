@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +17,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
@@ -36,11 +39,13 @@ import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
+import com.darsh.multipleimageselect.saf.SafUtil;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -145,6 +150,8 @@ public class ImageSelectActivity extends HelperActivity {
         }
     };
     private String albumDir;
+    private Uri albumDir2;
+    private boolean isAlbumFromSafApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +178,10 @@ public class ImageSelectActivity extends HelperActivity {
         album = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM);
         albumDir = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM_PATH);
         isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
+
+        albumDir2 = (Uri) intent.getExtras().get(Constants.INTENT_EXTRA_ALBUM_SAF_DIR);
+        Log.d(SafUtil.TAG,"albumDir2:"+ URLDecoder.decode(albumDir2.toString()));
+        isAlbumFromSafApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_SAF_API,false);
 
         errorDisplay = (TextView) findViewById(R.id.text_view_error);
         errorDisplay.setVisibility(View.INVISIBLE);
@@ -662,9 +673,35 @@ public class ImageSelectActivity extends HelperActivity {
 
                 for (File file1 : files) {
                     String name = file1.getName();
+                    Log.d(SafUtil.TAG,"image name:"+name);
                     if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
                             || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
                         temp.add(new Image(0, name, file1.getAbsolutePath(), false));
+                    }
+                }
+                images.addAll(temp);
+                sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+
+            }else if(isAlbumFromSafApi){
+                //DocumentFile dir = DocumentFile.fromTreeUri(getApplicationContext(),albumDir2);
+                //还是拿到根目录
+
+                DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
+                DocumentFile[] files = dir.listFiles();
+                if(files == null){
+                    sendMessage(Constants.ERROR);
+                    return;
+                }
+
+                ArrayList<Image> temp = new ArrayList<>(files.length);
+                int tempCountSelected = 0;
+
+                for (DocumentFile file1 : files) {
+                    String name = file1.getName();
+                    Log.d(SafUtil.TAG,"image name saf :"+name);
+                    if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
+                            || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
+                        temp.add(new Image(0, name, file1.getUri().toString(), false));
                     }
                 }
                 images.addAll(temp);

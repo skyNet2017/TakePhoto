@@ -24,40 +24,19 @@ import io.reactivex.schedulers.Schedulers;
 
 public class TfAlbumFinder {
 
-    public static void listAllAlbum(final Observer<List<Album>> observer){
+    public static void listSafAlbum(final Observer<Album> observer){
         if(SafUtil.sdRoot == null){
             Log.w(SafUtil.TAG,Thread.currentThread().getName()+"  SafUtil.sdRoot is null");
             return;
         }
-        final List<Album> albums = new ArrayList<>();
-        Observable.just(SafUtil.sdRoot)
-
-                .map(new Function<DocumentFile, List<Album>>() {
-                    @Override
-                    public List<Album> apply(DocumentFile file) throws Exception {
-                        Log.d(SafUtil.TAG,"d:"+file.getUri().toString());
-                        getAlbums(file,albums);
-                        Log.d(SafUtil.TAG,Thread.currentThread().getName()+", album--:"+albums.size());
-                        /*Collections.sort(albums, new Comparator<Album>() {
-                            @Override
-                            public int compare(Album o1, Album o2) {
-                                return (int) (o2.count - o1.count);
-                            }
-                        });*/
-
-                        return albums;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( observer);
+        final List<Album> albums = new ArrayList<>(300);
+        getAlbums(SafUtil.sdRoot,observer);
 
     }
 
   public   static ExecutorService executorService = Executors.newFixedThreadPool(20);
 
-    private static void getAlbums(final DocumentFile dir, final List<Album> albums) {
+    private static void getAlbums(final DocumentFile dir, final Observer<Album> observer) {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -65,7 +44,6 @@ public class TfAlbumFinder {
                 if(files == null || files.length ==0){
                     return;
                 }
-                boolean havePic = false;
                 Album album = null;
                 int count = 0;
                 Log.d(SafUtil.TAG,Thread.currentThread().getName()+"  展开文件夹:"+ Uri.decode(dir.getUri().toString()));
@@ -79,28 +57,30 @@ public class TfAlbumFinder {
                         if("MobileQQ".equals(file.getName())){
                             continue;
                         }
-                        getAlbums(file,albums);
+                        getAlbums(file,observer);
                     }else {
                         String name = file.getName();
                         if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
                                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
                             count++;
-                            if(havePic){
+                            if(album != null){
+                                album.fileSize = file.length() + album.fileSize;
                                 continue;
                             }
-                            havePic = true;
                             album = new Album(dir.getName(),file.getUri().toString());
                             album.fromSAFApi = true;
+                            album.fileSize = file.length();
                             album.dir = dir.getUri().toString();
                             album.cover2 = file.getUri();
                             album.dir2 = dir.getUri();
-                            albums.add(album);
+                            album.dirSaf = dir;
                             Log.d(SafUtil.TAG,Thread.currentThread().getName()+"  添加有图文件夹:"+album.dir);
                         }
                     }
                 }
                 if(album != null){
                     album.count = count;
+                    observer.onNext(album);
                 }
             }
         });

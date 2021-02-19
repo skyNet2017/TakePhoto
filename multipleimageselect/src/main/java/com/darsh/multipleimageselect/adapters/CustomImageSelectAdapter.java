@@ -100,6 +100,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
 
                     }
                 });

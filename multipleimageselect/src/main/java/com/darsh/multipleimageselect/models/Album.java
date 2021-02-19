@@ -3,6 +3,8 @@ package com.darsh.multipleimageselect.models;
 import android.net.Uri;
 import android.os.Build;
 
+import androidx.documentfile.provider.DocumentFile;
+
 import java.util.Objects;
 
 /**
@@ -18,6 +20,7 @@ public class Album {
     public boolean fromSAFApi;
 
     public Uri dir2;
+    public DocumentFile dirSaf;
     public Uri cover2;
 
     public Album(String name, String cover) {
@@ -26,7 +29,7 @@ public class Album {
         this.count = count;
     }
 
-    @Override
+    /*@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Album)) return false;
@@ -45,5 +48,5 @@ public class Album {
         }else {
             return dir.hashCode()+90;
         }
-    }
+    }*/
 }

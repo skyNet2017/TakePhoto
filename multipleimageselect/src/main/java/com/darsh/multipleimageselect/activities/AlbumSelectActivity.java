@@ -35,8 +35,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -104,13 +106,151 @@ public class AlbumSelectActivity extends HelperActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), ImageSelectActivity.class);
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM, albums.get(position).name);
+
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, albums.get(position).dir);
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API, albums.get(position).fromFileApi);
+
+                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_SAF_DIR, albums.get(position).dir2);
+                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_SAF_API, albums.get(position).fromSAFApi);
+
+
                 startActivityForResult(intent, Constants.REQUEST_CODE);
             }
         });
 
         loadData();
+
+
+
+
+    }
+
+    private void loadByMediaStore() {
+
+    }
+
+    public static Map<String,Album> docs = new HashMap<>();
+
+    private void loadBySaf() {
+        TfAlbumFinder.listSafAlbum(new Observer<Album>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Album album) {
+                Log.d("监听","添加有图文件夹 完成 :"+album.dir2);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (adapter == null) {
+                            adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
+                            gridView.setAdapter(adapter);
+
+                            progressBar.setVisibility(View.INVISIBLE);
+                            gridView.setVisibility(View.VISIBLE);
+                            orientationBasedUI(getResources().getConfiguration().orientation);
+
+                        }
+                                        /*if(albums.contains(album)){
+                                            albums.remove(albums.indexOf(album));
+                                        }*/
+                        albums.add(album);
+                        docs.put(album.dir,album);
+                        //再次排序:按图片个数排:
+                        //按文件大小排序:
+                                        /*Collections.sort(albums, new Comparator<Album>() {
+                                            @Override
+                                            public int compare(Album o1, Album o2) {
+                                                return (int) (o2.count - o1.count);
+                                            }
+                                        });*/
+                        Collections.sort(albums, new Comparator<Album>() {
+                            @Override
+                            public int compare(Album o1, Album o2) {
+                                return (o2.fileSize > o1.fileSize) ? 1: -1;
+                            }
+                        });
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+                //calFileSize(albums,adapter);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
+
+    private void loadByFileApi() {
+        AlbumFinder.listAllAlbum(new Observer<Album>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Album album) {
+                Log.d("监听","添加有图文件夹 完成 :"+album.dir);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (adapter == null) {
+                            adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
+                            gridView.setAdapter(adapter);
+
+                            progressBar.setVisibility(View.INVISIBLE);
+                            gridView.setVisibility(View.VISIBLE);
+                            orientationBasedUI(getResources().getConfiguration().orientation);
+
+                        }
+                                        /*if(albums.contains(album)){
+                                            albums.remove(albums.indexOf(album));
+                                        }*/
+                        albums.add(album);
+                        //再次排序:按图片个数排:
+                        //按文件大小排序:
+                                        /*Collections.sort(albums, new Comparator<Album>() {
+                                            @Override
+                                            public int compare(Album o1, Album o2) {
+                                                return (int) (o2.count - o1.count);
+                                            }
+                                        });*/
+                        Collections.sort(albums, new Comparator<Album>() {
+                            @Override
+                            public int compare(Album o1, Album o2) {
+                                return (o2.fileSize > o1.fileSize) ? 1: -1;
+                            }
+                        });
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+                //calFileSize(albums,adapter);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
     }
 
     private void loadData() {
@@ -130,64 +270,9 @@ public class AlbumSelectActivity extends HelperActivity {
                     }
 
                     case Constants.FETCH_COMPLETED: {
-
-                        AlbumFinder.listAllAlbum(new Observer<Album>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
-
-                            }
-
-                            @Override
-                            public void onNext(Album album) {
-                                Log.d("监听","添加有图文件夹 完成 :"+album.dir);
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (adapter == null) {
-                                            adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
-                                            gridView.setAdapter(adapter);
-
-                                            progressBar.setVisibility(View.INVISIBLE);
-                                            gridView.setVisibility(View.VISIBLE);
-                                            orientationBasedUI(getResources().getConfiguration().orientation);
-
-                                        }
-                                        /*if(albums.contains(album)){
-                                            albums.remove(albums.indexOf(album));
-                                        }*/
-                                        albums.add(album);
-                                        //再次排序:按图片个数排:
-                                        //按文件大小排序:
-                                        /*Collections.sort(albums, new Comparator<Album>() {
-                                            @Override
-                                            public int compare(Album o1, Album o2) {
-                                                return (int) (o2.count - o1.count);
-                                            }
-                                        });*/
-                                        Collections.sort(albums, new Comparator<Album>() {
-                                            @Override
-                                            public int compare(Album o1, Album o2) {
-                                                return (o2.fileSize > o1.fileSize) ? 1: -1;
-                                            }
-                                        });
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                });
-
-                                //calFileSize(albums,adapter);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                e.printStackTrace();
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
+                        //loadByMediaStore();
+                        //loadByFileApi();
+                        loadBySaf();
 
                         break;
                     }
