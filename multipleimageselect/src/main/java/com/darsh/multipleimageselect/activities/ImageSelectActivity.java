@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -40,14 +41,20 @@ import com.darsh.multipleimageselect.adapters.CustomImageSelectAdapter;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
+import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.models.Image;
 import com.darsh.multipleimageselect.saf.SafUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.hss01248.imginfo.ImageInfoFormater;
 
+import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -669,6 +676,18 @@ public class ImageSelectActivity extends HelperActivity {
                 //还是拿到根目录
 
                 try {
+                    List<Image> imagesCache = readImagesFromCache(albumDir);
+                  int cacheCount =  0;
+                  if(imagesCache != null && imagesCache.size()>0){
+                      cacheCount = imagesCache.size();
+                      handler.post(new Runnable() {
+                          @Override
+                          public void run() {
+                              images.addAll(imagesCache);
+                              sendMessage(Constants.FETCH_COMPLETED, 0);
+                          }
+                      });
+                  }
                     Uri uri = Uri.parse(albumDir);
                     long start = System.currentTimeMillis();
                     /*final int takeFlags = getIntent().getFlags()
@@ -694,7 +713,7 @@ public class ImageSelectActivity extends HelperActivity {
                         return;
                     }
 
-                    //ArrayList<Image> temp = new ArrayList<>(files.length);
+                    ArrayList<Image> temp = new ArrayList<>(files.length);
                     int tempCountSelected = 0;
 
                     int count = 0;
@@ -707,26 +726,39 @@ public class ImageSelectActivity extends HelperActivity {
                         if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
                                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
                             Image image = new Image(0, name, file1.getUri().toString(), false);
-                            //temp.add();
+                            temp.add(image);
                             count++;
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    images.add(image);
-                                }
-                            });
-                            if(count % 18 == 0){
+                            if(cacheCount ==0){
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+                                        images.add(image);
                                     }
                                 });
+                                if(count % 18 == 0){
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
+                                        }
+                                    });
+                                }
                             }
+
                             //new FileInputStream(getContentResolver().openFileDescriptor(file1.getUri(),"w"));
                             //getContentResolver().openFileDescriptor()
                         }
                     }
+                    if(cacheCount!=0){
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                images.clear();
+                                images.addAll(temp);
+                            }
+                        });
+                    }
+                    writeCacheImages(temp);
                     //images.addAll(temp);
                     Log.w(SafUtil.TAG,"cost:(s) "+(System.currentTimeMillis()-start)/1000);
                     //7-8s,太慢了
@@ -789,5 +821,40 @@ public class ImageSelectActivity extends HelperActivity {
             }
 
         }
+    }
+
+    private void writeCacheImages(ArrayList<Image> temp) {
+        File dir = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"picuricache");
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        File file = new File(dir,albumDir+".json");
+        try {
+            String json = new Gson().toJson(temp);
+            FileUtils.writeStringToFile(file,json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<Image> readImagesFromCache(String albumDir) {
+        File dir = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"picuricache");
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
+        File file = new File(dir,albumDir+".json");
+        String json = null;
+        try {
+            json = FileUtils.readFileToString(file);
+            Log.d(SafUtil.TAG,json);
+            if(!TextUtils.isEmpty(json)) {
+                List<Image> albums = new Gson().fromJson(json, new TypeToken<List<Image>>() {}.getType());
+                return albums;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 }

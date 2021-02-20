@@ -123,8 +123,8 @@ public class AlbumSelectActivity extends HelperActivity {
     }
 
     private void initData() {
-        progressBar.setVisibility(View.VISIBLE);
-        gridView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
+        gridView.setVisibility(View.VISIBLE);
         adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
         gridView.setAdapter(adapter);
         orientationBasedUI(getResources().getConfiguration().orientation);

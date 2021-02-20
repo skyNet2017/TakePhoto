@@ -15,6 +15,7 @@
 
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:id="@+id/iv_original"
+            android:visibility="gone"
             android:layout_centerVertical="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -45,6 +46,7 @@
 
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:id="@+id/iv_compressed"
+            android:visibility="gone"
             android:layout_centerVertical="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

@@ -25,6 +25,9 @@ import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.lubanturbo.TurboCompressor;
+import com.shizhefei.view.largeimage.LargeImageView;
+import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
+
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -35,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -579,6 +583,29 @@ public class PhotoCompressHelper {
         }
         imageView.setImage(ImageSource.uri(uri));
 
+    }
+
+    public static void setPathToPreview(LargeImageView imageView, String filePath){
+        if(TextUtils.isEmpty(filePath)){
+            return;
+        }
+        Uri uri = null;
+        File file = new File(filePath);
+        if(file.exists()){
+            try {
+                imageView.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(file)));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }else {
+            uri = Uri.parse(filePath);
+            try {
+                imageView.setImage(new InputStreamBitmapDecoderFactory(
+                        new FileInputStream(imageView.getContext().getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor())));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

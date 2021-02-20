@@ -35,13 +35,13 @@ import java.io.FileNotFoundException;
 public class CpHolder extends SuperPagerHolder<String, Activity> {
 
 
-    SubsamplingScaleImageView ivOriginal;
+    //SubsamplingScaleImageView ivOriginal;
 
     TextView tvOriginal;
 
     RelativeLayout rlOriginal;
 
-    SubsamplingScaleImageView ivCompressed;
+   // SubsamplingScaleImageView ivCompressed;
     LargeImageView ivOriginalSaf;
     LargeImageView ivCompressedSaf;
 
@@ -77,10 +77,10 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
         llCompress = (LinearLayout) rootView.findViewById(R.id.ll_compress);
         rlOriginal = (RelativeLayout) rootView.findViewById(R.id.rl_original);
-        ivOriginal = (SubsamplingScaleImageView) rootView.findViewById(R.id.iv_original);
+        //ivOriginal = (SubsamplingScaleImageView) rootView.findViewById(R.id.iv_original);
         tvOriginal = (TextView) rootView.findViewById(R.id.tv_original);
         rlCompressed = (RelativeLayout) rootView.findViewById(R.id.rl_compressed);
-        ivCompressed = (SubsamplingScaleImageView) rootView.findViewById(R.id.iv_compressed);
+       // ivCompressed = (SubsamplingScaleImageView) rootView.findViewById(R.id.iv_compressed);
         tvCompressed = (TextView) rootView.findViewById(R.id.tv_compressed);
         ivOriginalSaf = rootView.findViewById(R.id.iv_original_saf);
         ivCompressedSaf = rootView.findViewById(R.id.iv_compressed_saf);
@@ -104,9 +104,12 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     public void assingDatasAndEvents(Activity context, @Nullable String s, int i) {
         String originalPath = s;
         Log.d(SafUtil.TAG,"uri: "+s);
+       // ivCompressed.setVisibility(View.GONE);
+       // ivOriginal.setVisibility(View.GONE);
+        ivOriginalSaf.setVisibility(View.VISIBLE);
+        ivCompressedSaf.setVisibility(View.VISIBLE);
         if(s.startsWith("content://")){
-            ivCompressed.setVisibility(View.GONE);
-            ivOriginal.setVisibility(View.GONE);
+
             ivOriginalSaf.setVisibility(View.VISIBLE);
             ivCompressedSaf.setVisibility(View.VISIBLE);
             Uri uri = Uri.parse(s);
@@ -137,7 +140,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
        File file = new File(s);
        if(file.exists()){
            rlOriginal.setVisibility(View.VISIBLE);
-           PhotoCompressHelper.setPathToPreview(ivOriginal,originalPath);
+           PhotoCompressHelper.setPathToPreview(ivOriginalSaf,originalPath);
            if(isPreview){
                tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
            }else {
@@ -152,7 +155,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
        if(!isPreview){
            String compressedPath = PhotoCompressHelper.getCompressedFilePath(s,true);
            if(!TextUtils.isEmpty(compressedPath)){
-               PhotoCompressHelper.setPathToPreview(ivCompressed,compressedPath);
+               PhotoCompressHelper.setPathToPreview(ivCompressedSaf,compressedPath);
                tvCompressed.setText(context.getResources().getString(R.string.c_compressed)+":"+ImageInfoFormater.formatImagInfo(compressedPath,true));
                rlCompressed.setVisibility(View.VISIBLE);
            }else {
