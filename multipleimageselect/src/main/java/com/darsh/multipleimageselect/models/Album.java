@@ -12,17 +12,21 @@ import java.util.Objects;
  */
 public class Album {
     public String name;
+    /**
+     * 可能是纯文件路径,或者saf拿到的content://xxxx
+     */
     public String cover;
     public int count;
+    /**
+     * 可能是纯文件路径,或者saf拿到的content://xxxx
+     */
     public String dir;
     public long fileSize;
     public boolean fromFileApi;
     public boolean fromSAFApi;
 
-    public Uri dir2;
+   // public transient DocumentFile dirSaf;
 
-    public transient DocumentFile dirSaf;
-    public Uri cover2;
 
     public Album(String name, String cover) {
         this.name = name;
@@ -30,7 +34,7 @@ public class Album {
         this.count = count;
     }
 
-    /*@Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Album)) return false;
@@ -49,5 +53,5 @@ public class Album {
         }else {
             return dir.hashCode()+90;
         }
-    }*/
+    }
 }

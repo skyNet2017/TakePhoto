@@ -5,15 +5,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import android.provider.MediaStore;
 import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.AdapterListUpdateCallback;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -31,19 +28,13 @@ import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.saf.TfAlbumFinder;
-import com.google.gson.Gson;
-import com.hss01248.imginfo.ImageInfoFormater;
-
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -116,8 +107,6 @@ public class AlbumSelectActivity extends HelperActivity {
 
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, albums.get(position).dir);
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API, albums.get(position).fromFileApi);
-
-                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_SAF_DIR, albums.get(position).dir2);
                 intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_SAF_API, albums.get(position).fromSAFApi);
 
 
@@ -125,18 +114,29 @@ public class AlbumSelectActivity extends HelperActivity {
             }
         });
 
-        loadData();
+        initHandler();
+        initData();
 
 
 
 
+    }
+
+    private void initData() {
+        progressBar.setVisibility(View.VISIBLE);
+        gridView.setVisibility(View.INVISIBLE);
+        adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
+        gridView.setAdapter(adapter);
+        orientationBasedUI(getResources().getConfiguration().orientation);
+        //loadByMediaStore();
+        loadBySaf();
     }
 
     private void loadByMediaStore() {
 
     }
 
-    public static Map<String,Album> docs = new HashMap<>();
+
 
     private void loadBySaf() {
         TfAlbumFinder.listSafAlbum(new Observer<Album>() {
@@ -147,41 +147,19 @@ public class AlbumSelectActivity extends HelperActivity {
 
             @Override
             public void onNext(Album album) {
-                Log.d("监听", "添加有图文件夹 完成 :" + album.dir2);
+                //Log.d("监听", "添加有图文件夹 完成 :" + album.dir);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (adapter == null) {
-                            adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
-                            gridView.setAdapter(adapter);
-
-                            progressBar.setVisibility(View.INVISIBLE);
-                            gridView.setVisibility(View.VISIBLE);
-                            orientationBasedUI(getResources().getConfiguration().orientation);
-
+                        progressBar.setVisibility(View.GONE);
+                        gridView.setVisibility(View.VISIBLE);
+                        if(albums.contains(album)){
+                            Album albumOld =  albums.get(albums.indexOf(album));
+                            albumOld.count = album.count;
+                            albumOld.fileSize = album.fileSize;
+                        }else {
+                            albums.add(album);
                         }
-                                        /*if(albums.contains(album)){
-                                            albums.remove(albums.indexOf(album));
-                                        }*/
-
-                        /*Iterator<Album> iterator = albums.iterator();
-                        while (iterator.hasNext()){
-                            Album album1 = iterator.next();
-                            if(album1.dir.equals(album.dir)){
-                                iterator.remove();
-                                break;
-                            }
-                        }*/
-                        albums.add(album);
-                        docs.put(album.dir, album);
-                        //再次排序:按图片个数排:
-                        //按文件大小排序:
-                                        /*Collections.sort(albums, new Comparator<Album>() {
-                                            @Override
-                                            public int compare(Album o1, Album o2) {
-                                                return (int) (o2.count - o1.count);
-                                            }
-                                        });*/
                         Collections.sort(albums, new Comparator<Album>() {
                             @Override
                             public int compare(Album o1, Album o2) {
@@ -192,7 +170,6 @@ public class AlbumSelectActivity extends HelperActivity {
                     }
                 });
 
-                //calFileSize(albums,adapter);
             }
 
             @Override
@@ -204,20 +181,6 @@ public class AlbumSelectActivity extends HelperActivity {
             @Override
             public void onComplete() {
 
-                try {
-                    List<Album> albums2 = new ArrayList<>();
-                    for (Album album : albums) {
-                        if(album.dir.startsWith("content")){
-                            albums2.add(album);
-                        }
-                    }
-                    File file = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"safcache.json");
-                    String json = new Gson().toJson(albums2);
-                    FileUtils.writeStringToFile(file,json);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
             }
         }, new Observer<List<Album>>() {
             @Override
@@ -227,18 +190,8 @@ public class AlbumSelectActivity extends HelperActivity {
 
             @Override
             public void onNext(List<Album> albums0) {
-                /*if (adapter == null) {
-                    adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
-                    gridView.setAdapter(adapter);
-
-                    progressBar.setVisibility(View.INVISIBLE);
-                    gridView.setVisibility(View.VISIBLE);
-                    orientationBasedUI(getResources().getConfiguration().orientation);
-
-                }
-                                        *//*if(albums.contains(album)){
-                                            albums.remove(albums.indexOf(album));
-                                        }*//*
+                progressBar.setVisibility(View.GONE);
+                gridView.setVisibility(View.VISIBLE);
                 albums.addAll(albums0);
                 Collections.sort(albums, new Comparator<Album>() {
                     @Override
@@ -246,7 +199,7 @@ public class AlbumSelectActivity extends HelperActivity {
                         return (o2.fileSize > o1.fileSize) ? 1 : -1;
                     }
                 });
-                adapter.notifyDataSetChanged();*/
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -256,7 +209,7 @@ public class AlbumSelectActivity extends HelperActivity {
 
             @Override
             public void onComplete() {
-
+                loadByFileApi();
             }
         });
 
@@ -322,7 +275,7 @@ public class AlbumSelectActivity extends HelperActivity {
         });
     }
 
-    private void loadData() {
+    private void initHandler() {
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -339,9 +292,6 @@ public class AlbumSelectActivity extends HelperActivity {
                     }
 
                     case Constants.FETCH_COMPLETED: {
-                        //loadByMediaStore();
-                        loadByFileApi();
-                        loadBySaf();
 
                         break;
                     }
@@ -358,7 +308,7 @@ public class AlbumSelectActivity extends HelperActivity {
                 }
             }
         };
-        observer = new ContentObserver(handler) {
+        /*observer = new ContentObserver(handler) {
             @Override
             public void onChange(boolean selfChange, Uri uri) {
                 loadAlbums();
@@ -366,7 +316,7 @@ public class AlbumSelectActivity extends HelperActivity {
         };
         getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
 
-        checkPermission();
+        checkPermission();*/
     }
 
     @Override

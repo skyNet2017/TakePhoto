@@ -45,15 +45,9 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<Album> {
         String desc = album.name+"\n"+ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count;
 
         viewHolder.textView.setText(desc);
-        if(album.fromSAFApi){
-            Glide.with(context)
-                    .load(album.cover2)
-                    .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
-        }else {
-            Glide.with(context)
-                    .load(arrayList.get(position).cover)
-                    .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
-        }
+        Glide.with(context)
+                .load(arrayList.get(position).cover)
+                .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
 
 
         return convertView;

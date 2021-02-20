@@ -153,7 +153,6 @@ public class ImageSelectActivity extends HelperActivity {
         }
     };
     private String albumDir;
-    private Uri albumDir2;
     private boolean isAlbumFromSafApi;
 
     @Override
@@ -182,12 +181,7 @@ public class ImageSelectActivity extends HelperActivity {
         albumDir = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM_PATH);
         isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
 
-        albumDir2 = (Uri) intent.getExtras().get(Constants.INTENT_EXTRA_ALBUM_SAF_DIR);
-        if(albumDir2 != null){
-            Log.d(SafUtil.TAG,"albumDir2:"+ URLDecoder.decode(albumDir2.toString()));
-        }
-
-        isAlbumFromSafApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_SAF_API,false);
+        isAlbumFromSafApi = albumDir.startsWith("content://");
 
         errorDisplay = (TextView) findViewById(R.id.text_view_error);
         errorDisplay.setVisibility(View.INVISIBLE);
@@ -675,7 +669,7 @@ public class ImageSelectActivity extends HelperActivity {
                 //还是拿到根目录
 
                 try {
-                    //Uri uri = Uri.parse(albumDir);
+                    Uri uri = Uri.parse(albumDir);
                     long start = System.currentTimeMillis();
                     /*final int takeFlags = getIntent().getFlags()
                             & (Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -683,15 +677,17 @@ public class ImageSelectActivity extends HelperActivity {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         //getContentResolver().takePersistableUriPermission(uri, takeFlags);
                     }*/
-                    DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
+                    //DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
                     //androidx.documentfile.provider.TreeDocumentFile@96492fc
 
-                    //DocumentFile dir = DocumentFile.fromTreeUri(getApplicationContext(),uri);
+                    DocumentFile dir0 = DocumentFile.fromTreeUri(getApplicationContext(),uri);
+                    DocumentFile dir = SafUtil.findFile(dir0,albumDir);
                     //DocumentFile.fromSingleUri(getApplicationContext(),uri);
                     //java.lang.UnsupportedOperationException
 
                     Log.w(SafUtil.TAG,"dir22:"+Uri.decode(dir.getUri().toString()));
                     //Log.w(SafUtil.TAG,"dir222:"+dir.toString());
+                    //dir.listFiles()性能很差
                     DocumentFile[] files = dir.listFiles();
                     if(files == null){
                         sendMessage(Constants.ERROR);
@@ -719,7 +715,7 @@ public class ImageSelectActivity extends HelperActivity {
                                     images.add(image);
                                 }
                             });
-                            if(count % 20 == 0){
+                            if(count % 18 == 0){
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {

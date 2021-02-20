@@ -64,7 +64,7 @@ public class SafUtil {
         StorageUtils.context = activity.getApplicationContext();
 
         ArrayList<StorageBean> storageData = getStorageData(activity.getApplicationContext());
-        if(storageData ==null || storageData.size() <=1){
+        if(storageData ==null || storageData.size() <=0){
             Log.w(SafUtil.TAG,"没有额外sd卡");
             return;
         }
@@ -412,6 +412,33 @@ public class SafUtil {
                 final double kbValue = space / A_KB;
                 return String.format("%.2fKB", kbValue);
             }
+        }
+    }
+
+    public static DocumentFile findFile(DocumentFile topDir,String uriString){
+        try {
+            String path2 = URLDecoder.decode(uriString);
+            if(path2.contains(":")){
+                path2 = path2.substring(path2.lastIndexOf(":")+1);
+            }
+            //Log.d(TAG,"pure path:"+path2);
+            String[] paths = path2.split("/");
+            DocumentFile dir = topDir;
+            if(path2 != null && path2.length() > 0){
+                for (String path : paths) {
+                    dir = dir.findFile(path);
+
+                }
+            }
+            if(dir.equals(topDir)){
+                return null;
+            }
+            //Log.d(TAG,"dir path:"+URLDecoder.decode(dir.getUri().toString()));
+            return dir;
+
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+            return null;
         }
     }
 }
