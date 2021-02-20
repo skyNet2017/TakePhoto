@@ -23,6 +23,7 @@ import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
 import com.fanjun.keeplive.config.KeepLiveService;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.shizhefei.view.largeimage.BlockImageLoader;
 import com.simple.spiderman.SpiderMan;
 
 import java.io.File;
@@ -65,7 +66,7 @@ public class BaseApp extends Application {
         ImageInfoFormater.init(this);
         ReportUtil.init(this, "UA-131503834-1", false, isDebugable);
         // AdUtil.init(this,false,"ca-app-pub-2335840373239478~2863497563");
-
+       // BlockImageLoader.DEBUG = true;
         //registerContentObserver();
 
       boolean  isMainProcess = getApplicationContext().getPackageName().equals
