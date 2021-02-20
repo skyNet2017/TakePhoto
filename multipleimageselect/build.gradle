@@ -37,4 +37,5 @@ dependencies {
     //api 'com.github.SherlockGougou:BigImageViewPager:v3_4.0.2'
     api 'com.shizhefei:LargeImageView:1.1.0'
     api 'com.google.code.gson:gson:2.8.5'
+    api 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
 }

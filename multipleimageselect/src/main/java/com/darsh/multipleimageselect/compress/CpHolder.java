@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,6 +27,8 @@ import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
+import pl.droidsonroids.gif.GifImageView;
 
 
 /**
@@ -50,6 +53,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     RelativeLayout rlCompressed;
 
     LinearLayout llCompress;
+    GifImageView gif;
 
     public CpHolder setPreview(boolean preview) {
         isPreview = preview;
@@ -84,6 +88,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         tvCompressed = (TextView) rootView.findViewById(R.id.tv_compressed);
         ivOriginalSaf = rootView.findViewById(R.id.iv_original_saf);
         ivCompressedSaf = rootView.findViewById(R.id.iv_compressed_saf);
+        gif = rootView.findViewById(R.id.gif_original);
 
     }
 
@@ -110,25 +115,33 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         ivCompressedSaf.setVisibility(View.VISIBLE);
         if(s.startsWith("content://")){
 
-            ivOriginalSaf.setVisibility(View.VISIBLE);
-            ivCompressedSaf.setVisibility(View.VISIBLE);
-            Uri uri = Uri.parse(s);
-            if(!isPreview){
-                rlCompressed.setVisibility(View.VISIBLE);
-                tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
+            if(s.contains(".gif")){
+                gif.setVisibility(View.VISIBLE);
+                ivOriginalSaf.setVisibility(View.GONE);
+                //gif.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                gif.setImageURI(Uri.parse(s));
             }else {
-                rlCompressed.setVisibility(View.GONE);
-                tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+                gif.setVisibility(View.GONE);
+                ivOriginalSaf.setVisibility(View.VISIBLE);
+                ivCompressedSaf.setVisibility(View.VISIBLE);
+                Uri uri = Uri.parse(s);
+                if(!isPreview){
+                    rlCompressed.setVisibility(View.VISIBLE);
+                    tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
+                }else {
+                    rlCompressed.setVisibility(View.GONE);
+                    tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+                }
+
+                //tvOriginal.setText(s);
+                try {
+                    ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(
+                            new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor())));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
 
-            //tvOriginal.setText(s);
-            try {
-                ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(
-                        new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor())));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            return;
         }
 
 
@@ -139,13 +152,23 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
        File file = new File(s);
        if(file.exists()){
-           rlOriginal.setVisibility(View.VISIBLE);
-           PhotoCompressHelper.setPathToPreview(ivOriginalSaf,originalPath);
-           if(isPreview){
-               tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+
+           if(s.contains(".gif")){
+               gif.setVisibility(View.VISIBLE);
+               ivOriginalSaf.setVisibility(View.GONE);
+               //gif.setScaleType(ImageView.ScaleType.FIT_CENTER);
+               gif.setImageURI(Uri.fromFile(file));
            }else {
-               tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
+               gif.setVisibility(View.GONE);
+               rlOriginal.setVisibility(View.VISIBLE);
+               PhotoCompressHelper.setPathToPreview(ivOriginalSaf,originalPath);
+               if(isPreview){
+                   tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+               }else {
+                   tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
+               }
            }
+
 
        }else {
            rlOriginal.setVisibility(View.GONE);

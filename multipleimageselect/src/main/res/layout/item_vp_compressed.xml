@@ -16,8 +16,15 @@
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:id="@+id/iv_original"
             android:layout_centerVertical="true"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/gif_original"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
+            android:layout_height="match_parent"/>
         <com.darsh.multipleimageselect.compress.MyLargeImageView
             android:id="@+id/iv_original_saf"
             android:visibility="gone"
@@ -45,6 +52,7 @@
 
         <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
             android:id="@+id/iv_compressed"
+            android:visibility="gone"
             android:layout_centerVertical="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

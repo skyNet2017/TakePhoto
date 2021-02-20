@@ -73,6 +73,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         viewHolder.image = image;
         Glide.with(context)
                 .load(image.path)
+                .thumbnail(0.2f)
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
         //viewHolder.tvInfo.setText("");
