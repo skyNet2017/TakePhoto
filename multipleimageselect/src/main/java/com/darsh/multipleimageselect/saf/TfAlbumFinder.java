@@ -40,13 +40,15 @@ public class TfAlbumFinder {
     //public static volatile List<Album> albumsOld = new ArrayList<>(256);
     public static volatile List<Album> albumsNew = new ArrayList<>(256);
 
+
     public static void listSafAlbum(final Observer<Album> observer,final Observer<List<Album>> observer2){
         if(SafUtil.sdRoot == null){
             Log.w(SafUtil.TAG,Thread.currentThread().getName()+"  SafUtil.sdRoot is null");
             observer2.onComplete();
             return;
         }
-        stopBefore();
+
+        final boolean[] hasCached = {false};
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -59,6 +61,7 @@ public class TfAlbumFinder {
                         if(!TextUtils.isEmpty(json)){
                             List<Album> albums = new Gson().fromJson(json, new TypeToken<List<Album>>(){}.getType());
                             if(albums.size() >0){
+                                hasCached[0] = true;
                                 /*for (Album album : albums) {
                                     if(!TextUtils.isEmpty(album.dir) && album.dir.startsWith("content")){
                                         //这里会比较慢
@@ -87,13 +90,23 @@ public class TfAlbumFinder {
                 observer2.onComplete();
             }
         });
-
+        // //1h间隔
+        if(countGet.get() != 0){
+            Log.w(SafUtil.TAG,Thread.currentThread().getName()+"  上一次的任务还在跑,不再继续");
+            return;
+        }
+        if(System.currentTimeMillis() - lastTime < 30*60*1000){
+            Log.w(SafUtil.TAG,Thread.currentThread().getName()+"  30min内不再执行刷新缓存操作");
+            return;
+        }
+        lastTime = System.currentTimeMillis();
+        //stopBefore();
         //并行递归,如何判断最终完成?
         getAlbums(SafUtil.sdRoot,observer);
-
-
-
     }
+    static long lastTime;
+
+
 
     private static void stopBefore() {
         //stopAll.getAndSet(true);
@@ -112,7 +125,7 @@ public class TfAlbumFinder {
 
     private static void getAlbums(final DocumentFile dir, final Observer<Album> observer) {
 
-        Log.v(SafUtil.TAG,"开始遍历当前文件夹,原子count计数:"+countGet.incrementAndGet()+", "+dir.getName());
+        Log.w(SafUtil.TAG,"开始遍历当前文件夹,原子count计数:"+countGet.incrementAndGet()+", "+dir.getName());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -123,7 +136,7 @@ public class TfAlbumFinder {
                     if(count0 ==0){
                         onComplete(observer);
                     }
-                    Log.v(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
+                    Log.w(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
                     return;
                 }
                 Album album = null;
@@ -180,7 +193,7 @@ public class TfAlbumFinder {
                 if(count0 ==0){
                     onComplete(observer);
                 }
-                Log.v(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
+                Log.w(SafUtil.TAG,"遍历当前一层文件夹完成,原子count计数:"+count0+", "+dir.getName());
             }
         });
 
