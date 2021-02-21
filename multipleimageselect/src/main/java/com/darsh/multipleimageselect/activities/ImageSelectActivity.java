@@ -44,9 +44,11 @@ import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.models.Image;
 import com.darsh.multipleimageselect.saf.SafUtil;
+import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
@@ -56,10 +58,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Darshan on 4/18/2015.
@@ -687,6 +699,7 @@ public class ImageSelectActivity extends HelperActivity {
                               sendMessage(Constants.FETCH_COMPLETED, 0);
                           }
                       });
+                      //return;
                   }
                     Uri uri = Uri.parse(albumDir);
                     long start = System.currentTimeMillis();
@@ -727,6 +740,7 @@ public class ImageSelectActivity extends HelperActivity {
                                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
                             Image image = new Image(0, name, file1.getUri().toString(), false);
                             temp.add(image);
+                            //Log.w(SafUtil.TAG,"dir22: images:   "+file1.getUri().toString());
                             count++;
                             if(cacheCount ==0){
                                 handler.post(new Runnable() {
@@ -758,7 +772,7 @@ public class ImageSelectActivity extends HelperActivity {
                             }
                         });
                     }
-                    writeCacheImages(temp);
+                   TfAlbumFinder.writeCacheImages(temp,albumDir);
                     //images.addAll(temp);
                     Log.w(SafUtil.TAG,"cost:(s) "+(System.currentTimeMillis()-start)/1000);
                     //7-8s,太慢了
@@ -823,32 +837,44 @@ public class ImageSelectActivity extends HelperActivity {
         }
     }
 
-    private void writeCacheImages(ArrayList<Image> temp) {
-        File dir = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"picuricache");
-        if(!dir.exists()){
-            dir.mkdirs();
-        }
-        File file = new File(dir,albumDir+".json");
-        try {
-            String json = new Gson().toJson(temp);
-            FileUtils.writeStringToFile(file,json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+
+    /**
+     * 过滤特殊字符
+     * @param str
+     * @return
+     */
+    public static String stringFilter (String str){
+        //// 只允许字母和数字 // String regEx =”[^a-zA-Z0-9]”;
+        String regEx="[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        return m.replaceAll("").trim();
     }
+
 
     private List<Image> readImagesFromCache(String albumDir) {
         File dir = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"picuricache");
         if(!dir.exists()){
             dir.mkdirs();
         }
-        File file = new File(dir,albumDir+".json");
+        File file = new File(dir,
+                TfAlbumFinder.md5(albumDir)+".json");
         String json = null;
         try {
             json = FileUtils.readFileToString(file);
             Log.d(SafUtil.TAG,json);
             if(!TextUtils.isEmpty(json)) {
                 List<Image> albums = new Gson().fromJson(json, new TypeToken<List<Image>>() {}.getType());
+               /* if(albums != null){
+                    for (Image image : albums) {
+                        //FileNotFoundException: content:/com.android.externalstorage
+                        if(image.path.startsWith("content:/") && !image.path.startsWith("content://")){
+                            image.path = image.path.replace("content:/","content://");
+                        }
+                       // image.path = URLDecoder.decode(image.path);
+                    }
+                }*/
                 return albums;
             }
         } catch (IOException e) {

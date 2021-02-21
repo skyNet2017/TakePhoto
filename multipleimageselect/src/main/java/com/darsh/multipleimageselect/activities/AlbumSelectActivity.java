@@ -190,16 +190,22 @@ public class AlbumSelectActivity extends HelperActivity {
 
             @Override
             public void onNext(List<Album> albums0) {
-                progressBar.setVisibility(View.GONE);
-                gridView.setVisibility(View.VISIBLE);
-                albums.addAll(albums0);
-                Collections.sort(albums, new Comparator<Album>() {
+                handler.post(new Runnable() {
                     @Override
-                    public int compare(Album o1, Album o2) {
-                        return (o2.fileSize > o1.fileSize) ? 1 : -1;
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        gridView.setVisibility(View.VISIBLE);
+                        albums.addAll(albums0);
+                        Collections.sort(albums, new Comparator<Album>() {
+                            @Override
+                            public int compare(Album o1, Album o2) {
+                                return (o2.fileSize > o1.fileSize) ? 1 : -1;
+                            }
+                        });
+                        adapter.notifyDataSetChanged();
                     }
                 });
-                adapter.notifyDataSetChanged();
+
             }
 
             @Override

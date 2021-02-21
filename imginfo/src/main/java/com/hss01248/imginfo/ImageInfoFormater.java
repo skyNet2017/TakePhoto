@@ -37,6 +37,7 @@ public class ImageInfoFormater {
             try {
                 FileInputStream inputStream = new FileInputStream(context.getContentResolver().openFileDescriptor(uri, "r").getFileDescriptor());
                int len =  inputStream.available();
+                inputStream.close();
                 String size = formatFileSize(len);
                 int[] wh = getImageWidthHeight(path);
                 //return path+"\n"+size;

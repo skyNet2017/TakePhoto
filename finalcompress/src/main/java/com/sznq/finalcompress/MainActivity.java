@@ -92,14 +92,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPermissionGet(DocumentFile dir) {
                 Log.w(SafUtil.TAG,"getRootDir:"+dir.getUri());
-                try {
-                    DocumentFile[] documentFiles = dir.listFiles();
-                    for (DocumentFile documentFile : documentFiles) {
-                        Log.d(SafUtil.TAG,"type:"+(documentFile.isDirectory() ? "dir" : "file")+" , uri->"+Uri.decode(documentFile.getUri().toString()));
-                    }
-                }catch (Throwable throwable){
-                    throwable.printStackTrace();
-                }
+
 
 
 

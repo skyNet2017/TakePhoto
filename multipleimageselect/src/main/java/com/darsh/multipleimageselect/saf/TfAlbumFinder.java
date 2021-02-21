@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.darsh.multipleimageselect.models.Album;
+import com.darsh.multipleimageselect.models.Image;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
@@ -14,7 +15,9 @@ import com.hss01248.imginfo.ImageInfoFormater;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLDecoder;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,7 +29,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class TfAlbumFinder {
 
@@ -120,6 +127,7 @@ public class TfAlbumFinder {
                     return;
                 }
                 Album album = null;
+                List<Image> images = new ArrayList<>(files.length);
                 int count = 0;
                 //Log.d(SafUtil.TAG,Thread.currentThread().getName()+"  展开文件夹:"+ Uri.decode(dir.getUri().toString()));
                 for (DocumentFile file : files) {
@@ -142,6 +150,12 @@ public class TfAlbumFinder {
                         if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
                                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
                             count++;
+
+                            Image image = new Image(0,name,file.getUri().toString(),false);
+                            images.add(image);
+                            if(count != 0 && count % 100 ==0){
+                                //writeCacheImages(images,dir.getUri().toString());
+                            }
                             if(album != null){
                                 album.fileSize = file.length() + album.fileSize;
                                 continue;
@@ -159,6 +173,7 @@ public class TfAlbumFinder {
                     album.count = count;
                     albumsNew.add(album);
                     observer.onNext(album);
+                    writeCacheImages(images,dir.getUri().toString());
                     Log.d("监听", "添加有图文件夹 完成 :" + URLDecoder.decode(album.dir));
                 }
                 int count0 = countGet.decrementAndGet();
@@ -215,5 +230,62 @@ public class TfAlbumFinder {
         }finally {
             albumsNew.clear();
         }
+    }
+    public static String md5(String dataStr) {
+        try {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.update(dataStr.getBytes("UTF8"));
+            byte s[] = m.digest();
+            String result = "";
+            for (int i = 0; i < s.length; i++) {
+                result += Integer.toHexString((0x000000FF & s[i]) | 0xFFFFFF00).substring(6);
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataStr;
+    }
+    public static void writeCacheImages(List<Image> temp,String albumDir) {
+        Observable.just(1).subscribeOn(Schedulers.io())
+                .doOnNext(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        File dir = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"picuricache");
+                        if(!dir.exists()){
+                            dir.mkdirs();
+                        }
+                        File file = new File(dir,md5(albumDir)+".json");
+                        try {
+                            String json = new Gson().toJson(new ArrayList<>(temp));
+                            FileUtils.writeStringToFile(file,json);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })//.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Integer i) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 }

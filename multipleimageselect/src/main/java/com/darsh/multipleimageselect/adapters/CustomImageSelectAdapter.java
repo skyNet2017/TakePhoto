@@ -3,6 +3,7 @@ package com.darsh.multipleimageselect.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -13,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.models.Image;
+import com.darsh.multipleimageselect.saf.SafUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 
 import java.io.File;
@@ -71,14 +73,28 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
 
         Image image = arrayList.get(position);
         viewHolder.image = image;
+        Log.w(SafUtil.TAG,"dir22: images show:   "+image.path);
+        if(image.path.startsWith("content:/") && !image.path.startsWith("content://")){
+            image.path = image.path.replace("content:/","content://");
+        }
+        //.FileNotFoundException: content:/com.android.externalstorage.documents/tree/0123-4567
+        Uri uri = null;
+        if(image.path.startsWith("content")){
+            uri = Uri.parse(image.path);
+        }else if(image.path.startsWith("/storage/")){
+            uri = Uri.fromFile(new File(image.path));
+        }else {
+            uri = Uri.parse(image.path);
+        }
         Glide.with(context)
-                .load(image.path)
+                .load(uri)
                 .thumbnail(0.2f)
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
         //viewHolder.tvInfo.setText("");
 
         Observable.just(viewHolder1)
+                .subscribeOn(Schedulers.io())
                 .doOnNext(new Consumer<ViewHolder>() {
                     @Override
                     public void accept(ViewHolder viewHolder) throws Exception {
@@ -86,7 +102,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
                         viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.path,false);
                     }
                 })
-                .subscribeOn(Schedulers.io())
+
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ViewHolder>() {
                     @Override
