@@ -49,7 +49,7 @@ public class DbUtil {
                 .where(BaseMediaFolderInfoDao.Properties.Type.eq(type))
                 .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
-        Log.v(SafUtil.TAG, " getAllFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
+        Log.w(SafUtil.TAG, " getAllFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
         //耗时(ms):103
         return infos;
     }
@@ -60,7 +60,17 @@ public class DbUtil {
                 .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),BaseMediaFolderInfoDao.Properties.Type.eq(2))
                 .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
-        Log.v(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
+        Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
+        return infos;
+    }
+
+    public static List<BaseMediaFolderInfo> getAllFolders2(){
+        long start = System.currentTimeMillis();
+        List<BaseMediaFolderInfo> infos =  getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
+                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),BaseMediaFolderInfoDao.Properties.Type.eq(2),BaseMediaFolderInfoDao.Properties.Type.eq(2))
+                .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
+                .list();
+        Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
         return infos;
     }
 
@@ -71,7 +81,7 @@ public class DbUtil {
                 //最新的排最前
                 .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime)
                 .list();
-        Log.v(SafUtil.TAG, " getAllContentInFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size() +", dir:"+dir);
+        Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size() +", dir:"+dir);
         return infos;
     }
 

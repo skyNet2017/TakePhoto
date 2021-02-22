@@ -223,12 +223,17 @@ public class ImageSelectActivity extends HelperActivity {
 
 
                 } else {
-                    //点击去预览
-                    ArrayList<String> files = new ArrayList<>();
-                    for (BaseMediaInfo image : images) {
-                        files.add(image.pathOrUri);
+                    if(type == 1){
+                        //点击去预览
+                        ArrayList<String> files = new ArrayList<>();
+                        for (BaseMediaInfo image : images) {
+                            files.add(image.pathOrUri);
+                        }
+                        CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
+                    }else {
+                        viewVideo(images.get(position));
                     }
-                    CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
+
                 }
 
             }
@@ -263,6 +268,19 @@ public class ImageSelectActivity extends HelperActivity {
         gridView.setVisibility(View.VISIBLE);
         orientationBasedUI(getResources().getConfiguration().orientation);
         loadImages();
+    }
+
+    private void viewVideo(BaseMediaInfo baseMediaInfo) {
+        try {
+            Uri uri = Uri.parse(baseMediaInfo.pathOrUri);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+            Toast.makeText(this,throwable.getMessage(),Toast.LENGTH_LONG).show();
+        }
     }
 
     public void refresh() {

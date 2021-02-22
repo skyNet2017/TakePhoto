@@ -65,7 +65,7 @@ public class SafUtil {
         context = activity.getApplicationContext();
 
         ArrayList<StorageBean> storageData = getStorageData(activity.getApplicationContext());
-        if(storageData ==null || storageData.size() <=0){
+        if(storageData ==null || storageData.size() <=1){
             Log.w(SafUtil.TAG,"没有额外sd卡");
             return;
         }

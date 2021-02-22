@@ -36,7 +36,7 @@ public class SafFileFinder {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                List<BaseMediaFolderInfo> infos = DbUtil.getAllImageAndVideoFolders();
+                List<BaseMediaFolderInfo> infos = DbUtil.getAllFolders2();
 
                 boolean hasDataInDb = false;
                 if (infos != null && infos.size() > 0) {
@@ -52,10 +52,15 @@ public class SafFileFinder {
     }
 
     private static void scanByFile(boolean hasDataInDb, ExecutorService executorService, ScanFolderCallback observer) {
+        if(System.currentTimeMillis() - FileScanner.safStart < 60*1000*10){
+            //10min内不刷新
+            return;
+        }
         FileScanner.safStart = System.currentTimeMillis();
-        FileScanner.getAlbums(Environment.getExternalStorageDirectory(),executorService,observer);
+        FileScanner.getAlbums(hasDataInDb,Environment.getExternalStorageDirectory(),executorService,observer);
     }
 
+    volatile static boolean hasFinishedBefore;
     private static void scanBySaf(boolean hasDataInDb, ExecutorService executorService, ScanFolderCallback observer) {
         if (SafUtil.sdRoot == null) {
             Log.w(SafUtil.TAG, Thread.currentThread().getName() + "  SafUtil.sdRoot is null");
@@ -67,18 +72,22 @@ public class SafFileFinder {
         if (hasDataInDb) {
             long latScanFinishedTime = sp.getLong("latScanFinishedTime", 0);
             if (latScanFinishedTime != 0 && (System.currentTimeMillis() - latScanFinishedTime < 12 * 60 * 60 * 1000)) {
-                Log.w(SafUtil.TAG, "一天内只扫描一次");
+                Log.w(SafUtil.TAG, "一天内只全量扫描一次");
+                //遍历所有文件夹完成!!!!!!!!!!!!!!! 耗时(s):1039
+
+                //每次重点扫描最大的几个文件夹
                 return;
             }
+            hasFinishedBefore = latScanFinishedTime !=0;
             sp.edit().putBoolean("isScaning", true).commit();
             //有数据,那么接下来就只用一个线程去跑
             safStart = System.currentTimeMillis();
-            getAlbums(SafUtil.sdRoot, executorService, observer);
+            getAlbums(SafUtil.sdRoot, latScanFinishedTime !=0 ? executorService : Executors.newFixedThreadPool(8), observer);
         } else {
             sp.edit().putBoolean("isScaning", true).commit();
             //没有数据,就用5个线程去跑
             safStart = System.currentTimeMillis();
-            getAlbums(SafUtil.sdRoot, Executors.newFixedThreadPool(5), observer);
+            getAlbums(SafUtil.sdRoot, Executors.newFixedThreadPool(8), observer);
         }
     }
 
@@ -97,14 +106,14 @@ public class SafFileFinder {
      * @param observer
      */
     private static void getAlbums(final DocumentFile dir, ExecutorService executorService, final ScanFolderCallback observer) {
-        Log.v(SafUtil.TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getName());
+        Log.w(SafUtil.TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getName());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 DocumentFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
                     int count0 = countGetSaf.decrementAndGet();
-                    Log.v(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
+                    Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
                     if (count0 == 0) {
                         onComplete(observer,true,safStart);
                     }
@@ -265,13 +274,14 @@ public class SafFileFinder {
                 }
                 if (folderInfos.size() != 0) {
                     print(folderInfos, true);
-                    observer.onScanEachFolder(folderInfos);
-
+                    if(hasFinishedBefore){
+                        observer.onScanEachFolder(folderInfos);
+                    }
                 }
                 writeDB(dir, folderInfos, images, videos, audios);
 
                 int count0 = countGetSaf.decrementAndGet();
-                Log.v(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
+                Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
                 if (count0 == 0) {
                     onComplete(observer,true,safStart);
                 }
@@ -314,7 +324,7 @@ public class SafFileFinder {
     }
 
      static void onComplete(ScanFolderCallback observer,boolean isSaf,long safStart) {
-        List<BaseMediaFolderInfo> infos = DbUtil.getAllImageAndVideoFolders();
+        List<BaseMediaFolderInfo> infos = DbUtil.getAllFolders2();
         observer.onScanFinished(infos);
         observer.onComplete();
         Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, "遍历所有文件夹完成!!!!!!!!!!!!!!! 耗时(s):" + (System.currentTimeMillis() - safStart) / 1000);

@@ -46,6 +46,7 @@ public abstract class DefaultScanFolderCallback implements ScanFolderCallback{
 
     @Override
     public void onScanEachFolder(List<BaseMediaFolderInfo> folderInfos) {
+
         for (BaseMediaFolderInfo folderInfo : folderInfos) {
             if(!infos.contains(folderInfo)){
                 infos.add(folderInfo);
@@ -70,14 +71,14 @@ public abstract class DefaultScanFolderCallback implements ScanFolderCallback{
 
         if(System.currentTimeMillis() - lastUpdate > 3000){
             lastUpdate = System.currentTimeMillis();
-
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    notifyDataSetChanged();
+                }
+            });
         }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
+
 
     }
 

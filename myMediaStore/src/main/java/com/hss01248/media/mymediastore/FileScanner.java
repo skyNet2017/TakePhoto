@@ -35,7 +35,7 @@ public class FileScanner {
      * @param dir
      * @param observer
      */
-     static void getAlbums(final File dir, ExecutorService executorService, final ScanFolderCallback observer) {
+     static void getAlbums(boolean hasDataInDb,final File dir, ExecutorService executorService, final ScanFolderCallback observer) {
         Log.v(TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getName());
         executorService.execute(new Runnable() {
             @Override
@@ -80,7 +80,7 @@ public class FileScanner {
                         }
                         //Log.d("监听","进入文件夹遍历:"+dir.getAbsolutePath());
                         //todo 单线程时为深度优先.  那么前后两次要反着来
-                        getAlbums(file, executorService, observer);
+                        getAlbums(hasDataInDb,file, executorService, observer);
                     } else {
                         String name = file.getName();
                         if(TextUtils.isEmpty(name)){
@@ -193,7 +193,10 @@ public class FileScanner {
                 }
                 if (folderInfos.size() != 0) {
                     SafFileFinder.print(folderInfos,false);
-                    observer.onScanEachFolder(folderInfos);
+                    if(!hasDataInDb){
+                        observer.onScanEachFolder(folderInfos);
+                    }
+
 
                 }
                 SafFileFinder.writeDB(DocumentFile.fromFile(dir), folderInfos, images, videos, audios);

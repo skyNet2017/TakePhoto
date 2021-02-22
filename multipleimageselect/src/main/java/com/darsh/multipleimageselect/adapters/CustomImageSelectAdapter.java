@@ -2,6 +2,7 @@ package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
@@ -102,6 +103,13 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                     public void accept(ViewHolder viewHolder) throws Exception {
                         //viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
                         viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
+                       /* if(viewHolder.image.type == 1){
+                            viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
+                        }else {
+                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                            retriever.setDataSource(viewHolder.image.pathOrUri);
+                        }*/
+
                     }
                 })
 
