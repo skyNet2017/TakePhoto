@@ -23,6 +23,7 @@ public class DbUtil {
     public static ISort contentSort = new SortByFileName();
 
     public static boolean showHidden = false;
+    public static int folderSortType = 0;
 
     static void init(Context context) {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "mymedia.db");
@@ -78,10 +79,31 @@ public class DbUtil {
         if (!showHidden) {
             builder.where(BaseMediaFolderInfoDao.Properties.Hidden.eq(0));
         }
-        List<BaseMediaFolderInfo> infos = builder.orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
-                .list();
+        doSort(builder);
+        List<BaseMediaFolderInfo> infos = builder.list();
         Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         return infos;
+    }
+
+    /**
+     *  desc[0] = "按文件从大到小";
+     *         desc[1] ="按文件个数从大到小";
+     *         desc[2] ="按更新时间 新在前";
+     *         desc[3] ="按更新时间顺序 旧在前";
+     * @param builder
+     */
+    private static void doSort(QueryBuilder<BaseMediaFolderInfo> builder) {
+        if(folderSortType == 0){
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.FileSize);
+        }else if(folderSortType == 1){
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.Count);
+        }else if(folderSortType == 2){
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.UpdatedTime)
+            .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(3*1024));
+        }else if(folderSortType == 3){
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.UpdatedTime)
+                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(3*1024));
+        }
     }
 
     public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type) {

@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
@@ -28,9 +29,13 @@ import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.saf.TfAlbumFinder;
+import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.DefaultScanFolderCallback;
 import com.hss01248.media.mymediastore.SafFileFinder;
+import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.noober.menu.FloatMenu;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,10 +67,8 @@ public class AlbumSelectActivity extends HelperActivity {
     private GridView gridView;
     private CustomAlbumSelectAdapter adapter;
 
-    private ActionBar actionBar;
 
-    private Handler handler;
-    private Thread thread;
+    CommonTitleBar titleBar;
 
     private final String[] projection = new String[]{
             MediaStore.Images.Media.BUCKET_ID,
@@ -76,19 +79,14 @@ public class AlbumSelectActivity extends HelperActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_select);
-        setView(findViewById(R.id.layout_album_select));
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
-
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(R.string.album_view);
-        }
+        //https://github.com/wuhenzhizao/android-titlebar
+        titleBar = findViewById(R.id.titlebar);
+        titleBar.getLeftTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -119,9 +117,62 @@ public class AlbumSelectActivity extends HelperActivity {
 
         initData();
 
+        initMenu();
 
 
 
+    }
+
+    private void initMenu() {
+        final FloatMenu floatMenu = new FloatMenu(this, titleBar.getRightTextView());
+        String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        floatMenu.items(hide, "排序");
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                Toast.makeText(AlbumSelectActivity.this, "菜单"+position, Toast.LENGTH_SHORT).show();
+                if(position ==0){
+                    DbUtil.showHidden = !DbUtil.showHidden;
+                    refresh();
+                }else if(position ==1){
+                    showSortMenu(v);
+                }
+            }
+        });
+        titleBar.getRightTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+                floatMenu.items(hide, "排序");
+                floatMenu.show();
+            }
+        });
+    }
+
+    private void showSortMenu(View view) {
+        final FloatMenu floatMenu = new FloatMenu(this, view);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[4];
+        desc[0] = "按文件夹容量从大到小";
+        desc[1] ="按文件个数从大到小";
+        desc[2] ="按更新时间 新在前";
+        desc[3] ="按更新时间顺序 旧在前";
+
+        desc[DbUtil.folderSortType] =  desc[DbUtil.folderSortType] +"(now)";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                DbUtil.folderSortType = position;
+                refresh();
+            }
+        });
+        floatMenu.show();
+    }
+
+    private void refresh() {
+        SafFileFinder.listAllAlbum(callback,true);
     }
 
     private void initData() {
@@ -140,7 +191,7 @@ public class AlbumSelectActivity extends HelperActivity {
         gridView.setAdapter(adapter);
         orientationBasedUI(getResources().getConfiguration().orientation);
 
-        SafFileFinder.listAllAlbum(callback);
+        SafFileFinder.listAllAlbum(callback,false);
 
 
 
@@ -178,11 +229,7 @@ public class AlbumSelectActivity extends HelperActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        //原onstop里做的
 
-        if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(null);
-        }
         //albums = null;
         if (adapter != null) {
             adapter.releaseResources();

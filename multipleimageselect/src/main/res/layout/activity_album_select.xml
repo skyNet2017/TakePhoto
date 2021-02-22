@@ -4,11 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/toolbar"/>
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
+        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/titlebar"
+        titlebar:leftType="textView"
+    titlebar:leftText="文件夹"
+        titlebar:leftDrawable="@drawable/ic_arrow_back"
+        titlebar:rightType="textView"
+    titlebar:rightText="menu"
+    android:layout_width="match_parent"
+        android:layout_height="56dp"/>
 
     <ProgressBar
         android:id="@+id/progress_bar_album_select"
@@ -27,7 +32,7 @@
         android:id="@+id/grid_view_album_select"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/titlebar"
         android:paddingTop="1dp"
         android:paddingBottom="1dp"
         android:paddingLeft="1dp"

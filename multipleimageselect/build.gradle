@@ -39,4 +39,7 @@ dependencies {
     api 'com.shizhefei:LargeImageView:1.1.0'
     api 'com.google.code.gson:gson:2.8.5'
     api 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
+
+    api 'com.noober.floatmenu:common:1.0.4'
+    api 'com.wuhenzhizao:titlebar:1.2.0'
 }

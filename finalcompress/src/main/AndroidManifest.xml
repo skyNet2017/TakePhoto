@@ -5,7 +5,7 @@
     <uses-sdk tools:overrideLibrary="com.hss01248.lib,
     com.hss01248.adapter,com.hss01248.notifyutil,
     com.gc.materialdesign,com.hss01248.testtool,
-com.orhanobut.logger,es.dmoral.toasty,pl.droidsonroids.gif,pl.droidsonroids.relinker"/>
+com.orhanobut.logger,es.dmoral.toasty,pl.droidsonroids.gif,pl.droidsonroids.relinker,com.wuhenzhizao.titlebar"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
    <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>-->

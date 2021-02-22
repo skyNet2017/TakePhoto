@@ -27,11 +27,11 @@ public class SafFileFinder {
 
     static final String SP_NAME = "DirPermission";
 
-    public static void listAllAlbum(final ScanFolderCallback observer) {
-        listFromDb(observer);
+    public static void listAllAlbum(final ScanFolderCallback observer, boolean onlyDb) {
+        listFromDb(observer,onlyDb);
     }
 
-    private static void listFromDb(ScanFolderCallback observer) {
+    private static void listFromDb(ScanFolderCallback observer, boolean onlyDb) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
             @Override
@@ -42,6 +42,10 @@ public class SafFileFinder {
                 if (infos != null && infos.size() > 0) {
                     observer.onFromDB(infos);
                     hasDataInDb = true;
+                }
+
+                if(onlyDb){
+                    return;
                 }
 
                 scanByFile(hasDataInDb, executorService, observer);
