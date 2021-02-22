@@ -11,14 +11,16 @@ import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.models.Album;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Darshan on 4/14/2015.
  */
-public class CustomAlbumSelectAdapter extends CustomGenericAdapter<Album> {
-    public CustomAlbumSelectAdapter(Context context, ArrayList<Album> albums) {
+public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFolderInfo> {
+    public CustomAlbumSelectAdapter(Context context, List<BaseMediaFolderInfo> albums) {
         super(context, albums);
     }
 
@@ -39,10 +41,10 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<Album> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Album album = arrayList.get(position);
+        BaseMediaFolderInfo album = arrayList.get(position);
         viewHolder.imageView.getLayoutParams().width = size;
         viewHolder.imageView.getLayoutParams().height = size;
-        String desc = album.name+"\n"+ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count;
+        String desc = album.name+"\n"+ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count+" "+typeDes(album.type);
 
         viewHolder.textView.setText(desc);
         Glide.with(context)
@@ -51,6 +53,17 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<Album> {
 
 
         return convertView;
+    }
+
+    private String typeDes(int type) {
+        if(type ==1){
+            return "图";
+        }else if(type == 2){
+            return "视频";
+        }else if(type == 3){
+            return "音频";
+        }
+        return "未知";
     }
 
     private static class ViewHolder {

@@ -48,6 +48,8 @@ import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 
 import org.apache.commons.io.FileUtils;
@@ -82,7 +84,7 @@ public class ImageSelectActivity extends HelperActivity {
     boolean isInSelectingMode;
     Menu menu;
     List<File> selected;
-    private ArrayList<Image> images;
+    private List<BaseMediaInfo> images = new ArrayList<>();
     private String album;
     private TextView errorDisplay;
     private ProgressBar progressBar;
@@ -96,6 +98,7 @@ public class ImageSelectActivity extends HelperActivity {
     private Thread thread;
     private boolean isSelectAll;
     boolean isAlbumFromFileApi;
+    int type;
     private ActionMode.Callback callback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -103,7 +106,7 @@ public class ImageSelectActivity extends HelperActivity {
             MenuInflater menuInflater = mode.getMenuInflater();
             menuInflater.inflate(R.menu.menu_contextual_action_bar, menu);
 
-            if (PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))) {
+            if (PhotoCompressHelper.isACompressedDr(new File(images.get(0).pathOrUri))) {
                 menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
             }
             actionMode = mode;
@@ -126,9 +129,9 @@ public class ImageSelectActivity extends HelperActivity {
             }
             if (i == R.id.menu_item_select_all) {//全选与取消全选
                 isSelectAll = !isSelectAll;
-                for (Image image : images) {
+               /* for (Image image : images) {
                     image.isSelected = isSelectAll;
-                }
+                }*/
                 if (actionMode != null) {
                     countSelected = isSelectAll ? images.size() : 0;
                     actionMode.setTitle(countSelected + " " + getString(R.string.selected));
@@ -199,7 +202,7 @@ public class ImageSelectActivity extends HelperActivity {
         album = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM);
         albumDir = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM_PATH);
         isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
-
+        type = intent.getIntExtra(Constants.INTENT_EXTRA_TYPE,0);
         isAlbumFromSafApi = albumDir.startsWith("content://");
 
         errorDisplay = (TextView) findViewById(R.id.text_view_error);
@@ -222,8 +225,8 @@ public class ImageSelectActivity extends HelperActivity {
                 } else {
                     //点击去预览
                     ArrayList<String> files = new ArrayList<>();
-                    for (Image image : images) {
-                        files.add(image.path);
+                    for (BaseMediaInfo image : images) {
+                        files.add(image.pathOrUri);
                     }
                     CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
                 }
@@ -252,6 +255,13 @@ public class ImageSelectActivity extends HelperActivity {
             }
         });
         initHandler();
+
+        adapter = new CustomImageSelectAdapter(getApplicationContext(), images);
+        gridView.setAdapter(adapter);
+
+        progressBar.setVisibility(View.INVISIBLE);
+        gridView.setVisibility(View.VISIBLE);
+        orientationBasedUI(getResources().getConfiguration().orientation);
         loadImages();
     }
 
@@ -270,15 +280,15 @@ public class ImageSelectActivity extends HelperActivity {
                 }*/
                 //deselectAll();
                 if(images.size()>0){
-                    Iterator<Image> iterator = images.iterator();
+                    Iterator<BaseMediaInfo> iterator = images.iterator();
                     while (iterator.hasNext()){
-                        Image image = iterator.next();
-                        if(new File(image.path).length() <=0){
+                        BaseMediaInfo image = iterator.next();
+                        /*if(new File(image.path).length() <=0){
                             iterator.remove();
                             image.isSelected = false;
                         }else {
                             image.isSelected = false;
-                        }
+                        }*/
                     }
                 }
                 Log.d("select","do refresh2:"+images.size());
@@ -481,7 +491,7 @@ public class ImageSelectActivity extends HelperActivity {
     }*/
 
     private void toggleSelection(int position) {
-        if (!images.get(position).isSelected && countSelected >= Constants.limit) {
+       /* if (!images.get(position).isSelected && countSelected >= Constants.limit) {
             Toast.makeText(
                     getApplicationContext(),
                     String.format(getString(R.string.limit_exceeded), Constants.limit),
@@ -496,26 +506,26 @@ public class ImageSelectActivity extends HelperActivity {
         } else {
             countSelected--;
         }
-        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();*/
     }
 
     private void deselectAll() {
-        for (int i = 0, l = images.size(); i < l; i++) {
+       /* for (int i = 0, l = images.size(); i < l; i++) {
             images.get(i).isSelected = false;
         }
         countSelected = 0;
-        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();*/
     }
 
-    private ArrayList<Image> getSelected() {
-        ArrayList<Image> selectedImages = new ArrayList<>();
-        selected = new ArrayList<>();
+    private ArrayList<BaseMediaInfo> getSelected() {
+        ArrayList<BaseMediaInfo> selectedImages = new ArrayList<>();
+       /* selected = new ArrayList<>();
         for (int i = 0, l = images.size(); i < l; i++) {
             if (images.get(i).isSelected) {
                 selectedImages.add(images.get(i));
                 selected.add(new File(images.get(i).path));
             }
-        }
+        }*/
         return selectedImages;
     }
 
@@ -524,15 +534,15 @@ public class ImageSelectActivity extends HelperActivity {
         intent.putParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES, getSelected());
         setResult(RESULT_OK, intent);
         finish();*/
-        final ArrayList<Image> images = getSelected();
+        final ArrayList<BaseMediaInfo> images = getSelected();
         if (images == null || images.isEmpty()) {
             Toast.makeText(this, R.string.c_mot_selected, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))) {
+        if (!PhotoCompressHelper.isACompressedDr(new File(images.get(0).pathOrUri))) {
             List<File> files = new ArrayList<>();
-            for (Image image : images) {
-                files.add(new File(image.path));
+            for (BaseMediaInfo image : images) {
+                files.add(new File(image.pathOrUri));
             }
             PhotoCompressHelper.compressAllFiles(files, this, new Subscriber<String>() {
                 @Override
@@ -543,8 +553,8 @@ public class ImageSelectActivity extends HelperActivity {
                 @Override
                 public void onNext(String s) {
                     ArrayList<String> paths = new ArrayList<>();
-                    for (Image image : images) {
-                        paths.add(image.path);
+                    for (BaseMediaInfo image : images) {
+                        paths.add(image.pathOrUri);
                     }
                     CompressResultCompareActivity.lauch(ImageSelectActivity.this, paths, countSelected == images.size());
                 }
@@ -555,8 +565,8 @@ public class ImageSelectActivity extends HelperActivity {
                     if ("1".equalsIgnoreCase(t.getMessage())) {//全部都被压缩过了
                         menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
                         ArrayList<String> paths = new ArrayList<>();
-                        for (Image image : images) {
-                            paths.add(image.path);
+                        for (BaseMediaInfo image : images) {
+                            paths.add(image.pathOrUri);
                         }
                         CompressResultCompareActivity.lauch(ImageSelectActivity.this, paths, countSelected == images.size());
                     }
@@ -572,8 +582,8 @@ public class ImageSelectActivity extends HelperActivity {
 
 
         ArrayList<String> paths = new ArrayList<>();
-        for (Image image : images) {
-            paths.add(image.path);
+        for (BaseMediaInfo image : images) {
+            paths.add(image.pathOrUri);
         }
         CompressResultCompareActivity.lauch(this, paths, countSelected == images.size());
 
@@ -581,27 +591,24 @@ public class ImageSelectActivity extends HelperActivity {
     }
 
     private void loadImages() {
-        startThread(new ImageLoaderRunnable());
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                images.addAll(DbUtil.getAllContentInFolders(albumDir,type))    ;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+            }
+        }).start();
+
     }
 
-    private void startThread(Runnable runnable) {
-        stopThread();
-        thread = new Thread(runnable);
-        thread.start();
-    }
 
-    private void stopThread() {
-        if (thread == null || !thread.isAlive()) {
-            return;
-        }
-
-        thread.interrupt();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void sendMessage(int what) {
         sendMessage(what, 0);
@@ -629,258 +636,12 @@ public class ImageSelectActivity extends HelperActivity {
         gridView.setVisibility(View.INVISIBLE);
     }
 
-    private class ImageLoaderRunnable implements Runnable {
-        @Override
-        public void run() {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-            /*
-            If the adapter is null, this is first time this activity's view is
-            being shown, hence send FETCH_STARTED message to show progress bar
-            while images are loaded from phone
-             */
-            if (adapter == null) {
-                sendMessage(Constants.FETCH_STARTED);
-            }
-
-            File file;
-            HashSet<Long> selectedImages = new HashSet<>();
-            if (images != null) {
-                Image image;
-                for (int i = 0, l = images.size(); i < l; i++) {
-                    image = images.get(i);
-                    file = new File(image.path);
-                    if (file.exists() && image.isSelected) {
-                        selectedImages.add(image.id);
-                    }
-                }
-            }
-
-            if (images == null) {
-                images = new ArrayList<>();
-            }
-            images.clear();
 
 
 
-            if(isAlbumFromFileApi){
-                File[] files = new File(albumDir).listFiles();
-                if(files == null){
-                    sendMessage(Constants.ERROR);
-                    return;
-                }
-
-                ArrayList<Image> temp = new ArrayList<>(files.length);
-                int tempCountSelected = 0;
-
-                for (File file1 : files) {
-                    String name = file1.getName();
-                    Log.d(SafUtil.TAG,"image name:"+name);
-                    if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
-                            || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
-                        temp.add(new Image(0, name, file1.getAbsolutePath(), false));
-                    }
-                }
-                images.addAll(temp);
-                sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
-
-            }else if(isAlbumFromSafApi){
-                //DocumentFile dir = DocumentFile.fromTreeUri(getApplicationContext(),albumDir2);
-                //还是拿到根目录
-
-                try {
-                    List<Image> imagesCache = readImagesFromCache(albumDir);
-                  int cacheCount =  0;
-                  if(imagesCache != null && imagesCache.size()>0){
-                      cacheCount = imagesCache.size();
-                      handler.post(new Runnable() {
-                          @Override
-                          public void run() {
-                              images.addAll(imagesCache);
-                              sendMessage(Constants.FETCH_COMPLETED, 0);
-                          }
-                      });
-                      //return;
-                  }
-                    Uri uri = Uri.parse(albumDir);
-                    long start = System.currentTimeMillis();
-                    /*final int takeFlags = getIntent().getFlags()
-                            & (Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        //getContentResolver().takePersistableUriPermission(uri, takeFlags);
-                    }*/
-                    //DocumentFile dir = AlbumSelectActivity.docs.get(albumDir).dirSaf;
-                    //androidx.documentfile.provider.TreeDocumentFile@96492fc
-
-                    DocumentFile dir0 = DocumentFile.fromTreeUri(getApplicationContext(),uri);
-                    DocumentFile dir = SafUtil.findFile(dir0,albumDir);
-                    //DocumentFile.fromSingleUri(getApplicationContext(),uri);
-                    //java.lang.UnsupportedOperationException
-
-                    Log.w(SafUtil.TAG,"dir22:"+Uri.decode(dir.getUri().toString()));
-                    //Log.w(SafUtil.TAG,"dir222:"+dir.toString());
-                    //dir.listFiles()性能很差
-                    DocumentFile[] files = dir.listFiles();
-                    if(files == null){
-                        sendMessage(Constants.ERROR);
-                        return;
-                    }
-
-                    ArrayList<Image> temp = new ArrayList<>(files.length);
-                    int tempCountSelected = 0;
-
-                    int count = 0;
-                    for (DocumentFile file1 : files) {
-                        String name = file1.getName();
-                        if(TextUtils.isEmpty(name)){
-                            continue;
-                        }
-                        //Log.d(SafUtil.TAG,"image name saf :"+name);
-                        if(name.endsWith(".jpg")|| name.endsWith(".png") || name.endsWith(".gif")
-                                || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")){
-                            Image image = new Image(0, name, file1.getUri().toString(), false);
-                            temp.add(image);
-                            //Log.w(SafUtil.TAG,"dir22: images:   "+file1.getUri().toString());
-                            count++;
-                            if(cacheCount ==0){
-                                handler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        images.add(image);
-                                    }
-                                });
-                                if(count % 18 == 0){
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
-                                        }
-                                    });
-                                }
-                            }
-
-                            //new FileInputStream(getContentResolver().openFileDescriptor(file1.getUri(),"w"));
-                            //getContentResolver().openFileDescriptor()
-                        }
-                    }
-                    if(cacheCount!=0){
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                images.clear();
-                                images.addAll(temp);
-                            }
-                        });
-                    }
-                   TfAlbumFinder.writeCacheImages(temp,albumDir);
-                    //images.addAll(temp);
-                    Log.w(SafUtil.TAG,"cost:(s) "+(System.currentTimeMillis()-start)/1000);
-                    //7-8s,太慢了
-                    sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
-                }catch (Throwable throwable){
-                    throwable.printStackTrace();
-                    sendMessage(Constants.ERROR);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),throwable.getMessage(),Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-
-
-            }else {
-                Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
-                        MediaStore.Images.Media.BUCKET_DISPLAY_NAME + " =?", new String[]{album}, MediaStore.Images.Media.DATE_ADDED);
-                if (cursor == null) {
-                    sendMessage(Constants.ERROR);
-                    return;
-                }
-
-            /*
-            In case this runnable is executed to onChange calling loadImages,
-            using countSelected variable can result in a race condition. To avoid that,
-            tempCountSelected keeps track of number of selected images. On handling
-            FETCH_COMPLETED message, countSelected is assigned value of tempCountSelected.
-             */
-                int tempCountSelected = 0;
-                ArrayList<Image> temp = new ArrayList<>(cursor.getCount());
-                if (cursor.moveToLast()) {
-                    do {
-                        if (Thread.interrupted()) {
-                            return;
-                        }
-
-                        long id = cursor.getLong(cursor.getColumnIndex(projection[0]));
-                        String name = cursor.getString(cursor.getColumnIndex(projection[1]));
-                        String path = cursor.getString(cursor.getColumnIndex(projection[2]));
-                        boolean isSelected = selectedImages.contains(id);
-                        if (isSelected) {
-                            tempCountSelected++;
-                        }
-
-                        file = new File(path);
-                        Log.i("path", path);
-                        if (file.exists()) {
-                            temp.add(new Image(id, name, path, isSelected));
-                        }
-
-                    } while (cursor.moveToPrevious());
-                }
-                cursor.close();
-
-                images.addAll(temp);
-                sendMessage(Constants.FETCH_COMPLETED, tempCountSelected);
-            }
-
-        }
-    }
 
 
 
-    /**
-     * 过滤特殊字符
-     * @param str
-     * @return
-     */
-    public static String stringFilter (String str){
-        //// 只允许字母和数字 // String regEx =”[^a-zA-Z0-9]”;
-        String regEx="[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(str);
-        return m.replaceAll("").trim();
-    }
 
 
-    private List<Image> readImagesFromCache(String albumDir) {
-        File dir = new File(ImageInfoFormater.context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),"picuricache");
-        if(!dir.exists()){
-            dir.mkdirs();
-        }
-        File file = new File(dir,
-                TfAlbumFinder.md5(albumDir)+".json");
-        String json = null;
-        try {
-            json = FileUtils.readFileToString(file);
-            Log.d(SafUtil.TAG,json);
-            if(!TextUtils.isEmpty(json)) {
-                List<Image> albums = new Gson().fromJson(json, new TypeToken<List<Image>>() {}.getType());
-               /* if(albums != null){
-                    for (Image image : albums) {
-                        //FileNotFoundException: content:/com.android.externalstorage
-                        if(image.path.startsWith("content:/") && !image.path.startsWith("content://")){
-                            image.path = image.path.replace("content:/","content://");
-                        }
-                       // image.path = URLDecoder.decode(image.path);
-                    }
-                }*/
-                return albums;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-
-    }
 }

@@ -23,6 +23,7 @@ import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
 import com.fanjun.keeplive.config.KeepLiveService;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.SafUtil;
 import com.shizhefei.view.largeimage.BlockImageLoader;
 import com.simple.spiderman.SpiderMan;
 
@@ -57,6 +58,7 @@ public class BaseApp extends Application {
             }
         });*/
         app = this;
+        SafUtil.context = this;
        handler = new Handler();
         isDebugable = BuildConfig.DEBUG;
         SpiderMan.init(this);

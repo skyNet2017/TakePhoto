@@ -66,10 +66,10 @@ public class SafFileFinder {
         SharedPreferences sp = SafUtil.context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         if (hasDataInDb) {
             long latScanFinishedTime = sp.getLong("latScanFinishedTime", 0);
-           /* if (latScanFinishedTime != 0 && (System.currentTimeMillis() - latScanFinishedTime < 12 * 60 * 60 * 1000)) {
+            if (latScanFinishedTime != 0 && (System.currentTimeMillis() - latScanFinishedTime < 12 * 60 * 60 * 1000)) {
                 Log.w(SafUtil.TAG, "一天内只扫描一次");
                 return;
-            }*/
+            }
             sp.edit().putBoolean("isScaning", true).commit();
             //有数据,那么接下来就只用一个线程去跑
             safStart = System.currentTimeMillis();
@@ -78,7 +78,7 @@ public class SafFileFinder {
             sp.edit().putBoolean("isScaning", true).commit();
             //没有数据,就用5个线程去跑
             safStart = System.currentTimeMillis();
-            getAlbums(SafUtil.sdRoot, executorService, observer);
+            getAlbums(SafUtil.sdRoot, Executors.newFixedThreadPool(5), observer);
         }
     }
 
@@ -245,17 +245,20 @@ public class SafFileFinder {
                     }
                 }
                 if (imageFolder != null) {
+                    imageFolder.generateTheId();
                     imageFolder.count = imageCount;
                     imageFolder.fileSize = imagesFileSize;
                     folderInfos.add(imageFolder);
                 }
                 if (videoFolder != null) {
+                    videoFolder.generateTheId();
                     videoFolder.count = videoCount;
                     videoFolder.fileSize = videoFileSize;
                     folderInfos.add(videoFolder);
                 }
 
                 if (audioFolder != null) {
+                    audioFolder.generateTheId();
                     audioFolder.count = audioCount;
                     audioFolder.fileSize = audioFileSize;
                     folderInfos.add(audioFolder);
@@ -281,6 +284,7 @@ public class SafFileFinder {
         long start = System.currentTimeMillis();
         //文件夹:
         if (folderInfos.size() > 0) {
+            //其实是同一个文件夹,同时有图片,音视频,怎么处理? 用type-path作为id:
             DbUtil.getDaoSession().getBaseMediaFolderInfoDao().insertOrReplaceInTx(folderInfos);
             //DbUtil.getDaoSession().getBaseMediaFolderInfoDao().upda
             //todo 如何不更新里面的hidden值?

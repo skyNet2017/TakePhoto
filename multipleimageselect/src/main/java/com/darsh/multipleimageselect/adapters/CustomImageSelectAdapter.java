@@ -16,11 +16,13 @@ import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.models.Image;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -33,8 +35,8 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Created by Darshan on 4/18/2015.
  */
-public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
-    public CustomImageSelectAdapter(Context context, ArrayList<Image> images) {
+public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo> {
+    public CustomImageSelectAdapter(Context context, List<BaseMediaInfo> images) {
         super(context, images);
     }
 
@@ -62,7 +64,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         viewHolder.view.getLayoutParams().width = size;
         viewHolder.view.getLayoutParams().height = size;
 
-        if (arrayList.get(position).isSelected) {
+        if (false) {//arrayList.get(position).isSelected
             viewHolder.view.setAlpha(0.5f);
             ((FrameLayout) convertView).setForeground(context.getResources().getDrawable(R.drawable.ic_done_white));
 
@@ -71,20 +73,20 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
             ((FrameLayout) convertView).setForeground(null);
         }
 
-        Image image = arrayList.get(position);
+        BaseMediaInfo image = arrayList.get(position);
         viewHolder.image = image;
-        Log.w(SafUtil.TAG,"dir22: images show:   "+image.path);
-        if(image.path.startsWith("content:/") && !image.path.startsWith("content://")){
-            image.path = image.path.replace("content:/","content://");
+        Log.w(SafUtil.TAG,"dir22: images show:   "+image.pathOrUri);
+        if(image.pathOrUri.startsWith("content:/") && !image.pathOrUri.startsWith("content://")){
+            image.pathOrUri = image.pathOrUri.replace("content:/","content://");
         }
         //.FileNotFoundException: content:/com.android.externalstorage.documents/tree/0123-4567
         Uri uri = null;
-        if(image.path.startsWith("content")){
-            uri = Uri.parse(image.path);
-        }else if(image.path.startsWith("/storage/")){
-            uri = Uri.fromFile(new File(image.path));
+        if(image.pathOrUri.startsWith("content")){
+            uri = Uri.parse(image.pathOrUri);
+        }else if(image.pathOrUri.startsWith("/storage/")){
+            uri = Uri.fromFile(new File(image.pathOrUri));
         }else {
-            uri = Uri.parse(image.path);
+            uri = Uri.parse(image.pathOrUri);
         }
         Glide.with(context)
                 .load(uri)
@@ -99,7 +101,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
                     @Override
                     public void accept(ViewHolder viewHolder) throws Exception {
                         //viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
-                        viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.path,false);
+                        viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
                     }
                 })
 
@@ -108,11 +110,11 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
                     @Override
                     public void accept(ViewHolder viewHolder3) throws Exception {
                         if(viewHolder3.image.equals(viewHolder.image)){
-                            if(viewHolder.image.quality > PhotoCompressHelper.DEFAULT_QUALITY ){
+                            /*if(viewHolder.image.quality > PhotoCompressHelper.DEFAULT_QUALITY ){
                                 viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color_not_compressed));
                             }else {
                                 viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color));
-                            }
+                            }*/
                             viewHolder.tvInfo.setText(viewHolder.desc);
                         }else {
                             //viewHolder.tvInfo.setText("");
@@ -143,7 +145,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<Image> {
         public ImageView imageView;
         public View view;
         public TextView tvInfo;
-        public Image image;
+        public BaseMediaInfo image;
         public String  desc;
     }
 }

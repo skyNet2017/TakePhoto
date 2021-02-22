@@ -173,17 +173,20 @@ public class FileScanner {
                     }
                 }
                 if (imageFolder != null) {
+                    imageFolder.generateTheId();
                     imageFolder.count = imageCount;
                     imageFolder.fileSize = imagesFileSize;
                     folderInfos.add(imageFolder);
                 }
                 if (videoFolder != null) {
+                    videoFolder.generateTheId();
                     videoFolder.count = videoCount;
                     videoFolder.fileSize = videoFileSize;
                     folderInfos.add(videoFolder);
                 }
 
                 if (audioFolder != null) {
+                    audioFolder.generateTheId();
                     audioFolder.count = audioCount;
                     audioFolder.fileSize = audioFileSize;
                     folderInfos.add(audioFolder);

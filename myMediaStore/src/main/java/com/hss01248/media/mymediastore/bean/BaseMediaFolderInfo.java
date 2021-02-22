@@ -28,7 +28,7 @@ public class BaseMediaFolderInfo {
         if (!(o instanceof BaseMediaFolderInfo)) return false;
         BaseMediaFolderInfo that = (BaseMediaFolderInfo) o;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return Objects.equals(pathOrUri, that.pathOrUri);
+            return Objects.equals(pathAndType, that.pathAndType);
         }
         return false;
     }
@@ -36,7 +36,7 @@ public class BaseMediaFolderInfo {
     @Override
     public int hashCode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return Objects.hash(pathOrUri);
+            return Objects.hash(pathAndType);
         }
         return 9090;
     }
@@ -44,8 +44,15 @@ public class BaseMediaFolderInfo {
     /**
      * 可能是纯文件路径,或者saf拿到的content://xxxx
      */
-    @Id
+
     public String pathOrUri;
+
+    @Id
+    public String pathAndType;
+
+    public void generateTheId(){
+        pathAndType = type+"-"+pathOrUri;
+    }
 
 
     public int count;
@@ -60,13 +67,14 @@ public class BaseMediaFolderInfo {
 
     public int type;
 
-    @Generated(hash = 210610148)
+    @Generated(hash = 815481062)
     public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
-            int count, long fileSize, int hidden, long updatedTime, int order,
-            int type) {
+            String pathAndType, int count, long fileSize, int hidden,
+            long updatedTime, int order, int type) {
         this.name = name;
         this.cover = cover;
         this.pathOrUri = pathOrUri;
+        this.pathAndType = pathAndType;
         this.count = count;
         this.fileSize = fileSize;
         this.hidden = hidden;
@@ -161,6 +169,14 @@ public class BaseMediaFolderInfo {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getPathAndType() {
+        return this.pathAndType;
+    }
+
+    public void setPathAndType(String pathAndType) {
+        this.pathAndType = pathAndType;
     }
 
 

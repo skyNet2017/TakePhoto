@@ -87,36 +87,24 @@ public class MainActivity extends AppCompatActivity {
        /* AdView adView = findViewById(R.id.ad_banner);
         AdUtil.loadBannerAd(this, adView);*/
 
-       // StorageUtils.requestOutSdCradWritePermission(this);
-        SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
+
+        com.hss01248.media.mymediastore.SafUtil.getRootDir(this, new com.hss01248.media.mymediastore.SafUtil.ISdRoot() {
             @Override
             public void onPermissionGet(DocumentFile dir) {
                 Log.w(SafUtil.TAG,"getRootDir:"+dir.getUri());
+            }
 
+            @Override
+            public void onPermissionDenied(int resultCode, String msg) {
 
+            }
+        });
 
-
-               /* TfAlbumFinder.listAllAlbum(new Observer<List<Album>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(List<Album> albums) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });*/
+       // StorageUtils.requestOutSdCradWritePermission(this);
+        /*SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
+            @Override
+            public void onPermissionGet(DocumentFile dir) {
+                Log.w(SafUtil.TAG,"getRootDir:"+dir.getUri());
             }
 
             @Override
@@ -124,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(SafUtil.TAG,"onPermissionDenied:"+resultCode+","+msg);
 
             }
-        });
+        });*/
         AutoStartUtil.showDialog(MainActivity.this);
         MyImageWatcher.init();
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
