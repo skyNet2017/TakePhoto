@@ -52,7 +52,9 @@ import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.noober.menu.FloatMenu;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
+import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
@@ -176,26 +178,22 @@ public class ImageSelectActivity extends HelperActivity {
             actionMode = null;
         }
     };
+    CommonTitleBar titleBar;
     private String albumDir;
-    private boolean isAlbumFromSafApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_select);
-        setView(findViewById(R.id.layout_image_select));
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        titleBar = findViewById(R.id.titlebar);
+        titleBar.getLeftTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
-        actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
-
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(R.string.image_preview);
-        }
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -205,8 +203,11 @@ public class ImageSelectActivity extends HelperActivity {
         albumDir = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM_PATH);
         isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
         type = intent.getIntExtra(Constants.INTENT_EXTRA_TYPE,0);
-        isAlbumFromSafApi = albumDir.startsWith("content://");
 
+        String name = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM);
+        if(!TextUtils.isEmpty(name)){
+            titleBar.getLeftTextView().setText(name);
+        }
         errorDisplay = (TextView) findViewById(R.id.text_view_error);
         errorDisplay.setVisibility(View.INVISIBLE);
 
@@ -269,8 +270,60 @@ public class ImageSelectActivity extends HelperActivity {
         progressBar.setVisibility(View.INVISIBLE);
         gridView.setVisibility(View.VISIBLE);
         orientationBasedUI(getResources().getConfiguration().orientation);
+
+        initMenu();
         loadImages();
     }
+
+    private void initMenu() {
+        final FloatMenu floatMenu = new FloatMenu(this, titleBar.getRightTextView());
+        String hide = "待定....";
+        floatMenu.items(hide, "排序");
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                if(position ==0){
+
+                }else if(position ==1){
+                    showSortMenu(v);
+                }
+            }
+        });
+        titleBar.getRightTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String hide = "待定....";
+                floatMenu.items(hide, "排序");
+                floatMenu.show();
+            }
+        });
+    }
+
+    private void showSortMenu(View view) {
+        final FloatMenu floatMenu = new FloatMenu(this, view);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[6];
+        desc[0] ="按更新时间 新在前";
+        desc[1] ="按更新时间顺序 旧在前";
+        desc[2] = "文件大小从大到小";
+        desc[3] ="文件大小从小到大";
+        desc[4] ="按文件名 顺序";
+        desc[5] ="按文件名  倒序";
+
+        desc[DbUtil.fileSortType] =  desc[DbUtil.fileSortType] +"(now)";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                DbUtil.fileSortType = position;
+                loadImages();
+            }
+        });
+        floatMenu.show();
+    }
+
+
 
     private void viewVideo(BaseMediaInfo baseMediaInfo) {
         try {
@@ -639,6 +692,7 @@ public class ImageSelectActivity extends HelperActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                images.clear();
                 images.addAll(DbUtil.getAllContentInFolders(albumDir,type))    ;
                 handler.post(new Runnable() {
                     @Override

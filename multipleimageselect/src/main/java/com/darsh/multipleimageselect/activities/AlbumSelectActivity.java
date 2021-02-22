@@ -130,7 +130,6 @@ public class AlbumSelectActivity extends HelperActivity {
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
             public void onClick(View v, int position) {
-                Toast.makeText(AlbumSelectActivity.this, "菜单"+position, Toast.LENGTH_SHORT).show();
                 if(position ==0){
                     DbUtil.showHidden = !DbUtil.showHidden;
                     refresh();
@@ -152,11 +151,15 @@ public class AlbumSelectActivity extends HelperActivity {
     private void showSortMenu(View view) {
         final FloatMenu floatMenu = new FloatMenu(this, view);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[4];
+        String[] desc = new String[8];
         desc[0] = "按文件夹容量从大到小";
         desc[1] ="按文件个数从大到小";
         desc[2] ="按更新时间 新在前";
         desc[3] ="按更新时间顺序 旧在前";
+        desc[4] ="按文件夹名 顺序";
+        desc[5] ="按文件夹名  倒序";
+        desc[6] ="按路径 顺序";
+        desc[7] ="按路径  倒序";
 
         desc[DbUtil.folderSortType] =  desc[DbUtil.folderSortType] +"(now)";
 

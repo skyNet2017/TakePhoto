@@ -4,38 +4,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.wuhenzhizao.titlebar.widget.CommonTitleBar
-        xmlns:titlebar="http://schemas.android.com/apk/res-auto"
+    <com.wuhenzhizao.titlebar.widget.CommonTitleBar xmlns:titlebar="http://schemas.android.com/apk/res-auto"
         android:id="@+id/titlebar"
-        titlebar:leftType="textView"
-    titlebar:leftText="文件夹"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        titlebar:titleBarColor="@color/multiple_image_select_primary"
         titlebar:leftDrawable="@drawable/ic_arrow_back"
-        titlebar:rightType="textView"
-    titlebar:rightText="menu"
-    android:layout_width="match_parent"
-        android:layout_height="56dp"/>
+        titlebar:leftText="文件夹"
+        titlebar:leftTextColor="#ffffff"
+        titlebar:rightTextColor="#ffffff"
+        titlebar:titleBarHeight="45dp"
+        titlebar:fillStatusBar="true"
+        titlebar:statusBarColor="@color/multiple_image_select_primary"
+        titlebar:leftType="textView"
+        titlebar:rightText="menu"
+        titlebar:rightType="textView" />
 
     <ProgressBar
         android:id="@+id/progress_bar_album_select"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true" />
 
     <TextView
         android:id="@+id/text_view_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/error_null_cursor"/>
+        android:text="@string/error_null_cursor" />
 
     <GridView
         android:id="@+id/grid_view_album_select"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/titlebar"
-        android:paddingTop="1dp"
-        android:paddingBottom="1dp"
         android:paddingLeft="1dp"
+        android:paddingTop="1dp"
         android:paddingRight="1dp"
-        android:stretchMode="columnWidth"/>
+        android:paddingBottom="1dp"
+        android:stretchMode="columnWidth" />
 </RelativeLayout>

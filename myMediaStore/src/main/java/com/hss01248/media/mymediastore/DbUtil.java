@@ -24,6 +24,7 @@ public class DbUtil {
 
     public static boolean showHidden = false;
     public static int folderSortType = 0;
+    public static int fileSortType = 0;
 
     static void init(Context context) {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "mymedia.db");
@@ -90,6 +91,10 @@ public class DbUtil {
      *         desc[1] ="按文件个数从大到小";
      *         desc[2] ="按更新时间 新在前";
      *         desc[3] ="按更新时间顺序 旧在前";
+     *         desc[4] ="按文件夹名 顺序";
+     *         desc[5] ="按文件夹名  倒序";
+     *         desc[6] ="按路径 顺序";
+     *         desc[7] ="按路径  倒序";
      * @param builder
      */
     private static void doSort(QueryBuilder<BaseMediaFolderInfo> builder) {
@@ -99,22 +104,62 @@ public class DbUtil {
             builder.orderDesc(BaseMediaFolderInfoDao.Properties.Count);
         }else if(folderSortType == 2){
             builder.orderDesc(BaseMediaFolderInfoDao.Properties.UpdatedTime)
-            .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(3*1024));
+            .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
         }else if(folderSortType == 3){
             builder.orderAsc(BaseMediaFolderInfoDao.Properties.UpdatedTime)
-                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(3*1024));
+                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+        }else if(folderSortType == 4){
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.Name)
+                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+        }else if(folderSortType == 5){
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.Name)
+                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+        }else if(folderSortType == 6){
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.PathOrUri)
+                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+        }else if(folderSortType == 7){
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.PathOrUri)
+                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
         }
     }
 
     public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type) {
         long start = System.currentTimeMillis();
-        List<BaseMediaInfo> infos = getDaoSession().getBaseMediaInfoDao().queryBuilder()
-                .where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir))
-                //最新的排最前
-                .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime)
-                .list();
+
+        QueryBuilder<BaseMediaInfo> builder =
+         getDaoSession().getBaseMediaInfoDao().queryBuilder()
+                .where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir));
+
+        orderFiles(builder);
+               // .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime);
+        List<BaseMediaInfo> infos  = builder .list();
         Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
         return infos;
+    }
+
+    /**
+     desc[0] ="按更新时间 新在前";
+     desc[1] ="按更新时间顺序 旧在前";
+     desc[2] = "文件大小从大到小";
+     desc[3] ="文件大小从小到大";
+     desc[4] ="按文件名 顺序";
+     desc[5] ="按文件名  倒序";
+     * @param builder
+     */
+    private static void orderFiles(QueryBuilder<BaseMediaInfo> builder) {
+        if(fileSortType == 2){
+            builder.orderDesc(BaseMediaInfoDao.Properties.FileSize);
+        }else if(fileSortType == 3){
+            builder.orderAsc(BaseMediaInfoDao.Properties.FileSize);
+        }else if(fileSortType == 0){
+            builder.orderDesc(BaseMediaInfoDao.Properties.UpdatedTime);
+        }else if(fileSortType == 1){
+            builder.orderAsc(BaseMediaInfoDao.Properties.UpdatedTime);
+        }else if(fileSortType == 4){
+            builder.orderAsc(BaseMediaInfoDao.Properties.Name);
+        }else if(fileSortType == 5){
+            builder.orderDesc(BaseMediaInfoDao.Properties.Name);
+        }
     }
 
 
