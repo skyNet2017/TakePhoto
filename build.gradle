@@ -21,6 +21,7 @@ buildscript {
         classpath 'com.google.gms:google-services:4.2.0' // google-services plugin
         classpath 'io.fabric.tools:gradle:1.25.4'
         classpath 'com.google.firebase:firebase-plugins:1.1.5'
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.3.0' // add plugin
 
 
     }

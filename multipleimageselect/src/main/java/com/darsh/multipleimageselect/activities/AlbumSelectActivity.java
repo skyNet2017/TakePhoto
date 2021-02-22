@@ -28,6 +28,8 @@ import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.saf.TfAlbumFinder;
+import com.hss01248.media.mymediastore.DefaultScanFolderCallback;
+import com.hss01248.media.mymediastore.SafFileFinder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -128,12 +130,20 @@ public class AlbumSelectActivity extends HelperActivity {
         adapter = new CustomAlbumSelectAdapter(getApplicationContext(), albums);
         gridView.setAdapter(adapter);
         orientationBasedUI(getResources().getConfiguration().orientation);
-        //loadByMediaStore();
-        loadBySaf();
+        loadByMediaStore();
+        //loadBySaf();
+
     }
 
     private void loadByMediaStore() {
+        DefaultScanFolderCallback callback = new DefaultScanFolderCallback() {
+            @Override
+            protected void notifyDataSetChanged() {
 
+            }
+        };
+
+        SafFileFinder.listAllAlbum(callback);
     }
 
 
