@@ -19,6 +19,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.darsh.multipleimageselect.MySelectFileProvider;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomImageSelectAdapter;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
@@ -272,11 +274,35 @@ public class ImageSelectActivity extends HelperActivity {
 
     private void viewVideo(BaseMediaInfo baseMediaInfo) {
         try {
-            Uri uri = Uri.parse(baseMediaInfo.pathOrUri);
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            if (baseMediaInfo.pathOrUri.startsWith("/storage/")) {
+                Uri uri = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    //判断版本是否在7.0以上
+                    uri =
+                            MySelectFileProvider.getUriForFile(getApplicationContext(),
+                                    getPackageName() + ".selectfileprovider",
+                                    new File(baseMediaInfo.pathOrUri));
+                    //添加这一句表示对目标应用临时授权该Uri所代表的文件
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else {
+                    uri = Uri.fromFile(new File(baseMediaInfo.pathOrUri));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            } else {
+                Uri uri = Uri.parse(baseMediaInfo.pathOrUri);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+
+
         }catch (Throwable throwable){
             throwable.printStackTrace();
             Toast.makeText(this,throwable.getMessage(),Toast.LENGTH_LONG).show();

@@ -67,6 +67,7 @@ public class FileScanner {
                 List<BaseMediaInfo> images = null;
                 List<BaseMediaInfo> videos = null;
                 List<BaseMediaInfo> audios = null;
+                int isHiden = 0;
 
                 for (File file : files) {
                     if (file.isDirectory()) {
@@ -84,6 +85,10 @@ public class FileScanner {
                     } else {
                         String name = file.getName();
                         if(TextUtils.isEmpty(name)){
+                            continue;
+                        }
+                        if(".nomedia".equals(name)){
+                            isHiden = 1;
                             continue;
                         }
                         if(file.length() <=0){
@@ -176,11 +181,13 @@ public class FileScanner {
                     imageFolder.generateTheId();
                     imageFolder.count = imageCount;
                     imageFolder.fileSize = imagesFileSize;
+                    imageFolder.hidden = isHiden;
                     folderInfos.add(imageFolder);
                 }
                 if (videoFolder != null) {
                     videoFolder.generateTheId();
                     videoFolder.count = videoCount;
+                    videoFolder.hidden = isHiden;
                     videoFolder.fileSize = videoFileSize;
                     folderInfos.add(videoFolder);
                 }
@@ -188,6 +195,7 @@ public class FileScanner {
                 if (audioFolder != null) {
                     audioFolder.generateTheId();
                     audioFolder.count = audioCount;
+                    audioFolder.hidden = isHiden;
                     audioFolder.fileSize = audioFileSize;
                     folderInfos.add(audioFolder);
                 }

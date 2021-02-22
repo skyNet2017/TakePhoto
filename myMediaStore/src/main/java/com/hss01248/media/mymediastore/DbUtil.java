@@ -13,14 +13,18 @@ import com.hss01248.media.mymediastore.db.DaoSession;
 import com.hss01248.media.mymediastore.sort.SortByFileName;
 import com.hss01248.media.mymediastore.sort.SortByFolderName;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.util.List;
 
 public class DbUtil {
 
-    public static ISort folderSort  = new SortByFolderName();
-    public static ISort contentSort  = new SortByFileName();
+    public static ISort folderSort = new SortByFolderName();
+    public static ISort contentSort = new SortByFileName();
 
-     static void init(Context context){
+    public static boolean showHidden = false;
+
+    static void init(Context context) {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "mymedia.db");
         SQLiteDatabase db = helper.getWritableDatabase();
         DaoMaster daoMaster = new DaoMaster(db);
@@ -28,10 +32,11 @@ public class DbUtil {
     }
 
     private volatile static DaoSession daoSession;
+
     public static DaoSession getDaoSession() {
-        if(daoSession == null){
-            synchronized (DbUtil.class){
-                if(daoSession == null){
+        if (daoSession == null) {
+            synchronized (DbUtil.class) {
+                if (daoSession == null) {
                     init(SafUtil.context);
                 }
             }
@@ -39,53 +44,56 @@ public class DbUtil {
         return daoSession;
     }
 
-    public static List<BaseMediaFolderInfo> getAllFolders(){
+    public static List<BaseMediaFolderInfo> getAllFolders() {
         return getAllFolders(BaseMediaInfo.TYPE_IMAGE);
     }
 
-    public static List<BaseMediaFolderInfo> getAllFolders(int type){
+    public static List<BaseMediaFolderInfo> getAllFolders(int type) {
         long start = System.currentTimeMillis();
-        List<BaseMediaFolderInfo> infos =  getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
+        List<BaseMediaFolderInfo> infos = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
                 .where(BaseMediaFolderInfoDao.Properties.Type.eq(type))
                 .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
-        Log.w(SafUtil.TAG, " getAllFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
+        Log.w(SafUtil.TAG, " getAllFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         //耗时(ms):103
         return infos;
     }
 
-    public static List<BaseMediaFolderInfo> getAllImageAndVideoFolders(){
+    public static List<BaseMediaFolderInfo> getAllImageAndVideoFolders() {
         long start = System.currentTimeMillis();
-        List<BaseMediaFolderInfo> infos =  getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
-                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),BaseMediaFolderInfoDao.Properties.Type.eq(2))
+        List<BaseMediaFolderInfo> infos = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
+                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1), BaseMediaFolderInfoDao.Properties.Type.eq(2))
                 .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
-        Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
+        Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         return infos;
     }
 
-    public static List<BaseMediaFolderInfo> getAllFolders2(){
+    public static List<BaseMediaFolderInfo> getAllFolders2() {
         long start = System.currentTimeMillis();
-        List<BaseMediaFolderInfo> infos =  getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
-                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),BaseMediaFolderInfoDao.Properties.Type.eq(2),BaseMediaFolderInfoDao.Properties.Type.eq(2))
-                .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
+        //
+        QueryBuilder<BaseMediaFolderInfo> builder = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
+                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1), BaseMediaFolderInfoDao.Properties.Type.eq(2)
+                        , BaseMediaFolderInfoDao.Properties.Type.eq(2));
+        if (!showHidden) {
+            builder.where(BaseMediaFolderInfoDao.Properties.Hidden.eq(0));
+        }
+        List<BaseMediaFolderInfo> infos = builder.orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
-        Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size());
+        Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         return infos;
     }
 
-    public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type){
+    public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type) {
         long start = System.currentTimeMillis();
-        List<BaseMediaInfo> infos =  getDaoSession().getBaseMediaInfoDao().queryBuilder()
-                .where(BaseMediaInfoDao.Properties.Type.eq(type),BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir))
+        List<BaseMediaInfo> infos = getDaoSession().getBaseMediaInfoDao().queryBuilder()
+                .where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir))
                 //最新的排最前
                 .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime)
                 .list();
-        Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):"+(System.currentTimeMillis() - start)+", size:"+infos.size() +", dir:"+dir);
+        Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
         return infos;
     }
-
-
 
 
 }

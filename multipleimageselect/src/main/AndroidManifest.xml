@@ -39,6 +39,18 @@
         <activity
             android:name=".compress.CompressResultCompareActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+
+        <provider
+            android:name="com.darsh.multipleimageselect.MySelectFileProvider"
+            android:authorities="${applicationId}.selectfileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <!--元数据-->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/my_select_file_provider_paths"/>
+        </provider>
     </application>
 
 </manifest>

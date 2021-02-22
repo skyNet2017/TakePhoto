@@ -136,6 +136,7 @@ public class SafFileFinder {
                 BaseMediaFolderInfo imageFolder = null;
                 int imageCount = 0;
                 long imagesFileSize = 0;
+                int isHiden = 0;
 
                 BaseMediaFolderInfo videoFolder = null;
                 int videoCount = 0;
@@ -144,6 +145,7 @@ public class SafFileFinder {
                 BaseMediaFolderInfo audioFolder = null;
                 int audioCount = 0;
                 long audioFileSize = 0;
+
 
                 List<BaseMediaInfo> images = null;
                 List<BaseMediaInfo> videos = null;
@@ -165,6 +167,10 @@ public class SafFileFinder {
                     } else {
                         String name = file.getName();
                         if(TextUtils.isEmpty(name)){
+                            continue;
+                        }
+                        if(".nomedia".equals(name)){
+                            isHiden = 1;
                             continue;
                         }
                         if(file.length() <=0){
@@ -257,17 +263,20 @@ public class SafFileFinder {
                     imageFolder.generateTheId();
                     imageFolder.count = imageCount;
                     imageFolder.fileSize = imagesFileSize;
+                    imageFolder.hidden = isHiden;
                     folderInfos.add(imageFolder);
                 }
                 if (videoFolder != null) {
                     videoFolder.generateTheId();
                     videoFolder.count = videoCount;
                     videoFolder.fileSize = videoFileSize;
+                    videoFolder.hidden = isHiden;
                     folderInfos.add(videoFolder);
                 }
 
                 if (audioFolder != null) {
                     audioFolder.generateTheId();
+                    audioFolder.hidden = isHiden;
                     audioFolder.count = audioCount;
                     audioFolder.fileSize = audioFileSize;
                     folderInfos.add(audioFolder);
