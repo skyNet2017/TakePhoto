@@ -24,37 +24,54 @@ import it.sephiroth.android.library.exif2.ExifTag;
 
 public class ImageInfoFormater {
 
-   public static Context context;
+    public static Context context;
 
     public static void init(Context context) {
         ImageInfoFormater.context = context;
     }
 
-
-    public static String formatImagInfo(String path, boolean showFullPath) {
-        if(path.startsWith("content://")){
+    public static long getFileLen(String path) {
+        if (path.startsWith("content")) {
             Uri uri = Uri.parse(path);
             try {
                 FileInputStream inputStream = new FileInputStream(context.getContentResolver().openFileDescriptor(uri, "r").getFileDescriptor());
-               int len =  inputStream.available();
+                int len = inputStream.available();
+                inputStream.close();
+                return len;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return 0;
+        } else {
+            return new File(path).length();
+        }
+    }
+
+
+    public static String formatImagInfo(String path, boolean showFullPath) {
+        if (path.startsWith("content://")) {
+            Uri uri = Uri.parse(path);
+            try {
+                FileInputStream inputStream = new FileInputStream(context.getContentResolver().openFileDescriptor(uri, "r").getFileDescriptor());
+                int len = inputStream.available();
                 inputStream.close();
                 String size = formatFileSize(len);
                 int[] wh = getImageWidthHeight(path);
                 //return path+"\n"+size;
-                if(!showFullPath){
-                    return size+" "+wh[0]+"x"+wh[1];
+                if (!showFullPath) {
+                    return size + " " + wh[0] + "x" + wh[1];
                 }
 
                 String path2 = URLDecoder.decode(path);
-                if(path2.contains(":")){
-                    path2 = path2.substring(path2.lastIndexOf(":")+1);
+                if (path2.contains(":")) {
+                    path2 = path2.substring(path2.lastIndexOf(":") + 1);
                 }
-                return path2+"\n"+size+" "+wh[0]+"x"+wh[1];
+                return path2 + "\n" + size + " " + wh[0] + "x" + wh[1];
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            return path+"\n"+"";
+            return path + "\n" + "";
         }
         File file = new File(path);
         String size = formatFileSize(file.length());
@@ -105,7 +122,7 @@ public class ImageInfoFormater {
          * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
          */
         options.inJustDecodeBounds = true;
-        if(path.startsWith("content://")){
+        if (path.startsWith("content://")) {
             try {
                 Bitmap bitmap = BitmapFactory.decodeFileDescriptor(
                         context.getContentResolver().openFileDescriptor(Uri.parse(path), "r").getFileDescriptor(),
@@ -114,7 +131,7 @@ public class ImageInfoFormater {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
         }
         Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,13 +103,31 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                     @Override
                     public void accept(ViewHolder viewHolder) throws Exception {
                         //viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
-                        viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
-                       /* if(viewHolder.image.type == 1){
+                        //viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
+                        if(viewHolder.image.type == 1){
                             viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
                         }else {
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             retriever.setDataSource(viewHolder.image.pathOrUri);
-                        }*/
+
+                            int duration = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;//视频的长度 s
+                            String desc = "";
+                            if(viewHolder.image.type == BaseMediaInfo.TYPE_VIDEO){
+                                int width = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
+                                int height = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
+                                String ro = "";
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                                    int rotation = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));//视频的方向角度
+                                    if(rotation > 0){
+                                        ro = " "+rotation+"°";
+                                    }
+                                }
+                                desc = width+"x"+height+ro+"\n"+ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s";
+                            }else {
+                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s";
+                            }
+                            viewHolder.desc = desc;
+                        }
 
                     }
                 })
@@ -147,7 +166,28 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         return convertView;
     }
 
+    public static int toInt(Object o, int defaultValue) {
+        if (o == null) {
+            return defaultValue;
+        }
+        int value;
+        try {
+            String s = o.toString().trim();
+            if (s.contains(".")) {
+                value = Integer.valueOf(s.substring(0, s.lastIndexOf(".")));
+            } else {
+                value = Integer.valueOf(s);
+            }
+        } catch (Exception e) {
+            value = defaultValue;
+        }
 
+        return value;
+    }
+
+    public static int toInt(Object o) {
+        return toInt(o, 0);
+    }
 
     private static class ViewHolder {
         public ImageView imageView;
