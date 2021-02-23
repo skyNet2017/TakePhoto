@@ -116,6 +116,7 @@ public class SafFileFinder {
             public void run() {
                 DocumentFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
+                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
                     int count0 = countGetSaf.decrementAndGet();
                     Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
                     if (count0 == 0) {
@@ -263,12 +264,15 @@ public class SafFileFinder {
                         }
                     }
                 }
+
                 if (imageFolder != null) {
                     imageFolder.generateTheId();
                     imageFolder.count = imageCount;
                     imageFolder.fileSize = imagesFileSize;
                     imageFolder.hidden = isHiden;
                     folderInfos.add(imageFolder);
+                }else {
+                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE);
                 }
                 if (videoFolder != null) {
                     videoFolder.generateTheId();
@@ -276,6 +280,8 @@ public class SafFileFinder {
                     videoFolder.fileSize = videoFileSize;
                     videoFolder.hidden = isHiden;
                     folderInfos.add(videoFolder);
+                }else {
+                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_VIDEO);
                 }
 
                 if (audioFolder != null) {
@@ -284,6 +290,8 @@ public class SafFileFinder {
                     audioFolder.count = audioCount;
                     audioFolder.fileSize = audioFileSize;
                     folderInfos.add(audioFolder);
+                }else {
+                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_AUDIO);
                 }
                 if (folderInfos.size() != 0) {
                     print(folderInfos, true);
@@ -310,7 +318,8 @@ public class SafFileFinder {
             //其实是同一个文件夹,同时有图片,音视频,怎么处理? 用type-path作为id:
             DbUtil.getDaoSession().getBaseMediaFolderInfoDao().insertOrReplaceInTx(folderInfos);
             //DbUtil.getDaoSession().getBaseMediaFolderInfoDao().upda
-            //todo 如何不更新里面的hidden值?
+            // 如何不更新里面的hidden值?
+            // 已删除文件的处理:DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_AUDIO);
         }
         if (images != null) {
             DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(images);

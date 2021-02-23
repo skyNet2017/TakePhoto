@@ -42,6 +42,9 @@ public class FileScanner {
             public void run() {
                 File[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
+                    //   * 只能处理文件夹内部删除,而文件夹本身没有删除的情况.
+                    //     * 如果文件夹本身被删除了呢?
+                    DbUtil.delete(dir.getAbsolutePath(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
                     int count0 = countGetSaf.decrementAndGet();
                     Log.v(TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
                     if (count0 == 0) {
@@ -183,6 +186,8 @@ public class FileScanner {
                     imageFolder.fileSize = imagesFileSize;
                     imageFolder.hidden = isHiden;
                     folderInfos.add(imageFolder);
+                }else {
+                    DbUtil.delete(dir.getAbsolutePath(),BaseMediaInfo.TYPE_IMAGE);
                 }
                 if (videoFolder != null) {
                     videoFolder.generateTheId();
@@ -190,6 +195,8 @@ public class FileScanner {
                     videoFolder.hidden = isHiden;
                     videoFolder.fileSize = videoFileSize;
                     folderInfos.add(videoFolder);
+                }else {
+                    DbUtil.delete(dir.getAbsolutePath(),BaseMediaInfo.TYPE_VIDEO);
                 }
 
                 if (audioFolder != null) {
@@ -198,14 +205,14 @@ public class FileScanner {
                     audioFolder.hidden = isHiden;
                     audioFolder.fileSize = audioFileSize;
                     folderInfos.add(audioFolder);
+                }else {
+                    DbUtil.delete(dir.getAbsolutePath(),BaseMediaInfo.TYPE_AUDIO);
                 }
                 if (folderInfos.size() != 0) {
                     SafFileFinder.print(folderInfos,false);
                     if(!hasDataInDb){
                         observer.onScanEachFolder(folderInfos);
                     }
-
-
                 }
                 SafFileFinder.writeDB(DocumentFile.fromFile(dir), folderInfos, images, videos, audios);
 

@@ -2,6 +2,8 @@ package com.hss01248.media.mymediastore;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
@@ -15,6 +17,10 @@ import com.hss01248.media.mymediastore.sort.SortByFolderName;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class DbUtil {
@@ -82,9 +88,57 @@ public class DbUtil {
         }
         doSort(builder);
         List<BaseMediaFolderInfo> infos = builder.list();
+        //移除掉不存在的文件夹:
+        if(infos != null && infos.size() > 0){
+            List<BaseMediaFolderInfo> toDelete = new ArrayList<>();
+            Iterator<BaseMediaFolderInfo> iterator = infos.iterator();
+            while (iterator.hasNext()){
+                BaseMediaFolderInfo info = iterator.next();
+                if(TextUtils.isEmpty(info.pathOrUri)){
+                    toDelete.add(info);
+                    iterator.remove();
+                }else if(info.pathOrUri.startsWith("/storage/")){
+                    if(!new File(info.pathOrUri).exists()){
+                        toDelete.add(info);
+                        iterator.remove();
+                    }
+                }else if(info.pathOrUri.startsWith("content:")){
+                    try {
+                        SafUtil.context.getContentResolver().openFileDescriptor(Uri.parse(info.pathOrUri),"r");
+                    } catch (FileNotFoundException e) {
+                        toDelete.add(info);
+                        iterator.remove();
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if(toDelete.size() > 0){
+                getDaoSession().getBaseMediaFolderInfoDao().deleteInTx(toDelete);
+                Log.w(SafUtil.TAG, " getAllImageAndVideoFolders deleteInTx:" + toDelete.size());
+            }
+        }
         Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         return infos;
     }
+
+    /**
+     * 只能处理文件夹内部删除,而文件夹本身没有删除的情况.
+     * 如果文件夹本身被删除了呢?
+     * @param dirPathOrUri
+     * @param types
+     */
+    public static void delete(String dirPathOrUri,int... types){
+        if(types == null || types.length ==0){
+            return;
+        }
+        String[] keys = new String[types.length];
+        for (int i = 0; i < types.length; i++) {
+            keys[i] = types[i]+"-"+dirPathOrUri;
+        }
+        getDaoSession().getBaseMediaFolderInfoDao().deleteByKeyInTx(keys);
+    }
+
+
 
     /**
      *  desc[0] = "按文件从大到小";
