@@ -320,7 +320,7 @@ public class ImageSelectActivity extends HelperActivity {
                 loadImages();
             }
         });
-        floatMenu.show();
+        floatMenu.showAsDropDown(titleBar.getRightTextView());
     }
 
 

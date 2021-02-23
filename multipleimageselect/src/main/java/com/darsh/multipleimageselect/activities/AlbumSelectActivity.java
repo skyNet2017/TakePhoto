@@ -171,7 +171,8 @@ public class AlbumSelectActivity extends HelperActivity {
                 refresh();
             }
         });
-        floatMenu.show();
+        floatMenu.showAsDropDown(titleBar.getRightTextView());
+        //floatMenu.show();
     }
 
     private void refresh() {
