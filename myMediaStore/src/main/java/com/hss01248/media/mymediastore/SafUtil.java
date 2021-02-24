@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -405,5 +407,57 @@ public class SafUtil {
             throwable.printStackTrace();
             return null;
         }
+    }
+
+
+    public static int toInt(Object o, int defaultValue) {
+        if (o == null) {
+            return defaultValue;
+        }
+        int value;
+        try {
+            String s = o.toString().trim();
+            if (s.contains(".")) {
+                value = Integer.valueOf(s.substring(0, s.lastIndexOf(".")));
+            } else {
+                value = Integer.valueOf(s);
+            }
+        } catch (Exception e) {
+            value = defaultValue;
+        }
+
+        return value;
+    }
+
+    public static int toInt(Object o) {
+        return toInt(o, 0);
+    }
+
+
+    public static int[] getImageWidthHeight(String path) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        /**
+         * 最关键在此，把options.inJustDecodeBounds = true;
+         * 这里再decodeFile()，返回的bitmap为空，但此时调用options.outHeight时，已经包含了图片的高了
+         */
+        options.inJustDecodeBounds = true;
+        if (path.startsWith("content://")) {
+            try {
+                Bitmap bitmap = BitmapFactory.decodeFileDescriptor(
+                        context.getContentResolver().openFileDescriptor(Uri.parse(path), "r").getFileDescriptor(),
+                        null, options);
+                // 此时返回的bitmap为null
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
+        }
+        Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
+        /**
+         *options.outHeight为原始图片的高
+         */
+        return new int[]{options.outWidth, options.outHeight};
     }
 }

@@ -302,13 +302,21 @@ public class ImageSelectActivity extends HelperActivity {
     private void showSortMenu(View view) {
         final FloatMenu floatMenu = new FloatMenu(this, view);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[6];
+        String[] desc = new String[10];
         desc[0] ="按更新时间 新在前";
         desc[1] ="按更新时间顺序 旧在前";
         desc[2] = "文件大小从大到小";
         desc[3] ="文件大小从小到大";
         desc[4] ="按文件名 顺序";
         desc[5] ="按文件名  倒序";
+
+        desc[6] ="按画面尺寸 高分辨率在前";
+        desc[7] ="按画面尺寸 低分辨率在前";
+        if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
+            desc[8] = "按时长 长在前";
+            desc[9] ="按时长 短在前";
+        }
+
 
         desc[DbUtil.fileSortType] =  desc[DbUtil.fileSortType] +"(now)";
 

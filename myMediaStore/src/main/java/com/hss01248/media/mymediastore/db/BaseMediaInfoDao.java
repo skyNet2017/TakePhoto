@@ -29,7 +29,9 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         public final static Property PathOrUri = new Property(2, String.class, "pathOrUri", true, "PATH_OR_URI");
         public final static Property FileSize = new Property(3, long.class, "fileSize", false, "FILE_SIZE");
         public final static Property UpdatedTime = new Property(4, long.class, "updatedTime", false, "UPDATED_TIME");
-        public final static Property Type = new Property(5, int.class, "type", false, "TYPE");
+        public final static Property MaxSide = new Property(5, int.class, "maxSide", false, "MAX_SIDE");
+        public final static Property Duration = new Property(6, int.class, "duration", false, "DURATION");
+        public final static Property Type = new Property(7, int.class, "type", false, "TYPE");
     }
 
 
@@ -50,7 +52,9 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
                 "\"PATH_OR_URI\" TEXT PRIMARY KEY NOT NULL ," + // 2: pathOrUri
                 "\"FILE_SIZE\" INTEGER NOT NULL ," + // 3: fileSize
                 "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 4: updatedTime
-                "\"TYPE\" INTEGER NOT NULL );"); // 5: type
+                "\"MAX_SIDE\" INTEGER NOT NULL ," + // 5: maxSide
+                "\"DURATION\" INTEGER NOT NULL ," + // 6: duration
+                "\"TYPE\" INTEGER NOT NULL );"); // 7: type
     }
 
     /** Drops the underlying database table. */
@@ -79,7 +83,9 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         }
         stmt.bindLong(4, entity.getFileSize());
         stmt.bindLong(5, entity.getUpdatedTime());
-        stmt.bindLong(6, entity.getType());
+        stmt.bindLong(6, entity.getMaxSide());
+        stmt.bindLong(7, entity.getDuration());
+        stmt.bindLong(8, entity.getType());
     }
 
     @Override
@@ -102,7 +108,9 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         }
         stmt.bindLong(4, entity.getFileSize());
         stmt.bindLong(5, entity.getUpdatedTime());
-        stmt.bindLong(6, entity.getType());
+        stmt.bindLong(6, entity.getMaxSide());
+        stmt.bindLong(7, entity.getDuration());
+        stmt.bindLong(8, entity.getType());
     }
 
     @Override
@@ -118,7 +126,9 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // pathOrUri
             cursor.getLong(offset + 3), // fileSize
             cursor.getLong(offset + 4), // updatedTime
-            cursor.getInt(offset + 5) // type
+            cursor.getInt(offset + 5), // maxSide
+            cursor.getInt(offset + 6), // duration
+            cursor.getInt(offset + 7) // type
         );
         return entity;
     }
@@ -130,7 +140,9 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         entity.setPathOrUri(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setFileSize(cursor.getLong(offset + 3));
         entity.setUpdatedTime(cursor.getLong(offset + 4));
-        entity.setType(cursor.getInt(offset + 5));
+        entity.setMaxSide(cursor.getInt(offset + 5));
+        entity.setDuration(cursor.getInt(offset + 6));
+        entity.setType(cursor.getInt(offset + 7));
      }
     
     @Override

@@ -198,4 +198,28 @@ public class ImageInfoFormater {
     }
 
 
+    public static int toInt(Object o, int defaultValue) {
+        if (o == null) {
+            return defaultValue;
+        }
+        int value;
+        try {
+            String s = o.toString().trim();
+            if (s.contains(".")) {
+                value = Integer.valueOf(s.substring(0, s.lastIndexOf(".")));
+            } else {
+                value = Integer.valueOf(s);
+            }
+        } catch (Exception e) {
+            value = defaultValue;
+        }
+
+        return value;
+    }
+
+    public static int toInt(Object o) {
+        return toInt(o, 0);
+    }
+
+
 }

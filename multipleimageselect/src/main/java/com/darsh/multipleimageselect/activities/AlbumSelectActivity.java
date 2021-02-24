@@ -126,7 +126,7 @@ public class AlbumSelectActivity extends HelperActivity {
     private void initMenu() {
         final FloatMenu floatMenu = new FloatMenu(this, titleBar.getRightTextView());
         String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        floatMenu.items(hide, "排序");
+        floatMenu.items(hide, "排序","过滤");
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
             public void onClick(View v, int position) {
@@ -135,6 +135,8 @@ public class AlbumSelectActivity extends HelperActivity {
                     refresh();
                 }else if(position ==1){
                     showSortMenu(v);
+                }else if(position == 2){
+                    showFilterMenu(v);
                 }
             }
         });
@@ -142,10 +144,33 @@ public class AlbumSelectActivity extends HelperActivity {
             @Override
             public void onClick(View v) {
                 String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-                floatMenu.items(hide, "排序");
+                floatMenu.items(hide, "排序","过滤");
                 floatMenu.show();
             }
         });
+    }
+
+    private void showFilterMenu(View view) {
+        final FloatMenu floatMenu = new FloatMenu(this, view);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[5];
+        desc[0] = "全部";
+        desc[1] ="图片和视频";
+        desc[2] ="只有图片";
+        desc[3] ="只有视频";
+        desc[4] ="只有音频";
+
+        desc[DbUtil.folderFilterType] =  desc[DbUtil.folderFilterType] +"(now)";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                DbUtil.folderFilterType = position;
+                refresh();
+            }
+        });
+        floatMenu.showAsDropDown(titleBar.getRightTextView());
     }
 
     private void showSortMenu(View view) {

@@ -30,6 +30,7 @@ public class DbUtil {
 
     public static boolean showHidden = false;
     public static int folderSortType = 0;
+    public static int folderFilterType = 0;
     public static int fileSortType = 0;
 
     static void init(Context context) {
@@ -80,12 +81,11 @@ public class DbUtil {
     public static List<BaseMediaFolderInfo> getAllFolders2() {
         long start = System.currentTimeMillis();
         //
-        QueryBuilder<BaseMediaFolderInfo> builder = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
-                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1), BaseMediaFolderInfoDao.Properties.Type.eq(2)
-                        , BaseMediaFolderInfoDao.Properties.Type.eq(2));
+        QueryBuilder<BaseMediaFolderInfo> builder = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder();
         if (!showHidden) {
             builder.where(BaseMediaFolderInfoDao.Properties.Hidden.eq(0));
         }
+        doFilter(builder);
         doSort(builder);
         List<BaseMediaFolderInfo> infos = builder.list();
         //移除掉不存在的文件夹:
@@ -119,6 +119,32 @@ public class DbUtil {
         }
         Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         return infos;
+    }
+
+    /**
+     *  desc[0] = "全部";
+     *         desc[1] ="图片和视频";
+     *         desc[2] ="只有图片";
+     *         desc[3] ="只有视频";
+     *         desc[4] ="只有音频";
+     * @param builder
+     */
+    private static void doFilter(QueryBuilder<BaseMediaFolderInfo> builder) {
+        if(folderFilterType == 0){
+            builder.whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),
+                    BaseMediaFolderInfoDao.Properties.Type.eq(2)
+                    , BaseMediaFolderInfoDao.Properties.Type.eq(3));
+        }else if(folderFilterType == 1){
+            builder.whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),
+                    BaseMediaFolderInfoDao.Properties.Type.eq(2));
+        }else if(folderFilterType == 2){
+            builder.where(BaseMediaFolderInfoDao.Properties.Type.eq(1));
+        }else if(folderFilterType == 3){
+            builder.where(BaseMediaFolderInfoDao.Properties.Type.eq(2));
+        }else if(folderFilterType == 4){
+            builder.where(BaseMediaFolderInfoDao.Properties.Type.eq(3));
+        }
+
     }
 
     /**
@@ -198,6 +224,13 @@ public class DbUtil {
      desc[3] ="文件大小从小到大";
      desc[4] ="按文件名 顺序";
      desc[5] ="按文件名  倒序";
+
+     desc[6] ="按画面尺寸 高分辨率在前";
+     desc[7] ="按画面尺寸 低分辨率在前";
+     if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
+     desc[8] = "按时长 长在前";
+     desc[9] ="按时长 短在前";
+     }
      * @param builder
      */
     private static void orderFiles(QueryBuilder<BaseMediaInfo> builder) {
@@ -213,6 +246,14 @@ public class DbUtil {
             builder.orderAsc(BaseMediaInfoDao.Properties.Name);
         }else if(fileSortType == 5){
             builder.orderDesc(BaseMediaInfoDao.Properties.Name);
+        }else if(fileSortType == 6){
+            builder.orderDesc(BaseMediaInfoDao.Properties.MaxSide);
+        }else if(fileSortType == 7){
+            builder.orderAsc(BaseMediaInfoDao.Properties.MaxSide);
+        }else if(fileSortType == 8){
+            builder.orderDesc(BaseMediaInfoDao.Properties.Duration);
+        }else if(fileSortType == 9){
+            builder.orderAsc(BaseMediaInfoDao.Properties.Duration);
         }
     }
 

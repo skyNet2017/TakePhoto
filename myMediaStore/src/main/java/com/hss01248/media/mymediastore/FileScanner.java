@@ -1,5 +1,7 @@
 package com.hss01248.media.mymediastore;
 
+import android.media.MediaMetadataRetriever;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -62,10 +64,12 @@ public class FileScanner {
                 BaseMediaFolderInfo videoFolder = null;
                 int videoCount = 0;
                 long videoFileSize = 0;
+                long videoDuration = 0;
 
                 BaseMediaFolderInfo audioFolder = null;
                 int audioCount = 0;
                 long audioFileSize = 0;
+                long audioDuration = 0;
 
                 List<BaseMediaInfo> images = null;
                 List<BaseMediaInfo> videos = null;
@@ -126,6 +130,12 @@ public class FileScanner {
                             image.type = BaseMediaInfo.TYPE_IMAGE;
                             images.add(image);
 
+                            //图片宽高:
+                            int[] imageWidthHeight = SafUtil.getImageWidthHeight(file.getAbsolutePath());
+                            if(imageWidthHeight != null && imageWidthHeight.length == 2){
+                                image.maxSide = Math.max(imageWidthHeight[0],imageWidthHeight[1]);
+                            }
+
                         } else if (type == BaseMediaInfo.TYPE_VIDEO) {
                             videoCount++;
                             videoFileSize = videoFileSize + file.length();
@@ -152,6 +162,22 @@ public class FileScanner {
                             image.fileSize = file.length();
                             image.type = BaseMediaInfo.TYPE_VIDEO;
                             videos.add(image);
+
+                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                            try {
+                                retriever.setDataSource(file.getAbsolutePath());
+                                image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+                                videoDuration = videoDuration + image.duration;
+                                int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
+                                int height = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
+                                image.maxSide = Math.max(width,height);
+                            }catch (Throwable throwable){
+                                throwable.printStackTrace();
+                            }finally {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    retriever.close();
+                                }
+                            }
                         } else if (type == BaseMediaInfo.TYPE_AUDIO) {
                             audioCount++;
                             audioFileSize = audioFileSize + file.length();
@@ -178,6 +204,18 @@ public class FileScanner {
                             image.type = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
                         }
+
+                        /*MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                        try {
+                            retriever.setDataSource(file.getAbsolutePath());
+                            audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+                        }catch (Throwable throwable){
+                            throwable.printStackTrace();
+                        }finally {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                retriever.close();
+                            }
+                        }*/
                     }
                 }
                 if (imageFolder != null) {
@@ -194,6 +232,7 @@ public class FileScanner {
                     videoFolder.count = videoCount;
                     videoFolder.hidden = isHiden;
                     videoFolder.fileSize = videoFileSize;
+                    videoFolder.duration = videoDuration;
                     folderInfos.add(videoFolder);
                 }else {
                     DbUtil.delete(dir.getAbsolutePath(),BaseMediaInfo.TYPE_VIDEO);
@@ -204,6 +243,7 @@ public class FileScanner {
                     audioFolder.count = audioCount;
                     audioFolder.hidden = isHiden;
                     audioFolder.fileSize = audioFileSize;
+                    audioFolder.duration = audioDuration;
                     folderInfos.add(audioFolder);
                 }else {
                     DbUtil.delete(dir.getAbsolutePath(),BaseMediaInfo.TYPE_AUDIO);

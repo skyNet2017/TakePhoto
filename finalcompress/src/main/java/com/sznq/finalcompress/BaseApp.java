@@ -17,6 +17,7 @@ import androidx.multidex.MultiDex;
 import android.util.Log;
 
 import com.darsh.multipleimageselect.compress.StorageUtils;
+import com.facebook.stetho.Stetho;
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.ForegroundNotification;
 import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
@@ -67,6 +68,7 @@ public class BaseApp extends Application {
         StorageUtils.context = this;
         ImageInfoFormater.init(this);
         ReportUtil.init(this, "UA-131503834-1", false, isDebugable);
+
         // AdUtil.init(this,false,"ca-app-pub-2335840373239478~2863497563");
        // BlockImageLoader.DEBUG = true;
         //registerContentObserver();
@@ -77,6 +79,7 @@ public class BaseApp extends Application {
       if(isMainProcess){
           //开启保活后,不再走oncreate
           MyImageWatcher.init();
+          Stetho.initializeWithDefaults(this);
       }
 
 

@@ -32,8 +32,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         public final static Property FileSize = new Property(5, long.class, "fileSize", false, "FILE_SIZE");
         public final static Property Hidden = new Property(6, int.class, "hidden", false, "HIDDEN");
         public final static Property UpdatedTime = new Property(7, long.class, "updatedTime", false, "UPDATED_TIME");
-        public final static Property Order = new Property(8, int.class, "order", false, "ORDER");
-        public final static Property Type = new Property(9, int.class, "type", false, "TYPE");
+        public final static Property Duration = new Property(8, long.class, "duration", false, "DURATION");
+        public final static Property Order = new Property(9, int.class, "order", false, "ORDER");
+        public final static Property Type = new Property(10, int.class, "type", false, "TYPE");
     }
 
 
@@ -57,8 +58,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
                 "\"FILE_SIZE\" INTEGER NOT NULL ," + // 5: fileSize
                 "\"HIDDEN\" INTEGER NOT NULL ," + // 6: hidden
                 "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 7: updatedTime
-                "\"ORDER\" INTEGER NOT NULL ," + // 8: order
-                "\"TYPE\" INTEGER NOT NULL );"); // 9: type
+                "\"DURATION\" INTEGER NOT NULL ," + // 8: duration
+                "\"ORDER\" INTEGER NOT NULL ," + // 9: order
+                "\"TYPE\" INTEGER NOT NULL );"); // 10: type
     }
 
     /** Drops the underlying database table. */
@@ -94,8 +96,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         stmt.bindLong(6, entity.getFileSize());
         stmt.bindLong(7, entity.getHidden());
         stmt.bindLong(8, entity.getUpdatedTime());
-        stmt.bindLong(9, entity.getOrder());
-        stmt.bindLong(10, entity.getType());
+        stmt.bindLong(9, entity.getDuration());
+        stmt.bindLong(10, entity.getOrder());
+        stmt.bindLong(11, entity.getType());
     }
 
     @Override
@@ -125,8 +128,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         stmt.bindLong(6, entity.getFileSize());
         stmt.bindLong(7, entity.getHidden());
         stmt.bindLong(8, entity.getUpdatedTime());
-        stmt.bindLong(9, entity.getOrder());
-        stmt.bindLong(10, entity.getType());
+        stmt.bindLong(9, entity.getDuration());
+        stmt.bindLong(10, entity.getOrder());
+        stmt.bindLong(11, entity.getType());
     }
 
     @Override
@@ -145,8 +149,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
             cursor.getLong(offset + 5), // fileSize
             cursor.getInt(offset + 6), // hidden
             cursor.getLong(offset + 7), // updatedTime
-            cursor.getInt(offset + 8), // order
-            cursor.getInt(offset + 9) // type
+            cursor.getLong(offset + 8), // duration
+            cursor.getInt(offset + 9), // order
+            cursor.getInt(offset + 10) // type
         );
         return entity;
     }
@@ -161,8 +166,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         entity.setFileSize(cursor.getLong(offset + 5));
         entity.setHidden(cursor.getInt(offset + 6));
         entity.setUpdatedTime(cursor.getLong(offset + 7));
-        entity.setOrder(cursor.getInt(offset + 8));
-        entity.setType(cursor.getInt(offset + 9));
+        entity.setDuration(cursor.getLong(offset + 8));
+        entity.setOrder(cursor.getInt(offset + 9));
+        entity.setType(cursor.getInt(offset + 10));
      }
     
     @Override

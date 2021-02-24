@@ -61,16 +61,21 @@ public class BaseMediaFolderInfo {
     public long updatedTime;
 
     /**
+     * 总时长
+     */
+    public long duration;
+
+    /**
      * 排序的序号.用于置顶功能
      */
     public int order;
 
     public int type;
 
-    @Generated(hash = 815481062)
+    @Generated(hash = 1515707365)
     public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
             String pathAndType, int count, long fileSize, int hidden,
-            long updatedTime, int order, int type) {
+            long updatedTime, long duration, int order, int type) {
         this.name = name;
         this.cover = cover;
         this.pathOrUri = pathOrUri;
@@ -79,6 +84,7 @@ public class BaseMediaFolderInfo {
         this.fileSize = fileSize;
         this.hidden = hidden;
         this.updatedTime = updatedTime;
+        this.duration = duration;
         this.order = order;
         this.type = type;
     }
@@ -177,6 +183,14 @@ public class BaseMediaFolderInfo {
 
     public void setPathAndType(String pathAndType) {
         this.pathAndType = pathAndType;
+    }
+
+    public long getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
 

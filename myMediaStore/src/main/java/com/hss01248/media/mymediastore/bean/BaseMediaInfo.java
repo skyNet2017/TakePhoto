@@ -45,6 +45,9 @@ public class BaseMediaInfo {
     public long fileSize;
     public long updatedTime;
 
+    public int maxSide;
+    public int duration;
+
     public int type;
 
     public boolean isImage(){
@@ -107,18 +110,36 @@ public class BaseMediaInfo {
         this.type = type;
     }
 
+    public int getMaxSide() {
+        return this.maxSide;
+    }
+
+    public void setMaxSide(int maxSide) {
+        this.maxSide = maxSide;
+    }
+
+    public int getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
     public static final int TYPE_IMAGE = 1;
     public static final int TYPE_VIDEO = 2;
     public static final int TYPE_AUDIO = 3;
 
-    @Generated(hash = 646981729)
+    @Generated(hash = 1042764737)
     public BaseMediaInfo(String folderPathOrUri, String name, String pathOrUri,
-            long fileSize, long updatedTime, int type) {
+            long fileSize, long updatedTime, int maxSide, int duration, int type) {
         this.folderPathOrUri = folderPathOrUri;
         this.name = name;
         this.pathOrUri = pathOrUri;
         this.fileSize = fileSize;
         this.updatedTime = updatedTime;
+        this.maxSide = maxSide;
+        this.duration = duration;
         this.type = type;
     }
 

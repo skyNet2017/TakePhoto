@@ -23,6 +23,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,7 +125,11 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                 }
                                 desc = width+"x"+height+ro+"\n"+ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s";
                             }else {
-                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s";
+                                String path2 = URLDecoder.decode(viewHolder.image.pathOrUri);
+                                if (path2.contains(":")) {
+                                    path2 = path2.substring(path2.lastIndexOf(":") + 1);
+                                }
+                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s\n"+path2;
                             }
                             viewHolder.desc = desc;
                         }
