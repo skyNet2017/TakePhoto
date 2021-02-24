@@ -109,7 +109,21 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                             viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
                         }else {
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                            retriever.setDataSource(viewHolder.image.pathOrUri);
+                            try {
+                                if(viewHolder.image.pathOrUri.startsWith("content")){
+                                    retriever.setDataSource(
+                                            context.getContentResolver()
+                                                    .openFileDescriptor(
+                                                            Uri.parse(viewHolder.image.pathOrUri),"r").getFileDescriptor());
+                                }else {
+                                    retriever.setDataSource(viewHolder.image.pathOrUri);
+                                }
+
+                            }catch (Throwable throwable){
+                                throwable.printStackTrace();
+
+                            }
+
 
                             int duration = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;//视频的长度 s
                             String desc = "";

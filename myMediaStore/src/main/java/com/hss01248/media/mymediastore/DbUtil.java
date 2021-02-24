@@ -210,7 +210,7 @@ public class DbUtil {
          getDaoSession().getBaseMediaInfoDao().queryBuilder()
                 .where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir));
 
-        orderFiles(builder);
+        orderFiles(builder,type);
                // .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime);
         List<BaseMediaInfo> infos  = builder .list();
         Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
@@ -232,8 +232,9 @@ public class DbUtil {
      desc[9] ="按时长 短在前";
      }
      * @param builder
+     * @param type
      */
-    private static void orderFiles(QueryBuilder<BaseMediaInfo> builder) {
+    private static void orderFiles(QueryBuilder<BaseMediaInfo> builder, int type) {
         if(fileSortType == 2){
             builder.orderDesc(BaseMediaInfoDao.Properties.FileSize);
         }else if(fileSortType == 3){
@@ -247,9 +248,23 @@ public class DbUtil {
         }else if(fileSortType == 5){
             builder.orderDesc(BaseMediaInfoDao.Properties.Name);
         }else if(fileSortType == 6){
-            builder.orderDesc(BaseMediaInfoDao.Properties.MaxSide);
+            if(type == BaseMediaInfo.TYPE_IMAGE){
+                builder.orderDesc(BaseMediaInfoDao.Properties.MaxSide,BaseMediaInfoDao.Properties.Name);
+            }else if(type == BaseMediaInfo.TYPE_VIDEO){
+                builder.orderDesc(BaseMediaInfoDao.Properties.MaxSide,BaseMediaInfoDao.Properties.Duration);
+            }else {
+                builder.orderDesc(BaseMediaInfoDao.Properties.MaxSide,BaseMediaInfoDao.Properties.FileSize);
+            }
+
         }else if(fileSortType == 7){
-            builder.orderAsc(BaseMediaInfoDao.Properties.MaxSide);
+            if(type == BaseMediaInfo.TYPE_IMAGE){
+                builder.orderAsc(BaseMediaInfoDao.Properties.MaxSide,BaseMediaInfoDao.Properties.Name);
+            }else if(type == BaseMediaInfo.TYPE_VIDEO){
+                builder.orderAsc(BaseMediaInfoDao.Properties.MaxSide,BaseMediaInfoDao.Properties.Duration);
+            }else {
+                builder.orderAsc(BaseMediaInfoDao.Properties.MaxSide,BaseMediaInfoDao.Properties.FileSize);
+            }
+
         }else if(fileSortType == 8){
             builder.orderDesc(BaseMediaInfoDao.Properties.Duration);
         }else if(fileSortType == 9){

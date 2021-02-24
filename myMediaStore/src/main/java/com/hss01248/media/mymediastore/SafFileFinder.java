@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.ImageFormat;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -252,7 +253,20 @@ public class SafFileFinder {
 
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
-                                retriever.setDataSource(file.getUri().toString());
+                                try {
+                                    if(image.pathOrUri.startsWith("content")){
+                                        retriever.setDataSource(
+                                                SafUtil.context.getContentResolver()
+                                                        .openFileDescriptor(
+                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                    }else {
+                                        retriever.setDataSource(image.pathOrUri);
+                                    }
+
+                                }catch (Throwable throwable){
+                                    Log.w("errorv",image.pathOrUri);
+                                    throwable.printStackTrace();
+                                }
                                 image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
                                 videoDuration = videoDuration + image.duration;
                                 int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
@@ -290,19 +304,34 @@ public class SafFileFinder {
                             image.fileSize = file.length();
                             image.type = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
-                        }
 
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        try {
-                            retriever.setDataSource(file.getUri().toString());
-                            audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
-                        }catch (Throwable throwable){
-                            throwable.printStackTrace();
-                        }finally {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                retriever.close();
+                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                            try {
+                                try {
+                                    if(image.pathOrUri.startsWith("content")){
+                                        retriever.setDataSource(
+                                                SafUtil.context.getContentResolver()
+                                                        .openFileDescriptor(
+                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                    }else {
+                                        retriever.setDataSource(image.pathOrUri);
+                                    }
+
+                                }catch (Throwable throwable){
+                                    Log.w("error",image.pathOrUri);
+                                    throwable.printStackTrace();
+                                }
+                                audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+                            }catch (Throwable throwable){
+                                throwable.printStackTrace();
+                            }finally {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    retriever.close();
+                                }
                             }
                         }
+
+
                     }
                 }
 
@@ -338,8 +367,14 @@ public class SafFileFinder {
                 }
                 if (folderInfos.size() != 0) {
                     print(folderInfos, true);
-                    if(hasFinishedBefore){
-                        observer.onScanEachFolder(folderInfos);
+                    if(!hasFinishedBefore){
+                        if(DbUtil.showHidden){
+                            observer.onScanEachFolder(folderInfos);
+                        }else {
+                            if(folderInfos.get(0).hidden == 0){
+                                observer.onScanEachFolder(folderInfos);
+                            }
+                        }
                     }
                 }
                 writeDB(dir, folderInfos, images, videos, audios);

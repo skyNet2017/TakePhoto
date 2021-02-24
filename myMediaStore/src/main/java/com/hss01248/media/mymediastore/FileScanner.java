@@ -1,6 +1,7 @@
 package com.hss01248.media.mymediastore;
 
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,13 +167,16 @@ public class FileScanner {
 
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
-                                retriever.setDataSource(file.getAbsolutePath());
+
+                                //FileInputStream inputStream = new FileInputStream(new File(image.pathOrUri).getAbsolutePath());
+                                retriever.setDataSource(image.pathOrUri);
                                 image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
                                 videoDuration = videoDuration + image.duration;
                                 int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
                                 int height = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
                                 image.maxSide = Math.max(width,height);
                             }catch (Throwable throwable){
+                                Log.w("errorv",image.pathOrUri);
                                 throwable.printStackTrace();
                             }finally {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -203,19 +208,34 @@ public class FileScanner {
                             image.fileSize = file.length();
                             image.type = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
-                        }
 
-                        /*MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        try {
-                            retriever.setDataSource(file.getAbsolutePath());
-                            audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
-                        }catch (Throwable throwable){
-                            throwable.printStackTrace();
-                        }finally {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                retriever.close();
+
+                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                            try {
+                                try {
+                                    if(image.pathOrUri.startsWith("content")){
+                                        retriever.setDataSource(
+                                                SafUtil.context.getContentResolver()
+                                                        .openFileDescriptor(
+                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                    }else {
+                                        FileInputStream inputStream = new FileInputStream(new File(image.pathOrUri).getAbsolutePath());
+                                        retriever.setDataSource(inputStream.getFD());
+                                    }
+
+                                }catch (Throwable throwable){
+                                    Log.w("error",image.pathOrUri);
+                                    throwable.printStackTrace();
+                                }
+                                audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+                            }catch (Throwable throwable){
+                                throwable.printStackTrace();
+                            }finally {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    retriever.close();
+                                }
                             }
-                        }*/
+                        }
                     }
                 }
                 if (imageFolder != null) {
@@ -251,7 +271,14 @@ public class FileScanner {
                 if (folderInfos.size() != 0) {
                     SafFileFinder.print(folderInfos,false);
                     if(!hasDataInDb){
-                        observer.onScanEachFolder(folderInfos);
+                            if(DbUtil.showHidden){
+                                observer.onScanEachFolder(folderInfos);
+                            }else {
+                                if(folderInfos.get(0).hidden == 0){
+                                    observer.onScanEachFolder(folderInfos);
+                                }
+                            }
+
                     }
                 }
                 SafFileFinder.writeDB(DocumentFile.fromFile(dir), folderInfos, images, videos, audios);
