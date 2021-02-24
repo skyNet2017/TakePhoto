@@ -39,18 +39,21 @@ import android.widget.Toast;
 
 import com.darsh.multipleimageselect.MySelectFileProvider;
 import com.darsh.multipleimageselect.R;
+import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
 import com.darsh.multipleimageselect.adapters.CustomImageSelectAdapter;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.models.Image;
-import com.darsh.multipleimageselect.saf.SafUtil;
 import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.SafFileFinder;
+import com.hss01248.media.mymediastore.SafUtil;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.noober.menu.FloatMenu;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
@@ -245,6 +248,14 @@ public class ImageSelectActivity extends HelperActivity {
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                showLongPressMenu(position,view);
+                return true;
+            }
+        });
+
+        /*gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 isInSelectingMode = true;
                 if (actionMode == null) {
                     actionMode = ImageSelectActivity.this.startActionMode(callback);
@@ -261,7 +272,7 @@ public class ImageSelectActivity extends HelperActivity {
 
                 return true;
             }
-        });
+        });*/
         initHandler();
 
         adapter = new CustomImageSelectAdapter(getApplicationContext(), images);
@@ -273,6 +284,75 @@ public class ImageSelectActivity extends HelperActivity {
 
         initMenu();
         loadImages();
+    }
+
+    private void showLongPressMenu(int position, View view) {
+        BaseMediaInfo folderInfo = images.get(position);
+        final FloatMenu floatMenu = new FloatMenu(this, view);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[2];
+        desc[0] = "开启图片选择模式"  ;
+        desc[1] ="删除此文件";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                if(position == 0){
+                    switchToSelectMode();
+                }else if(position == 1){
+                    delete(folderInfo,position);
+                }
+            }
+        });
+        floatMenu.showAsDropDown(view);
+    }
+
+    private void switchToSelectMode() {
+
+    }
+
+    private void delete(BaseMediaInfo folderInfo, int position) {
+        //删除的确认弹窗:
+        new AlertDialog.Builder(this)
+                .setTitle("删除确认")
+                .setMessage("真的要删除这个"+ CustomAlbumSelectAdapter.typeDes(folderInfo.type)+"文件吗?")
+                .setPositiveButton("确定删除", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //删除文件:
+                        deleteFile2(folderInfo);
+                        DbUtil.getDaoSession().getBaseMediaInfoDao().delete(folderInfo);
+                        images.remove(position);
+                        adapter.notifyDataSetChanged();
+                    }
+                }).setNegativeButton("不删了", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }).create().show();
+
+    }
+
+    private void deleteFile2(BaseMediaInfo folderInfo) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(folderInfo.pathOrUri.startsWith("content")){
+                    DocumentFile file = com.hss01248.media.mymediastore.SafUtil.findFile(SafUtil.sdRoot,folderInfo.pathOrUri);
+                    if(file.exists()){
+                        file.delete();
+                    }
+                }else {
+                    File file = new File(folderInfo.pathOrUri);
+                    file.delete();
+
+                }
+            }
+        }).start();
+
+
     }
 
     private void initMenu() {
