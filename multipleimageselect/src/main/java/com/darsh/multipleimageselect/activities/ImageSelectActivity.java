@@ -323,7 +323,7 @@ public class ImageSelectActivity extends HelperActivity {
                         //删除文件:
                         deleteFile2(folderInfo);
                         DbUtil.getDaoSession().getBaseMediaInfoDao().delete(folderInfo);
-                        images.remove(position);
+                        images.remove(folderInfo);
                         adapter.notifyDataSetChanged();
                     }
                 }).setNegativeButton("不删了", new DialogInterface.OnClickListener() {

@@ -166,7 +166,7 @@ public class AlbumSelectActivity extends HelperActivity {
                 .setPositiveButton("确定删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        albums.remove(position);
+                        albums.remove(folderInfo);
                         DbUtil.getDaoSession().getBaseMediaFolderInfoDao().delete(folderInfo);
                         adapter.notifyDataSetChanged();
 
@@ -202,6 +202,7 @@ public class AlbumSelectActivity extends HelperActivity {
                             file.delete();
                         }
                     }
+                    showFinishToast(folderInfo);
                 }else {
                     File dir = new File(path);
                     File[] files = dir.listFiles();
@@ -214,11 +215,22 @@ public class AlbumSelectActivity extends HelperActivity {
                             file.delete();
                         }
                     }
+                    showFinishToast(folderInfo);
                 }
             }
         }).start();
 
 
+    }
+
+    private void showFinishToast(BaseMediaFolderInfo folderInfo) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String text = "文件夹内("+CustomAlbumSelectAdapter.typeDes(folderInfo.type)+")删除完成\n"+folderInfo.pathOrUri;
+                Toast.makeText(AlbumSelectActivity.this.getApplicationContext(),text,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void hideOrUnHide(BaseMediaFolderInfo folderInfo,int position) {
