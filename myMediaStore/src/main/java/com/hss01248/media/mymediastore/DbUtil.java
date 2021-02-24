@@ -175,6 +175,8 @@ public class DbUtil {
      *         desc[5] ="按文件夹名  倒序";
      *         desc[6] ="按路径 顺序";
      *         desc[7] ="按路径  倒序";
+     *           desc[8] ="按时长 顺序";
+     *         desc[9] ="按时长  倒序";
      * @param builder
      */
     private static void doSort(QueryBuilder<BaseMediaFolderInfo> builder) {
@@ -183,23 +185,21 @@ public class DbUtil {
         }else if(folderSortType == 1){
             builder.orderDesc(BaseMediaFolderInfoDao.Properties.Count);
         }else if(folderSortType == 2){
-            builder.orderDesc(BaseMediaFolderInfoDao.Properties.UpdatedTime)
-            .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.UpdatedTime);
         }else if(folderSortType == 3){
-            builder.orderAsc(BaseMediaFolderInfoDao.Properties.UpdatedTime)
-                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.UpdatedTime);
         }else if(folderSortType == 4){
-            builder.orderAsc(BaseMediaFolderInfoDao.Properties.Name)
-                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.Name);
         }else if(folderSortType == 5){
-            builder.orderDesc(BaseMediaFolderInfoDao.Properties.Name)
-                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.Name);
         }else if(folderSortType == 6){
-            builder.orderAsc(BaseMediaFolderInfoDao.Properties.PathOrUri)
-                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.PathOrUri);
         }else if(folderSortType == 7){
-            builder.orderDesc(BaseMediaFolderInfoDao.Properties.PathOrUri)
-                    .where(BaseMediaFolderInfoDao.Properties.Count.gt(2),BaseMediaFolderInfoDao.Properties.FileSize.gt(300*1024));
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.PathOrUri);
+        }else if(folderSortType == 8){
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.Duration);
+        }else if(folderSortType == 9){
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.Duration);
         }
     }
 

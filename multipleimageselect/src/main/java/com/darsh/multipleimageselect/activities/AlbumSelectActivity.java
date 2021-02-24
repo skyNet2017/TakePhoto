@@ -126,16 +126,16 @@ public class AlbumSelectActivity extends HelperActivity {
     private void initMenu() {
         final FloatMenu floatMenu = new FloatMenu(this, titleBar.getRightTextView());
         String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        floatMenu.items(hide, "排序","过滤");
+        floatMenu.items(hide, "过滤","排序");
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
             public void onClick(View v, int position) {
                 if(position ==0){
                     DbUtil.showHidden = !DbUtil.showHidden;
                     refresh();
-                }else if(position ==1){
+                }else if(position ==2){
                     showSortMenu(v);
-                }else if(position == 2){
+                }else if(position == 1){
                     showFilterMenu(v);
                 }
             }
@@ -144,7 +144,7 @@ public class AlbumSelectActivity extends HelperActivity {
             @Override
             public void onClick(View v) {
                 String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-                floatMenu.items(hide, "排序","过滤");
+                floatMenu.items(hide, "过滤","排序");
                 floatMenu.show();
             }
         });
@@ -176,7 +176,7 @@ public class AlbumSelectActivity extends HelperActivity {
     private void showSortMenu(View view) {
         final FloatMenu floatMenu = new FloatMenu(this, view);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[8];
+        String[] desc = new String[10];
         desc[0] = "按文件夹容量从大到小";
         desc[1] ="按文件个数从大到小";
         desc[2] ="按更新时间 新在前";
@@ -185,6 +185,8 @@ public class AlbumSelectActivity extends HelperActivity {
         desc[5] ="按文件夹名  倒序";
         desc[6] ="按路径 顺序";
         desc[7] ="按路径  倒序";
+        desc[8] ="按时长 顺序";
+        desc[9] ="按时长  倒序";
 
         desc[DbUtil.folderSortType] =  desc[DbUtil.folderSortType] +"(now)";
 

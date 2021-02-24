@@ -12,6 +12,7 @@ import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.models.Album;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,16 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
         BaseMediaFolderInfo album = arrayList.get(position);
         viewHolder.imageView.getLayoutParams().width = size;
         viewHolder.imageView.getLayoutParams().height = size;
-        String desc = album.name+"\n"+ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count+" "+typeDes(album.type);
+        String desc = ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count+" "+typeDes(album.type);
+        if(album.type == BaseMediaInfo.TYPE_AUDIO){
+            desc = album.pathOrUri+"\n"+desc;
+        }else {
+            desc =  album.name+"\n"+desc;
+        }
+        if(album.duration >0){
+            desc = desc+"\n"+formatTime(album.duration);
+        }
+
 
         viewHolder.textView.setText(desc);
         Glide.with(context)
@@ -53,6 +63,19 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
 
 
         return convertView;
+    }
+
+    public String formatTime(long duration) {
+        if(duration < 60){
+            return duration+"s";
+        }
+        if(duration< 3600){
+            return duration/60+"min "+duration % 60 +"s";
+        }
+        int hour = (int) (duration / 3600);
+        duration = duration % 3600;
+        return hour +"h "+ duration/60+"min "+duration % 60 +"s";
+
     }
 
     private String typeDes(int type) {

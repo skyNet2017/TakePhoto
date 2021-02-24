@@ -123,13 +123,16 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                         ro = " "+rotation+"°";
                                     }
                                 }
-                                desc = width+"x"+height+ro+"\n"+ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s";
+                                desc = width+"x"+height+ro+"\n"+ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+"   "+formatTime(duration);
                             }else {
                                 String path2 = URLDecoder.decode(viewHolder.image.pathOrUri);
                                 if (path2.contains(":")) {
                                     path2 = path2.substring(path2.lastIndexOf(":") + 1);
                                 }
-                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+" "+duration+"s\n"+path2;
+                                if(path2.contains("/")){
+                                    path2 = path2.substring(path2.lastIndexOf("/")+1);
+                                }
+                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+"   "+formatTime(duration)+"\n"+path2;
                             }
                             viewHolder.desc = desc;
                         }
@@ -169,6 +172,19 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         }
         viewHolder.tvInfo.setText(desc);*/
         return convertView;
+    }
+
+    public String formatTime(long duration) {
+        if(duration < 60){
+            return duration+"s";
+        }
+        if(duration< 3600){
+            return duration/60+"min "+duration % 60 +"s";
+        }
+        int hour = (int) (duration / 3600);
+        duration = duration % 3600;
+        return hour +"h "+ duration/60+"min "+duration % 60 +"s";
+
     }
 
     public static int toInt(Object o, int defaultValue) {
