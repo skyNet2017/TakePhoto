@@ -1,6 +1,7 @@
 package com.darsh.multipleimageselect.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
@@ -11,7 +12,10 @@ import android.os.Message;
 import android.os.Process;
 import android.provider.MediaStore;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
@@ -38,6 +42,7 @@ import com.noober.menu.FloatMenu;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -115,12 +120,166 @@ public class AlbumSelectActivity extends HelperActivity {
             }
         });
 
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                showLongPressMenu(position,view);
+                return true;
+            }
+        });
+
         initData();
 
         initMenu();
 
 
 
+    }
+
+    private void showLongPressMenu(int position, View view) {
+        BaseMediaFolderInfo folderInfo = albums.get(position);
+        final FloatMenu floatMenu = new FloatMenu(this, view);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[2];
+        desc[0] = folderInfo.hidden == 0 ? "隐藏此文件夹" : "取消此文件夹的隐藏"  ;
+        desc[1] ="删除此文件夹";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+               if(position == 0){
+                   hideOrUnHide(folderInfo,position);
+               }else if(position == 1){
+                   delete(folderInfo,position);
+               }
+            }
+        });
+        floatMenu.showAsDropDown(view);
+    }
+
+    private void delete(BaseMediaFolderInfo folderInfo, int position) {
+        //删除的确认弹窗:
+        new AlertDialog.Builder(this)
+                .setTitle("删除确认")
+                .setMessage("真的要删除这个文件夹里的"+CustomAlbumSelectAdapter.typeDes(folderInfo.type)+"吗?")
+                .setPositiveButton("确定删除", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        albums.remove(position);
+                        DbUtil.getDaoSession().getBaseMediaFolderInfoDao().delete(folderInfo);
+                        adapter.notifyDataSetChanged();
+
+                        //删除那一类的文件:
+                        deleteDir(folderInfo);
+                    }
+                }).setNegativeButton("不删了", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create().show();
+
+    }
+
+    private void deleteDir(BaseMediaFolderInfo folderInfo) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String path = folderInfo.pathOrUri;
+                if(path.startsWith("content")){
+                    DocumentFile dir = SafUtil.findFile(SafUtil.sdRoot,path);
+                    if(dir == null){
+                        return;
+                    }
+                    DocumentFile[] files = dir.listFiles();
+                    if(files ==null || files.length==0){
+                        return;
+                    }
+                    for (DocumentFile file : files) {
+                        int type = SafFileFinder.guessTypeByName(file.getName());
+                        if(type == folderInfo.type){
+                            file.delete();
+                        }
+                    }
+                }else {
+                    File dir = new File(path);
+                    File[] files = dir.listFiles();
+                    if(files ==null || files.length==0){
+                        return;
+                    }
+                    for (File file : files) {
+                        int type = SafFileFinder.guessTypeByName(file.getName());
+                        if(type == folderInfo.type){
+                            file.delete();
+                        }
+                    }
+                }
+            }
+        }).start();
+
+
+    }
+
+    private void hideOrUnHide(BaseMediaFolderInfo folderInfo,int position) {
+        if(folderInfo.hidden == 0){
+            folderInfo.hidden = 1;
+            if(!DbUtil.showHidden){
+                albums.remove(position);
+                adapter.notifyDataSetChanged();
+            }
+        }else {
+            folderInfo.hidden = 0;
+        }
+        //会影响同路径下其他类型文件的显示和隐藏
+        DbUtil.getDaoSession().getBaseMediaFolderInfoDao().update(folderInfo);
+        dealNoMediaFile(folderInfo,folderInfo.hidden ==0);
+    }
+
+    private void dealNoMediaFile(BaseMediaFolderInfo folderInfo,boolean showFolder) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String path = folderInfo.pathOrUri;
+                if(path.startsWith("content")){
+                    DocumentFile dir = SafUtil.findFile(SafUtil.sdRoot,path);
+                    if(dir == null){
+                        return;
+                    }
+                    DocumentFile[] files = dir.listFiles();
+                    if(files ==null || files.length==0){
+                        return;
+                    }
+                    DocumentFile file = dir.findFile(".nomedia");
+                    if(showFolder){
+                        if(file != null && file.exists()){
+                            file.delete();
+                        }
+                    }else {
+                        dir.createFile("text/plain",".nomedia");
+                    }
+
+
+                }else {
+                    File dir = new File(path);
+                    File[] files = dir.listFiles();
+                    if(files ==null || files.length==0){
+                        return;
+                    }
+                    File file = new File(dir,".nomedia");
+                    if(showFolder){
+                        file.delete();
+                    }else {
+                        try {
+                            file.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }).start();
     }
 
     private void initMenu() {

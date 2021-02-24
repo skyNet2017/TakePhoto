@@ -78,7 +78,7 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
 
     }
 
-    private String typeDes(int type) {
+    public static String typeDes(int type) {
         if(type ==1){
             return "图";
         }else if(type == 2){
