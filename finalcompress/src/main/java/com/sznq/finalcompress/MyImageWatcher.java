@@ -47,6 +47,7 @@ public class MyImageWatcher {
 
 
     public static void init(){
+
         if(!observerMap.isEmpty()){
             Iterator<Map.Entry<String, FileObserver>> iterator = observerMap.entrySet().iterator();
             while (iterator.hasNext()){

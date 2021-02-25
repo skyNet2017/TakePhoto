@@ -30,7 +30,12 @@ import com.darsh.multipleimageselect.saf.SafUtil;
 import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.gc.materialdesign.views.ButtonRectangle;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,6 +43,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -100,35 +107,59 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-       // StorageUtils.requestOutSdCradWritePermission(this);
-        /*SafUtil.getRootDir(this, new SafUtil.ISdRoot() {
-            @Override
-            public void onPermissionGet(DocumentFile dir) {
-                Log.w(SafUtil.TAG,"getRootDir:"+dir.getUri());
-            }
-
-            @Override
-            public void onPermissionDenied(int resultCode, String msg) {
-                Log.w(SafUtil.TAG,"onPermissionDenied:"+resultCode+","+msg);
-
-            }
-        });*/
-        AutoStartUtil.showDialog(MainActivity.this);
+       //AutoStartUtil.showDialog(MainActivity.this);
         MyImageWatcher.init();
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // 先判断有没有权限
-            if (Environment.isExternalStorageManager()) {
-               // writeFile();
-            } else {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.setData(Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, 976);
-            }
-        }*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},78);
         }
+
+        smb();
+
+    }
+
+    private void smb() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                {
+                    OutputStream out = null;
+                    PrintStream ps = null;
+                    try {
+                        File localFile = new File("00iputto.txt");//远程服务器共享文件名称
+                        String text = "来来来，我们来试一试";//要写入的文本内容
+                        String host = "10.0.192.20";//远程服务器的地址
+                        //String username = "guest";//远程服务器的用户名
+                        //String password = "";//远程服务器的密码
+                        String path = "/share/";//远程服务器共享文件夹名称
+                        //String remoteUrl = "smb://" + username + ":" + password + "@" + host + path + (path.endsWith("/") ? "" : "/");//带密码的url
+                        String remoteUrl = "smb://"+ host + path + (path.endsWith("/") ? "" : "/");//不需要输入用户名密码的url
+
+                        Log.w("remoteUrl", remoteUrl);
+                        SmbFile remoteFile = new SmbFile(remoteUrl + localFile.getPath());//创建远程对象
+                        remoteFile.connect();//建立连接
+                        Log.w("files", Arrays.toString(remoteFile.list()));
+                        out = new BufferedOutputStream(new SmbFileOutputStream(remoteFile));
+                        ps = new PrintStream(out);
+                        ps.println(text);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        String msg = "发生错误：" + e.getLocalizedMessage();
+                        System.out.println(msg);
+                    } finally {
+                        try {
+                            if (ps != null) {
+                                ps.close();
+                            }
+                            if (out != null) {
+                                out.close();
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+            }
+        }).start();
 
     }
 
