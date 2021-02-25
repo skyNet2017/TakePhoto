@@ -1,9 +1,13 @@
 package com.hss01248.media.localvideoplayer;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.shuyu.gsyvideoplayer.GSYBaseActivityDetail;
@@ -50,8 +54,6 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PlayerFactory.setPlayManager(SystemPlayerManager.class);
-
         videoPath = getIntent().getStringExtra(PATH);
         dismissPageWhenFinishPlay = getIntent().getBooleanExtra(TAG_DISMISSPAGEWHENFINISHPLAY,false);
         position = getIntent().getIntExtra(POSITION,0);
@@ -83,7 +85,11 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            //hideSystemUI();
+           /* hideSystemUI();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.TRANSPARENT);//将状态栏设置成透明色
+                getWindow().setNavigationBarColor(Color.TRANSPARENT);//将导航栏设置为透明色
+            }*/
             //detailPlayer.startWindowFullscreen(this,false,false);
         }
     }
@@ -115,25 +121,26 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
-    void onPlayNext(){
+   boolean  onPlayNext(){
+       Log.w("click","onPlayNext:"+detailPlayer.toString());
+       //Toast.makeText(getApplicationContext(),"onPlayNext:"+detailPlayer.toString(),Toast.LENGTH_SHORT).show();
 
         if(!isViewList){
-            return;
+            return false;
         }
         if(position >= videos.size()-1){
-            return;
+            return false;
         }
         position++;
         videoPath = videos.get(position);
 
-        getGSYVideoOptionBuilder().
-                setVideoAllCallBack(this)
-                .build(getGSYVideoPlayer());
-        detailPlayer.startPlayLogic();
+       playVideo(videoPath,position);
+        return true;
     }
 
     void onPlayPre(){
-
+        Log.w("click","onPlayPre:"+detailPlayer.toString());
+        //Toast.makeText(getApplicationContext(),"onPlayPre:"+detailPlayer.toString(),Toast.LENGTH_SHORT).show();
         if(!isViewList){
             return;
         }
@@ -143,10 +150,28 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         position--;
         videoPath = videos.get(position);
 
-        getGSYVideoOptionBuilder().
-                setVideoAllCallBack(this)
-                .build(getGSYVideoPlayer());
-        detailPlayer.startPlayLogic();
+        playVideo(videoPath,position);
+    }
+
+    private void playVideo(String url ,int position) {
+        String uri = url;
+        if(url.startsWith("/storage/")){
+            uri = "file://"+uri;
+        }
+        // 播放一个视频结束后，直接调用此方法，切换到下一个
+        // ?（问题：全屏播放的时候，播放结束了，自动回来调用在这个方法想播放下一个，只有声音，但画面没改变，黑的）
+        detailPlayer.release();
+        getGSYVideoOptionBuilder().setUrl(uri)
+                .setVideoTitle(getNameFromPath(url))
+                .setSeekOnStart(position)
+                .build(detailPlayer);
+        //getGSYVideoOptionBuilder().build(detailPlayer);
+        detailPlayer.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                detailPlayer.startPlayLogic();
+            }
+        }, 1000);
     }
 
 
@@ -162,8 +187,9 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         //loadCover(imageView, url);
         String uri = videoPath;
         if(videoPath.startsWith("/storage/")){
-            uri = "file:// "+uri;
+            uri = "file://"+uri;
         }
+        Log.w("click","uri:"+uri);
         return new GSYVideoOptionBuilder()
                 //.setThumbImageView(imageView)
                 //.setUrl(url)
@@ -172,10 +198,10 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                 .setShowFullAnimation(false)
                 .setVideoTitle(getNameFromPath(videoPath))
         //是否根据视频尺寸，自动选择竖屏全屏或者横屏全屏
-                .setAutoFullWithSize(false)
+                .setAutoFullWithSize(true)
                 .setIsTouchWiget(true)
                // .setRotateViewAuto(false)
-                .setLockLand(false)
+                //.setLockLand(false)
                 .setShowPauseCover(false)
                 .setStartAfterPrepared(true)
                 .setShowFullAnimation(false)
@@ -190,7 +216,10 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                                     if(!isViewList){
                                         finish();
                                     }else {
-                                        onPlayNext();
+                                       boolean success =  onPlayNext();
+                                       if(!success){
+                                           finish();
+                                       }
                                     }
 
 

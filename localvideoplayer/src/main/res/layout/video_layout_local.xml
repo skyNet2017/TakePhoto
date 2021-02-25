@@ -41,14 +41,28 @@
             android:id="@+id/bottom_single"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/tv_play_pre"
+                android:text="前"
+                android:gravity="center"
+                android:textColor="#ffffff"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"/>
             <moe.codeest.enviews.ENPlayView
                 android:id="@+id/start"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="15dp"
                 android:layout_gravity="center_vertical" />
+            <TextView
+                android:id="@+id/tv_play_next"
+                android:text="后"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"/>
             <TextView
                 android:id="@+id/current"
                 android:layout_width="wrap_content"
@@ -80,7 +94,7 @@
                 android:textColor="#ffffff" />
         </LinearLayout>
 
-        <!--播放视频列表时的ui-->
+        <!--&lt;!&ndash;播放视频列表时的ui&ndash;&gt;
         <LinearLayout
             android:id="@+id/bottom_list"
             android:layout_width="0dp"
@@ -90,7 +104,7 @@
             android:layout_height="match_parent">
             <TextView
                 android:id="@+id/tv_play_pre"
-                android:text="前一个视频"
+                android:text="<<"
                 android:gravity="center"
                 android:textColor="#ffffff"
                 android:layout_width="wrap_content"
@@ -104,13 +118,13 @@
                 android:layout_gravity="center_vertical" />
             <TextView
                 android:id="@+id/tv_play_next"
-                android:text="下一个视频"
+                android:text=">>"
                 android:textColor="#ffffff"
                 android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"/>
 
-        </LinearLayout>
+        </LinearLayout>-->
 
         <ImageView
             android:id="@+id/fullscreen"

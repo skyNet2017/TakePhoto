@@ -2,6 +2,7 @@ package com.hss01248.media.localvideoplayer;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -11,6 +12,7 @@ import androidx.constraintlayout.solver.GoalRow;
 
 import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
+import com.shuyu.gsyvideoplayer.video.base.GSYBaseVideoPlayer;
 
 import moe.codeest.enviews.ENPlayView;
 
@@ -31,9 +33,8 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
     TextView tvPre;
     TextView tvNext;
     LinearLayout llSingle;
-    LinearLayout llList;
     LinearLayout bottomLl;
-    ENPlayView playView;
+
 
     public void setActivity(PictureVideoPlayByGSYActivity activity) {
         this.activity = activity;
@@ -48,24 +49,29 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
         tvPre = findViewById(R.id.tv_play_pre);
         tvNext = findViewById(R.id.tv_play_next);
         llSingle = findViewById(R.id.bottom_single);
-        llList = findViewById(R.id.bottom_list);
         bottomLl = findViewById(R.id.layout_bottom);
-        playView = findViewById(R.id.start_list);
-
-
+        preOrNext();
+        if(context instanceof PictureVideoPlayByGSYActivity){
+            activity = (PictureVideoPlayByGSYActivity) context;
+        }
     }
 
     public void setVideoList(boolean videoList) {
         isVideoList = videoList;
         if(isVideoList){
-            llSingle.setVisibility(GONE);
-            llList.setVisibility(VISIBLE);
+            llSingle.setVisibility(VISIBLE);
             preOrNext();
         }else {
             llSingle.setVisibility(VISIBLE);
-            llList.setVisibility(GONE);
         }
     }
+
+    @Override
+    public GSYBaseVideoPlayer startWindowFullscreen(Context context, boolean actionBar, boolean statusBar) {
+        GSYBaseVideoPlayer player =  super.startWindowFullscreen(context, actionBar, statusBar);
+        return player;
+    }
+
 
     private void preOrNext() {
         tvPre.setOnClickListener(new OnClickListener() {
@@ -82,23 +88,25 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
                 activity.onPlayNext();
             }
         });
+    }
 
-        playView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isVideoList){
-                    if(playView.getCurrentState() == ENPlayView.STATE_PAUSE){
-                        playView.play();
-                        onVideoResume();
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
 
-                    }else {
-                        playView.pause();
-                        onVideoPause();
-                    }
-                    //startPlayLogic();
-                }
+        if(event.getAction() == MotionEvent.ACTION_DOWN){
+            if(v.getId()==R.id.tv_play_next || v.getId()==R.id.tv_play_pre){
+                return true;
             }
-        });
+        }
+        if(event.getAction() == MotionEvent.ACTION_UP){
+            if(v.getId()==R.id.tv_play_next || v.getId()==R.id.tv_play_pre){
+                v.performClick();
+                return true;
+            }
+        }
+
+
+        return super.onTouch(v, event);
     }
 
     boolean isVideoList;
@@ -116,6 +124,9 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
             mVideoAllCallBack.onClickStartThumb(mOriginUrl, mTitle, LocalVideoPlayer.this);
         }
         prepareVideo();
+        changeUiToPlayingShow();
+
+        //startWindowFullscreen(activity,false,false);
     }
 
 
