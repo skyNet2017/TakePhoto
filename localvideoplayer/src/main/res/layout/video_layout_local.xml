@@ -43,25 +43,26 @@
             android:layout_weight="1"
             android:visibility="visible"
             android:layout_height="match_parent">
-            <TextView
+            <Button
                 android:id="@+id/tv_play_pre"
                 android:text="前"
                 android:gravity="center"
                 android:textColor="#ffffff"
-                android:layout_width="40dp"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"/>
             <moe.codeest.enviews.ENPlayView
                 android:id="@+id/start"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
                 android:layout_gravity="center_vertical" />
-            <TextView
+            <Button
                 android:id="@+id/tv_play_next"
                 android:text="后"
                 android:textColor="#ffffff"
                 android:gravity="center"
-                android:layout_width="40dp"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"/>
             <TextView
                 android:id="@+id/current"

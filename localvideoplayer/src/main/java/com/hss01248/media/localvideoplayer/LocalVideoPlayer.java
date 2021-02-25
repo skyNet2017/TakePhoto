@@ -77,7 +77,6 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
         tvPre.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
                activity.onPlayPre();
             }
         });

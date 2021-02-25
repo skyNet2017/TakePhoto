@@ -12,13 +12,18 @@ import android.widget.Toast;
 
 import com.shuyu.gsyvideoplayer.GSYBaseActivityDetail;
 import com.shuyu.gsyvideoplayer.builder.GSYVideoOptionBuilder;
+import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
 import com.shuyu.gsyvideoplayer.listener.GSYStateUiListener;
 
 import com.shuyu.gsyvideoplayer.player.PlayerFactory;
 import com.shuyu.gsyvideoplayer.player.SystemPlayerManager;
+import com.shuyu.gsyvideoplayer.utils.Debuger;
+import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,13 +67,16 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         setContentView(R.layout.activity_detail_player);
         detailPlayer = (LocalVideoPlayer) findViewById(R.id.detail_player);
         detailPlayer.setActivity(this);
-        detailPlayer.setVideoList(isViewList);
+        //detailPlayer.setVideoList(isViewList);
         //增加title
         //detailPlayer.getTitleTextView().setVisibility(View.GONE);
         //detailPlayer.getBackButton().setVisibility(View.GONE);
 
         initVideoBuilderMode();
-
+//外部辅助的旋转，帮助全屏
+        orientationUtils = new OrientationUtils(this, detailPlayer);
+//初始化不打开外部的旋转
+        orientationUtils.setEnable(false);
 
         try {
             //detailPlayer.getGSYVideoManager().start();
@@ -158,20 +166,16 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         if(url.startsWith("/storage/")){
             uri = "file://"+uri;
         }
+        Log.w("click","on playVideo:"+uri);
         // 播放一个视频结束后，直接调用此方法，切换到下一个
         // ?（问题：全屏播放的时候，播放结束了，自动回来调用在这个方法想播放下一个，只有声音，但画面没改变，黑的）
-        detailPlayer.release();
+        //detailPlayer.release();
         getGSYVideoOptionBuilder().setUrl(uri)
                 .setVideoTitle(getNameFromPath(url))
-                .setSeekOnStart(position)
-                .build(detailPlayer);
+                .setPlayPosition(position)
+                .build(detailPlayer.getCurrentPlayer());
         //getGSYVideoOptionBuilder().build(detailPlayer);
-        detailPlayer.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                detailPlayer.startPlayLogic();
-            }
-        }, 1000);
+        detailPlayer.getCurrentPlayer().startPlayLogic();
     }
 
 
@@ -203,6 +207,7 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                // .setRotateViewAuto(false)
                 //.setLockLand(false)
                 .setShowPauseCover(false)
+                .setPlayPosition(position)
                 .setStartAfterPrepared(true)
                 .setShowFullAnimation(false)
                 .setNeedLockFull(false)
@@ -228,34 +233,57 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                         }
                     }
                 })
-                /*.setGSYVideoProgressListener(new GSYVideoProgressListener() {
+                .setVideoAllCallBack(new GSYSampleCallBack() {
                     @Override
-                    public void onProgress(int progress, int secProgress, int currentPosition, int duration) {
-                        if(progress == 100 || progress == 99){
-                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    finish();
-                                }
-                            },500);
+                    public void onPrepared(String url, Object... objects) {
+                        super.onPrepared(url, objects);
+                        //开始播放了才能旋转和全屏
+                        orientationUtils.setEnable(true);
+                        isPlay = true;
+                    }
 
+                    @Override
+                    public void onQuitFullscreen(String url, Object... objects) {
+                        super.onQuitFullscreen(url, objects);
+                        Debuger.printfError("***** onQuitFullscreen **** " + objects[0]);//title
+                        Debuger.printfError("***** onQuitFullscreen **** " + objects[1]);//当前非全屏player
+                        if (orientationUtils != null) {
+                            orientationUtils.backToProtVideo();
                         }
                     }
-                })*/
+                })
                 //.setThumbPlay(true)
                 .setSeekRatio(1);
     }
 
+    @Override
+    public void onAutoComplete(String url, Object... objects) {
+        super.onAutoComplete(url, objects);
+        //onPlayNext()
+       // detailPlayer.getCurrentPlayer().startPlayLogic();
+    }
+
     private String getNameFromPath(String videoPath) {
+        String name = position+"/"+videos.size()+", ";
         if(videoPath.contains("/")){
-            return videoPath.substring(videoPath.lastIndexOf("/")+1);
+            name = name+ videoPath.substring(videoPath.lastIndexOf("/")+1);
+        }else {
+            name = videoPath;
         }
-        return videoPath;
+        name = URLDecoder.decode(name);
+        return name;
     }
 
     @Override
     public void clickForFullScreen() {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        finish();
+        videos.clear();
     }
 
     @Override
