@@ -50,6 +50,7 @@ import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.localvideoplayer.VideoPlayUtil;
 import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.SafUtil;
@@ -229,15 +230,16 @@ public class ImageSelectActivity extends HelperActivity {
 
 
                 } else {
+                    ArrayList<String> files = new ArrayList<>();
+                    for (BaseMediaInfo image : images) {
+                        files.add(image.pathOrUri);
+                    }
                     if(type == 1){
                         //点击去预览
-                        ArrayList<String> files = new ArrayList<>();
-                        for (BaseMediaInfo image : images) {
-                            files.add(image.pathOrUri);
-                        }
                         CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
                     }else {
-                        viewVideo(images.get(position));
+                        //viewVideo(images.get(position));
+                        VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
                     }
 
                 }
