@@ -107,13 +107,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
        //AutoStartUtil.showDialog(MainActivity.this);
-        MyImageWatcher.init();
+        //MyImageWatcher.init();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},78);
         }
 
-        smb();
+        //smb();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //SmbjUtil.connect();
+            }
+        }).start();
+
 
     }
 
@@ -127,12 +134,12 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         File localFile = new File("00iputto.txt");//远程服务器共享文件名称
                         String text = "来来来，我们来试一试";//要写入的文本内容
-                        String host = "10.0.192.20";//远程服务器的地址
-                        //String username = "guest";//远程服务器的用户名
-                        //String password = "";//远程服务器的密码
-                        String path = "/share/";//远程服务器共享文件夹名称
-                        //String remoteUrl = "smb://" + username + ":" + password + "@" + host + path + (path.endsWith("/") ? "" : "/");//带密码的url
-                        String remoteUrl = "smb://"+ host + path + (path.endsWith("/") ? "" : "/");//不需要输入用户名密码的url
+                        String host = "192.168.3.8";//远程服务器的地址
+                        String username = "Administrator";//远程服务器的用户名
+                        String password = "614511qc";//远程服务器的密码
+                        String path = "/D/";//远程服务器共享文件夹名称
+                        String remoteUrl = "smb://" + username + ":" + password + "@" + host + path + (path.endsWith("/") ? "" : "/");//带密码的url
+                       // String remoteUrl = "smb://"+ host + path + (path.endsWith("/") ? "" : "/");//不需要输入用户名密码的url
 
                         Log.w("remoteUrl", remoteUrl);
                         SmbFile remoteFile = new SmbFile(remoteUrl + localFile.getPath());//创建远程对象

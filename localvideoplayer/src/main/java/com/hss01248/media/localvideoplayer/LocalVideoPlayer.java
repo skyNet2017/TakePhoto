@@ -117,7 +117,7 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
 
     @Override
     public void startPlayLogic() {
-        //super.startPlayLogic();
+        super.startPlayLogic();
         if (mVideoAllCallBack != null) {
             Debuger.printfLog("onClickStartThumb");
             mVideoAllCallBack.onClickStartThumb(mOriginUrl, mTitle, LocalVideoPlayer.this);
@@ -129,6 +129,10 @@ public class LocalVideoPlayer extends StandardGSYVideoPlayer {
     }
 
 
+    @Override
+    protected void setStateAndUi(int state) {
+        super.setStateAndUi(state);
+    }
 
     @Override
     public int getLayoutId() {

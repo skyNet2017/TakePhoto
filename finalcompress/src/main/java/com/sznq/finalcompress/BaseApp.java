@@ -80,6 +80,7 @@ public class BaseApp extends Application {
           //开启保活后,不再走oncreate
           MyImageWatcher.init();
           Stetho.initializeWithDefaults(this);
+          SmbUtil.init(this);
       }
 
 

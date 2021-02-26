@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_bright">
+    android:background="@android:color/black">
 
     <RelativeLayout
         android:id="@+id/surface_container"
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
-        android:background="#99000000"
+        android:background="#ff000000"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="invisible">
@@ -47,7 +47,7 @@
                 android:id="@+id/tv_play_pre"
                 android:text="前"
                 android:gravity="center"
-                android:textColor="#ffffff"
+                android:textColor="#333333"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"/>
             <moe.codeest.enviews.ENPlayView
@@ -60,7 +60,7 @@
             <Button
                 android:id="@+id/tv_play_next"
                 android:text="后"
-                android:textColor="#ffffff"
+                android:textColor="#333333"
                 android:gravity="center"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"/>
