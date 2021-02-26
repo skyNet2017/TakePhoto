@@ -41,6 +41,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileOutputStream;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -133,11 +135,11 @@ public class MainActivity extends AppCompatActivity {
                         String remoteUrl = "smb://"+ host + path + (path.endsWith("/") ? "" : "/");//不需要输入用户名密码的url
 
                         Log.w("remoteUrl", remoteUrl);
-                      /*  SmbFile remoteFile = new SmbFile(remoteUrl + localFile.getPath());//创建远程对象
+                        SmbFile remoteFile = new SmbFile(remoteUrl + localFile.getPath());//创建远程对象
                         remoteFile.connect();//建立连接
                         Log.w("files", Arrays.toString(remoteFile.list()));
                         out = new BufferedOutputStream(new SmbFileOutputStream(remoteFile));
-                        ps = new PrintStream(out);*/
+                        ps = new PrintStream(out);
                         ps.println(text);
                     } catch (Exception e) {
                         e.printStackTrace();
