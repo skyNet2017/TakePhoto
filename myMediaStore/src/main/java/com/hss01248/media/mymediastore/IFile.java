@@ -2,9 +2,11 @@ package com.hss01248.media.mymediastore;
 
 import android.net.Uri;
 
-public interface IFile<T> {
+public interface IFile {
 
-    T[] listFiles();
+    String storageId();
+
+    IFile[] listFiles();
 
    String getName();
 

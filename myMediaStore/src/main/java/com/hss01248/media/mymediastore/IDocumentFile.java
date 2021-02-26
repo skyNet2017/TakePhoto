@@ -4,7 +4,7 @@ import android.net.Uri;
 
 import androidx.documentfile.provider.DocumentFile;
 
-public class IDocumentFile implements IFile<DocumentFile>{
+public class IDocumentFile implements IFile{
     DocumentFile file;
 
     public IDocumentFile(DocumentFile file) {
@@ -12,37 +12,53 @@ public class IDocumentFile implements IFile<DocumentFile>{
     }
 
     @Override
-    public DocumentFile[] listFiles() {
-        return new DocumentFile[0];
+    public String storageId() {
+        return "IDocumentFile"+1;
+    }
+
+    @Override
+    public IFile[] listFiles() {
+        DocumentFile[] documentFiles = file.listFiles();
+        if(documentFiles == null){
+            return null;
+        }
+        if(documentFiles.length ==0){
+            return null;
+        }
+        IFile[] files = new IFile[documentFiles.length];
+        for (int i = 0; i < documentFiles.length; i++) {
+            files[i] = new IDocumentFile(documentFiles[i]);
+        }
+        return files;
     }
 
     @Override
     public String getName() {
-        return null;
+        return file.getName();
     }
 
     @Override
     public Uri getUri() {
-        return null;
+        return file.getUri();
     }
 
     @Override
     public String getPath() {
-        return null;
+        return file.getUri().toString();
     }
 
     @Override
     public boolean isDirectory() {
-        return false;
+        return file.isDirectory();
     }
 
     @Override
     public long length() {
-        return 0;
+        return file.length();
     }
 
     @Override
     public long lastModified() {
-        return 0;
+        return file.lastModified();
     }
 }

@@ -18,6 +18,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -26,7 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class SafFileFinder22 {
+public class SafFileFinder22<T extends IFile>{
 
     static final String SP_NAME = "DirPermission";
 
@@ -90,14 +91,14 @@ public class SafFileFinder22 {
             //有数据,那么接下来就只用一个线程去跑
             safStart = System.currentTimeMillis();
             IDocumentFile documentFile = new IDocumentFile(SafUtil.sdRoot);
-            getAlbums(documentFile, latScanFinishedTime !=0 ? executorService : Executors.newFixedThreadPool(8), observer);
+            new SafFileFinder22<IDocumentFile>().getAlbums(documentFile, latScanFinishedTime !=0 ? executorService : Executors.newFixedThreadPool(8), observer);
         } else {
             sp.edit().putBoolean("isScaning", true).commit();
             //没有数据,就用5个线程去跑
             safStart = System.currentTimeMillis();
 
             IDocumentFile documentFile = new IDocumentFile(SafUtil.sdRoot);
-            getAlbums(documentFile, Executors.newFixedThreadPool(8), observer);
+            new SafFileFinder22<IDocumentFile>().getAlbums(documentFile, Executors.newFixedThreadPool(8), observer);
         }
     }
 
@@ -115,12 +116,12 @@ public class SafFileFinder22 {
      * @param dir
      * @param observer
      */
-    private static <T extends IFile<T>> void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
+       void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
         Log.w(SafUtil.TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getName());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                T[] files = dir.listFiles();
+                IFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
                     DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
                     int count0 = countGetSaf.decrementAndGet();
@@ -135,7 +136,7 @@ public class SafFileFinder22 {
                     //根目录. 随机逆序
                     boolean random = new Random().nextBoolean();
                     if (random) {
-                        List<T> list = new ArrayList<>(Arrays.asList(files));
+                        List<T> list = new ArrayList<T>((Collection<? extends T>) Arrays.asList(files));
                         Collections.reverse(list);
                         for (int i = 0; i < list.size(); i++) {
                             files[i] = list.get(i);
@@ -164,7 +165,7 @@ public class SafFileFinder22 {
                 List<BaseMediaInfo> videos = null;
                 List<BaseMediaInfo> audios = null;
 
-                for (T file : files) {
+                for (IFile file : files) {
                     if (file.isDirectory()) {
                         //todo 6500个文件夹. 最后将其归并显示
                         if ("MicroMsg".equals(file.getName())) {
@@ -176,7 +177,7 @@ public class SafFileFinder22 {
                         }
                         //Log.d("监听","进入文件夹遍历:"+dir.getAbsolutePath());
                         //todo 单线程时为深度优先.  那么前后两次要反着来
-                        getAlbums(file, executorService, observer);
+                        getAlbums((T) file, executorService, observer);
                     } else {
                         String name = file.getName();
                         if(TextUtils.isEmpty(name)){
