@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -63,7 +65,8 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         dismissPageWhenFinishPlay = getIntent().getBooleanExtra(TAG_DISMISSPAGEWHENFINISHPLAY,false);
         position = getIntent().getIntExtra(POSITION,0);
         isViewList = getIntent().getBooleanExtra(IS_VIEW_LIST,false);
-
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_detail_player);
         detailPlayer = (LocalVideoPlayer) findViewById(R.id.detail_player);
         detailPlayer.setActivity(this);
@@ -76,16 +79,20 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
 //外部辅助的旋转，帮助全屏
         orientationUtils = new OrientationUtils(this, detailPlayer);
 //初始化不打开外部的旋转
-        orientationUtils.setEnable(false);
+        orientationUtils.setEnable(true);
 
         try {
             //detailPlayer.getGSYVideoManager().start();
             //detailPlayer.getStartButton().setVisibility(View.GONE);
             detailPlayer.setDismissControlTime(2500);
             detailPlayer.startPlayLogic();
+            //detailPlayer.setFullHideStatusBar(false);
         } catch (Throwable e) {
             e.printStackTrace();
         }
+
+
+
 
     }
 
@@ -93,12 +100,7 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-           /* hideSystemUI();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.TRANSPARENT);//将状态栏设置成透明色
-                getWindow().setNavigationBarColor(Color.TRANSPARENT);//将导航栏设置为透明色
-            }*/
-            //detailPlayer.startWindowFullscreen(this,false,false);
+           // hideSystemUI();
         }
     }
 
@@ -115,8 +117,10 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         // Hide the nav bar and status bar
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
     }
 
     // Shows the system bars by removing all the flags
@@ -250,6 +254,7 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                         if (orientationUtils != null) {
                             orientationUtils.backToProtVideo();
                         }
+                        //hideSystemUI();
                     }
                 })
                 //.setThumbPlay(true)
@@ -265,10 +270,11 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
 
     private String getNameFromPath(String videoPath) {
         String name = position+"/"+videos.size()+", ";
+        videoPath = URLDecoder.decode(videoPath);
         if(videoPath.contains("/")){
             name = name+ videoPath.substring(videoPath.lastIndexOf("/")+1);
         }else {
-            name = videoPath;
+            name = name+videoPath;
         }
         name = URLDecoder.decode(name);
         return name;
