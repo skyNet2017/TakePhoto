@@ -89,7 +89,7 @@ public class DbUtil {
         doSort(builder);
         List<BaseMediaFolderInfo> infos = builder.list();
         //移除掉不存在的文件夹:
-        if(infos != null && infos.size() > 0){
+        /*if(infos != null && infos.size() > 0){
             List<BaseMediaFolderInfo> toDelete = new ArrayList<>();
             Iterator<BaseMediaFolderInfo> iterator = infos.iterator();
             while (iterator.hasNext()){
@@ -105,7 +105,7 @@ public class DbUtil {
                 }else if(info.pathOrUri.startsWith("content:")){
                     try {
                         SafUtil.context.getContentResolver().openFileDescriptor(Uri.parse(info.pathOrUri),"r");
-                    } catch (FileNotFoundException e) {
+                    } catch (Throwable e) {
                         toDelete.add(info);
                         iterator.remove();
                         e.printStackTrace();
@@ -116,7 +116,7 @@ public class DbUtil {
                 getDaoSession().getBaseMediaFolderInfoDao().deleteInTx(toDelete);
                 Log.w(SafUtil.TAG, " getAllImageAndVideoFolders deleteInTx:" + toDelete.size());
             }
-        }
+        }*/
         Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
         return infos;
     }

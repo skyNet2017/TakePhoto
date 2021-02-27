@@ -499,7 +499,7 @@ public class SafFileFinder {
         return guessTypeByName(name) == BaseMediaInfo.TYPE_AUDIO;
     }
 
-    private static String getTypeForName(String name) {
+    public static String getTypeForName(String name) {
         final int lastDot = name.lastIndexOf('.');
         if (lastDot >= 0) {
             final String extension = name.substring(lastDot + 1).toLowerCase();

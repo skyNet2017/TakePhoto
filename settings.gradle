@@ -1,3 +1,4 @@
+include ':javafs'
 include ':localvideoplayer'
 include ':metadata'
 include ':myMediaStore'

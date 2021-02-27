@@ -92,7 +92,7 @@ public class ImageSelectActivity extends HelperActivity {
     boolean isInSelectingMode;
     Menu menu;
     List<File> selected;
-    private List<BaseMediaInfo> images = new ArrayList<>();
+    public static List<BaseMediaInfo> images = new ArrayList<>();
     private String album;
     private TextView errorDisplay;
     private ProgressBar progressBar;

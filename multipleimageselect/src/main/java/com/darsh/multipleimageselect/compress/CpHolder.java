@@ -18,11 +18,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.darsh.multipleimageselect.R;
+import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.gson.Gson;
 import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.fileapi.IFile;
+import com.hss01248.media.mymediastore.smb.FileApiForSmb;
+import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 
@@ -140,12 +144,90 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
             rlCompressed.setVisibility(View.GONE);
         }
         rlCompressed.setVisibility(View.GONE);
-        showImage(originalPath,context);
+
+
+        //showImage(originalPath,context);
+
+        showImage2(s,context,i);
+
         showInfo(originalPath);
 
 
 
 
+    }
+
+    private void showImage2(String s, Activity context,int idx) {
+
+        if(s.contains(".gif")){
+            gif.setVisibility(View.VISIBLE);
+            ivOriginalSaf.setVisibility(View.GONE);
+            //gif.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            if(s.startsWith("/storage/")){
+                gif.setImageURI(Uri.fromFile(new File(s)));
+            }else {
+                gif.setImageURI(Uri.parse(s));
+            }
+
+            //下载,然后播放
+
+        }else {
+            gif.setVisibility(View.GONE);
+            ivOriginalSaf.setVisibility(View.VISIBLE);
+            ivCompressedSaf.setVisibility(View.VISIBLE);
+            Uri uri = Uri.parse(s);
+            if(!isPreview){
+                rlCompressed.setVisibility(View.VISIBLE);
+                //tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
+            }else {
+                rlCompressed.setVisibility(View.GONE);
+                // tvOriginal.setText(ImageInfoFormater.formatImagInfo(originalPath,true));
+            }
+
+
+
+            //tvOriginal.setText(s);
+            Observable.just(uri)
+                    .subscribeOn(Schedulers.io())
+                    .map(new Function<Uri, InputStreamBitmapDecoderFactory>() {
+                        @Override
+                        public InputStreamBitmapDecoderFactory apply(Uri uri) throws Exception {
+                            IFile iFile = ImageSelectActivity.images.get(idx).getFile();
+                            // return new InputStreamBitmapDecoderFactory(
+                            //        new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor()));
+                            return new InputStreamBitmapDecoderFactory(iFile.getInputStream());
+                        }
+                    }).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<InputStreamBitmapDecoderFactory>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(InputStreamBitmapDecoderFactory inputStreamBitmapDecoderFactory) {
+                            ivOriginalSaf.setImage(inputStreamBitmapDecoderFactory);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            e.printStackTrace();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+            try {
+                //ivOriginalSaf.setImage());
+                   /* ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(
+                            context.getContentResolver().openInputStream(uri)));*/
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void showImage(String s, Context context) {
@@ -228,9 +310,9 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                     PhotoCompressHelper.setPathToPreview(ivOriginalSaf,s);
                 }
 
-
             }else {
-                rlOriginal.setVisibility(View.GONE);
+               // rlOriginal.setVisibility(View.GONE);
+                //FileApiForSmb smb =
             }
         }
     }

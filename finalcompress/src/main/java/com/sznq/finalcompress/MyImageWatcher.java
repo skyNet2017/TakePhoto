@@ -156,7 +156,7 @@ public class MyImageWatcher {
 
     private static void runTask(int time) {
         if(fileInfoQueue.isEmpty()){
-            Log.w("监听",Thread.currentThread().getName()+" thread ,没有要压缩的任务 ");
+            //Log.w("监听",Thread.currentThread().getName()+" thread ,没有要压缩的任务 ");
             return;
         }
         // 从队列头部取值,看是否有超过4s的任务,有的话,切割,将超过4s的任务全部执行掉:

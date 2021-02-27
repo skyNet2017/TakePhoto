@@ -42,13 +42,17 @@ dependencies {
     api "io.reactivex.rxjava2:rxandroid:2.1.0"
 
     api 'org.greenrobot:greendao:3.3.0' // add library
+
+    implementation group: 'com.hierynomus', name: 'smbj', version: '0.10.0'//局域网smb协议读写
+    implementation 'me.jahnen:libaums:0.8.0'//usb读写
+    implementation project(':javafs')//usb-ntfs读取支持
 }
 
 
 apply plugin: 'org.greenrobot.greendao'
 
 greendao {
-    schemaVersion 2  //我们的数据库的版本号  当数据库升级的时候可以在这里改版本
+    schemaVersion 3  //我们的数据库的版本号  当数据库升级的时候可以在这里改版本
     daoPackage 'com.hss01248.media.mymediastore.db'  //自动生成的DaoMaster、DaoSession、Dao的包名  根据自己想放的位置改变即可
     targetGenDir 'src/main/java'  //自动生成的DaoMaster、DaoSession、Dao的路径
 }

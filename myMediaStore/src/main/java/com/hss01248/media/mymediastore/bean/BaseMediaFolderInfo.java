@@ -50,59 +50,10 @@ public class BaseMediaFolderInfo {
     @Id
     public String pathAndType;
 
+    public String path;
+
     public void generateTheId(){
         pathAndType = type+"-"+pathOrUri;
-    }
-
-
-    public int count;
-    public long fileSize;
-    public int hidden;//1: true 0 :false
-    public long updatedTime;
-
-    /**
-     * 总时长
-     */
-    public long duration;
-
-    /**
-     * 排序的序号.用于置顶功能
-     */
-    public int order;
-
-    public int type;
-
-    @Generated(hash = 1515707365)
-    public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
-            String pathAndType, int count, long fileSize, int hidden,
-            long updatedTime, long duration, int order, int type) {
-        this.name = name;
-        this.cover = cover;
-        this.pathOrUri = pathOrUri;
-        this.pathAndType = pathAndType;
-        this.count = count;
-        this.fileSize = fileSize;
-        this.hidden = hidden;
-        this.updatedTime = updatedTime;
-        this.duration = duration;
-        this.order = order;
-        this.type = type;
-    }
-
-    @Generated(hash = 1055136609)
-    public BaseMediaFolderInfo() {
-    }
-
-    public boolean isImage(){
-        return type == TYPE_IMAGE;
-    }
-
-    public boolean isVideo(){
-        return type == TYPE_VIDEO;
-    }
-
-    public boolean isAudio(){
-        return type == TYPE_AUDIO;
     }
 
     public String getName() {
@@ -127,6 +78,22 @@ public class BaseMediaFolderInfo {
 
     public void setPathOrUri(String pathOrUri) {
         this.pathOrUri = pathOrUri;
+    }
+
+    public String getPathAndType() {
+        return this.pathAndType;
+    }
+
+    public void setPathAndType(String pathAndType) {
+        this.pathAndType = pathAndType;
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public int getCount() {
@@ -161,6 +128,14 @@ public class BaseMediaFolderInfo {
         this.updatedTime = updatedTime;
     }
 
+    public long getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
     public int getOrder() {
         return this.order;
     }
@@ -177,21 +152,47 @@ public class BaseMediaFolderInfo {
         this.type = type;
     }
 
-    public String getPathAndType() {
-        return this.pathAndType;
-    }
 
-    public void setPathAndType(String pathAndType) {
+    public int count;
+    public long fileSize;
+    public int hidden;//1: true 0 :false
+    public long updatedTime;
+
+    /**
+     * 总时长
+     */
+    public long duration;
+
+    /**
+     * 排序的序号.用于置顶功能
+     */
+    public int order;
+
+    public int type;
+
+    @Generated(hash = 1287292362)
+    public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
+            String pathAndType, String path, int count, long fileSize, int hidden,
+            long updatedTime, long duration, int order, int type) {
+        this.name = name;
+        this.cover = cover;
+        this.pathOrUri = pathOrUri;
         this.pathAndType = pathAndType;
-    }
-
-    public long getDuration() {
-        return this.duration;
-    }
-
-    public void setDuration(long duration) {
+        this.path = path;
+        this.count = count;
+        this.fileSize = fileSize;
+        this.hidden = hidden;
+        this.updatedTime = updatedTime;
         this.duration = duration;
+        this.order = order;
+        this.type = type;
     }
+
+    @Generated(hash = 1055136609)
+    public BaseMediaFolderInfo() {
+    }
+
+
 
 
 }

@@ -27,6 +27,13 @@
         android:layout_height="50dp"
         android:layout_centerHorizontal="true"
         android:text="@string/t_star" />
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:onClick="smbj"
+        android:layout_below="@id/btn_star"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:text="局域网" />
     <TextView
         android:layout_below="@id/btn_selected"
         android:layout_width="match_parent"

@@ -1,31 +1,44 @@
-package com.sznq.finalcompress;
+package com.hss01248.media.mymediastore.smb;
 
+import android.os.Environment;
 import android.util.Log;
 
 import com.hierynomus.msdtyp.AccessMask;
+import com.hierynomus.msdtyp.SecurityDescriptor;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.common.SmbPath;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
+import com.hss01248.media.mymediastore.SafFileFinder22;
+import com.hss01248.media.mymediastore.SafUtil;
+import com.hss01248.media.mymediastore.ScanFolderCallback;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.hss01248.media.mymediastore.fileapi.IFile;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class SmbjUtil {
 
-    private static final String SHARE_SRC_DIR = "/";
+    private static final String SHARE_SRC_DIR = "D";
+    static Map<String,DiskShare> map = new HashMap<>();
 
+    public static DiskShare share;
 
     public static void connect(){
         // 设置超时时间(可选)
@@ -46,19 +59,64 @@ public class SmbjUtil {
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), ip);
             Session session = connection.authenticate(ac);
 
+
+            /*after digging a bit deeper i found a solution, but in my opinion there is an inconsistant behavior.
+by calling share.getSecurityInfo("",...) for Root folder i'm getting an Error.
+If i open the directory and call getSecurityInfo it works fine. The difference between those two calls is open(,...) and openDirectory(,...)*/
             // 连接共享文件夹
-            DiskShare share = (DiskShare) session.connectShare("D");
+             share = (DiskShare) session.connectShare(SHARE_SRC_DIR);
+            map.put(ip+"/"+SHARE_SRC_DIR,share);
+            Log.w("smb", "request path:"+share.toString());
+           // share.openDirectory("..",)
+// https://github.com/hierynomus/smbj/issues/344   连接根目录的解决方案  https://github.com/rapid7/smbj-rpc
+
             List<FileIdBothDirectoryInformation> list = share.list("");
-            Log.w("files", "files in smb: num "+list.size()+","+Arrays.toString(list.toArray()));
+            Log.w("smb", "files in smb: num "+list.size()+","+Arrays.toString(list.toArray()));
 
             String folder = SHARE_SRC_DIR ;
-            String dstRoot = "要保存的本地文件夹路径";	// 如: D:/smd2/
+            String dstRoot = new java.io.File(Environment.getExternalStorageDirectory(),"smbdownloa").getAbsolutePath();	// 如: D:/smd2/
 
-            /*for (FileIdBothDirectoryInformation f : share.list(SHARE_DST_DIR, "*.mp4")) {
+            for (FileIdBothDirectoryInformation f : list) {
+                //, "*.mp4"
                 String filePath = folder + f.getFileName();
                 String dstPath = dstRoot + f.getFileName();
+                FileApiForSmb api = new FileApiForSmb(f);
+                api.setShare(share,"");
+                api.setContext(ip,SHARE_SRC_DIR);
+                api.printInfo();
+                SafFileFinder22.start(api, new ScanFolderCallback() {
+                    @Override
+                    public void onComplete() {
 
-                FileOutputStream fos = new FileOutputStream(dstPath);
+                    }
+
+                    @Override
+                    public void onFromDB(List<BaseMediaFolderInfo> folderInfos) {
+
+                    }
+
+                    @Override
+                    public void onScanEachFolder(List<BaseMediaFolderInfo> folderInfos) {
+
+                    }
+
+                    @Override
+                    public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
+
+                    }
+                });
+
+               /* if(api.isDirectory() ){//&& "360Downloads".equals(api.getName())
+                    IFile[] files = api.listFiles();
+                    if(files != null){
+                        for (IFile file : files) {
+                            file.printInfo();
+                        }
+                    }
+                }*/
+
+
+                /*FileOutputStream fos = new FileOutputStream(dstPath);
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
 
                 if (share.fileExists(filePath)) {
@@ -79,13 +137,13 @@ public class SmbjUtil {
                     System.out.println("==========================");
                 } else {
                     System.out.println("文件不存在");
-                }
-            }*/
+                }*/
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (client != null) {
-                client.close();
+                //client.close();
             }
         }
     }

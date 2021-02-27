@@ -10,10 +10,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import androidx.documentfile.provider.DocumentFile;
-
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
+import com.hss01248.media.mymediastore.fileapi.IFile;
+import com.hss01248.media.mymediastore.smb.FileApiForSmb;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class SafFileFinder22<T extends IFile>{
 
     static final String SP_NAME = "DirPermission";
 
-    public static void listAllAlbum(final ScanFolderCallback observer, boolean onlyDb) {
+    private static void listAllAlbum(final ScanFolderCallback observer, boolean onlyDb) {
         listFromDb(observer,onlyDb);
     }
 
@@ -89,22 +90,26 @@ public class SafFileFinder22<T extends IFile>{
             hasFinishedBefore = latScanFinishedTime !=0;
             sp.edit().putBoolean("isScaning", true).commit();
             //有数据,那么接下来就只用一个线程去跑
-            safStart = System.currentTimeMillis();
+            //safStart = System.currentTimeMillis();
             IDocumentFile documentFile = new IDocumentFile(SafUtil.sdRoot);
             new SafFileFinder22<IDocumentFile>().getAlbums(documentFile, latScanFinishedTime !=0 ? executorService : Executors.newFixedThreadPool(8), observer);
         } else {
             sp.edit().putBoolean("isScaning", true).commit();
             //没有数据,就用5个线程去跑
-            safStart = System.currentTimeMillis();
+            //safStart = System.currentTimeMillis();
 
             IDocumentFile documentFile = new IDocumentFile(SafUtil.sdRoot);
             new SafFileFinder22<IDocumentFile>().getAlbums(documentFile, Executors.newFixedThreadPool(8), observer);
         }
     }
 
-    static long safStart;
+    public static   void start(FileApiForSmb iFile,ScanFolderCallback observer){
+        new SafFileFinder22<FileApiForSmb>().getAlbums(iFile, Executors.newFixedThreadPool(2), observer);
+    }
 
-    static AtomicInteger countGetSaf = new AtomicInteger(0);
+     long safStart;
+
+     AtomicInteger countGetSaf = new AtomicInteger(0);
 
 
     /**
@@ -116,23 +121,31 @@ public class SafFileFinder22<T extends IFile>{
      * @param dir
      * @param observer
      */
-       void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
-        Log.w(SafUtil.TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getName());
+      public void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
+        Log.w(SafUtil.TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getPath()+", name:"+dir.getName());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+                //手机图片/20190206早上
+                boolean isTarget = false;
+                if("手机图片".equals(dir.getName()) || "20190206早上".equals(dir.getName())){
+                    isTarget = true;
+                }
+                if(!isTarget){
+                    return;
+                }
                 IFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
                     DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
                     int count0 = countGetSaf.decrementAndGet();
-                    Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
+                    Log.e(SafUtil.TAG, "当前文件夹为空,原子count计数:" + count0 + ", " + dir.getPath()+", name:"+dir.getName());
                     if (count0 == 0) {
                         onComplete(observer,true,safStart);
                     }
 
                     return;
                 }
-                if (countGetSaf.get() == 1) {
+                /*if (countGetSaf.get() == 1) {
                     //根目录. 随机逆序
                     boolean random = new Random().nextBoolean();
                     if (random) {
@@ -142,7 +155,7 @@ public class SafFileFinder22<T extends IFile>{
                             files[i] = list.get(i);
                         }
                     }
-                }
+                }*/
                 List<BaseMediaFolderInfo> folderInfos = new ArrayList<>();
 
                 BaseMediaFolderInfo imageFolder = null;
@@ -166,6 +179,7 @@ public class SafFileFinder22<T extends IFile>{
                 List<BaseMediaInfo> audios = null;
 
                 for (IFile file : files) {
+                    file.printInfo();
                     if (file.isDirectory()) {
                         //todo 6500个文件夹. 最后将其归并显示
                         if ("MicroMsg".equals(file.getName())) {
@@ -177,10 +191,11 @@ public class SafFileFinder22<T extends IFile>{
                         }
                         //Log.d("监听","进入文件夹遍历:"+dir.getAbsolutePath());
                         //todo 单线程时为深度优先.  那么前后两次要反着来
-                        getAlbums((T) file, executorService, observer);
+                        new SafFileFinder22<FileApiForSmb>().getAlbums((FileApiForSmb) file, executorService, observer);
                     } else {
                         String name = file.getName();
                         if(TextUtils.isEmpty(name)){
+                            Log.e("smb","file name is empty:"+file.getPath());
                             continue;
                         }
                         if(".nomedia".equals(name)){
@@ -188,9 +203,10 @@ public class SafFileFinder22<T extends IFile>{
                             continue;
                         }
                         if(file.length() <=0){
+                            Log.e("smb","file.length() <=0:"+file.getPath());
                             continue;
                         }
-                        int type = guessTypeByName(name);
+                        int type = guessTypeByName(file.getName());
 
                         if (type == BaseMediaInfo.TYPE_IMAGE) {
                             imageCount++;
@@ -202,8 +218,9 @@ public class SafFileFinder22<T extends IFile>{
                                 imageFolder.cover = file.getUri().toString();
                                 imageFolder.type = BaseMediaInfo.TYPE_IMAGE;
                                 imageFolder.updatedTime = file.lastModified();
+                                imageFolder.path = file.getPath();
                                 imageFolder.pathOrUri = dir.getUri().toString();
-                                Log.d("扫描", "添加有图文件夹:" + dir.getUri().toString());
+                                Log.w("扫描", "添加有图文件夹:" + dir.getUri().toString());
                             }
 
                             //内部文件uri的保存:
@@ -215,6 +232,7 @@ public class SafFileFinder22<T extends IFile>{
                             image.pathOrUri = file.getUri().toString();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
+                            image.path = file.getPath();
                             image.fileSize = file.length();
                             image.type = BaseMediaInfo.TYPE_IMAGE;
                             images.add(image);
@@ -237,7 +255,7 @@ public class SafFileFinder22<T extends IFile>{
                                 videoFolder.updatedTime = file.lastModified();
                                 videoFolder.type = BaseMediaInfo.TYPE_VIDEO;
                                 videoFolder.pathOrUri = dir.getUri().toString();
-                                Log.d("扫描", "添加有视频文件夹:" + dir.getUri().toString());
+                                Log.w("扫描", "添加有视频文件夹:" + dir.getUri().toString());
                             }
 
 
@@ -251,6 +269,7 @@ public class SafFileFinder22<T extends IFile>{
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
+                            image.path = file.getPath();
                             image.type = BaseMediaInfo.TYPE_VIDEO;
                             videos.add(image);
 
@@ -292,7 +311,7 @@ public class SafFileFinder22<T extends IFile>{
                                 audioFolder.updatedTime = file.lastModified();
                                 audioFolder.type = BaseMediaInfo.TYPE_AUDIO;
                                 audioFolder.pathOrUri = dir.getUri().toString();
-                                Log.d("扫描", "添加有音频文件夹:" + dir.getUri().toString());
+                                Log.w("扫描", "添加有音频文件夹:" + dir.getUri().toString());
                             }
 
                             //内部文件uri的保存:
@@ -305,6 +324,7 @@ public class SafFileFinder22<T extends IFile>{
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
+                            image.path = file.getPath();
                             image.type = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
 
@@ -379,11 +399,13 @@ public class SafFileFinder22<T extends IFile>{
                             }
                         }
                     }
+                }else {
+                    Log.e("dd0","no media exist in path:"+dir.getPath()+"/"+dir.getName());
                 }
                 writeDB(dir, folderInfos, images, videos, audios);
 
                 int count0 = countGetSaf.decrementAndGet();
-                Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getName());
+                Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getPath()+", name:"+dir.getName());
                 if (count0 == 0) {
                     onComplete(observer,true,safStart);
                 }
@@ -412,7 +434,7 @@ public class SafFileFinder22<T extends IFile>{
             DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(audios);
         }
         if (folderInfos.size() > 0) {
-            Log.v(SafUtil.TAG, URLDecoder.decode(dir.getUri().toString()) + "  路径下更新数据库完成!!!!!!!!!!!!!!! 耗时(ms):" + (System.currentTimeMillis() - start));
+            Log.w(SafUtil.TAG, URLDecoder.decode(dir.getUri().toString()) + "  路径下更新数据库完成!!!!!!!!!!!!!!! 耗时(ms):" + (System.currentTimeMillis() - start));
         }
 
         //todo 已经删除的文件,怎么删除数据库里的条目?
@@ -422,7 +444,7 @@ public class SafFileFinder22<T extends IFile>{
 
      static void print(List<BaseMediaFolderInfo> folderInfos, boolean isSaf) {
         for (BaseMediaFolderInfo folderInfo : folderInfos) {
-            Log.v(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.type + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
+            Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.type + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
         }
     }
 

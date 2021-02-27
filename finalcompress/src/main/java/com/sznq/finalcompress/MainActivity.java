@@ -8,16 +8,13 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ShareCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 
@@ -25,10 +22,9 @@ import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
-import com.darsh.multipleimageselect.models.Album;
 import com.darsh.multipleimageselect.saf.SafUtil;
-import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.gc.materialdesign.views.ButtonRectangle;
+import com.hss01248.media.mymediastore.smb.SmbjUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -114,12 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //smb();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //SmbjUtil.connect();
-            }
-        }).start();
+
 
 
     }
@@ -260,4 +251,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void smbj(View view) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SmbjUtil.connect();
+            }
+        }).start();
+    }
 }

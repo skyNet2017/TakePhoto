@@ -31,7 +31,8 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         public final static Property UpdatedTime = new Property(4, long.class, "updatedTime", false, "UPDATED_TIME");
         public final static Property MaxSide = new Property(5, int.class, "maxSide", false, "MAX_SIDE");
         public final static Property Duration = new Property(6, int.class, "duration", false, "DURATION");
-        public final static Property Type = new Property(7, int.class, "type", false, "TYPE");
+        public final static Property Path = new Property(7, String.class, "path", false, "PATH");
+        public final static Property Type = new Property(8, int.class, "type", false, "TYPE");
     }
 
 
@@ -54,7 +55,8 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
                 "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 4: updatedTime
                 "\"MAX_SIDE\" INTEGER NOT NULL ," + // 5: maxSide
                 "\"DURATION\" INTEGER NOT NULL ," + // 6: duration
-                "\"TYPE\" INTEGER NOT NULL );"); // 7: type
+                "\"PATH\" TEXT," + // 7: path
+                "\"TYPE\" INTEGER NOT NULL );"); // 8: type
     }
 
     /** Drops the underlying database table. */
@@ -85,7 +87,12 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         stmt.bindLong(5, entity.getUpdatedTime());
         stmt.bindLong(6, entity.getMaxSide());
         stmt.bindLong(7, entity.getDuration());
-        stmt.bindLong(8, entity.getType());
+ 
+        String path = entity.getPath();
+        if (path != null) {
+            stmt.bindString(8, path);
+        }
+        stmt.bindLong(9, entity.getType());
     }
 
     @Override
@@ -110,7 +117,12 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         stmt.bindLong(5, entity.getUpdatedTime());
         stmt.bindLong(6, entity.getMaxSide());
         stmt.bindLong(7, entity.getDuration());
-        stmt.bindLong(8, entity.getType());
+ 
+        String path = entity.getPath();
+        if (path != null) {
+            stmt.bindString(8, path);
+        }
+        stmt.bindLong(9, entity.getType());
     }
 
     @Override
@@ -128,7 +140,8 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
             cursor.getLong(offset + 4), // updatedTime
             cursor.getInt(offset + 5), // maxSide
             cursor.getInt(offset + 6), // duration
-            cursor.getInt(offset + 7) // type
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // path
+            cursor.getInt(offset + 8) // type
         );
         return entity;
     }
@@ -142,7 +155,8 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         entity.setUpdatedTime(cursor.getLong(offset + 4));
         entity.setMaxSide(cursor.getInt(offset + 5));
         entity.setDuration(cursor.getInt(offset + 6));
-        entity.setType(cursor.getInt(offset + 7));
+        entity.setPath(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setType(cursor.getInt(offset + 8));
      }
     
     @Override
