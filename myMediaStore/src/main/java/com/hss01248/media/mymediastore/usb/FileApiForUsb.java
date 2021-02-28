@@ -5,6 +5,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 
 import com.github.mjdev.libaums.fs.UsbFile;
+import com.github.mjdev.libaums.fs.UsbFileInputStream;
+import com.github.mjdev.libaums.fs.UsbFileOutputStream;
 import com.hss01248.media.mymediastore.fileapi.BaseFileApi;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 
@@ -117,12 +119,12 @@ public class FileApiForUsb extends BaseFileApi<UsbFile> {
 
     @Override
     public InputStream getInputStream() {
-        return null;
+        return new UsbFileInputStream(file);
     }
 
     @Override
     public OutputStream getOutPutStream() {
-        return null;
+        return new UsbFileOutputStream(file);
     }
 
     @Override

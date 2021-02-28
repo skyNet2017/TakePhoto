@@ -10,10 +10,13 @@ import android.hardware.usb.UsbManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.github.magnusja.libaums.javafs.JavaFsFileSystemCreator;
 import com.github.mjdev.libaums.UsbMassStorageDevice;
 import com.github.mjdev.libaums.fs.FileSystem;
+import com.github.mjdev.libaums.fs.FileSystemFactory;
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.github.mjdev.libaums.partition.Partition;
+import com.github.mjdev.libaums.usb.UsbCommunicationFactory;
 
 /**
  * https://www.codenong.com/cs70146041/
@@ -26,6 +29,14 @@ public class UsbUtil {
 
     private  static BroadcastReceiver mUsbReceiver;
     static Context context;
+
+    static {
+
+        FileSystemFactory.registerFileSystem(new JavaFsFileSystemCreator());
+       // UsbCommunicationFactory.registerCommunication(new LibusbCommunicationCreator());
+        //    underlyingUsbCommunication = UsbCommunicationFactory.UnderlyingUsbCommunication.OTHER
+
+    }
     public static void regist(Context context){
         UsbUtil.context = context.getApplicationContext();
         if(mUsbReceiver == null){
