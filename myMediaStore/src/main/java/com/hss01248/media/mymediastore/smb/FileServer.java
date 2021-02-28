@@ -162,6 +162,7 @@ public class FileServer extends Thread implements HTTPRequestListener {
                 httpRes.setStatusCode(HTTPStatus.OK);
                 httpRes.setContentLength(contentLen);
                 httpRes.setContentInputStream(contentIn);
+                httpRes.setContentRange(0,contentLen,contentLen);
 
                 httpReq.post(httpRes);
 
