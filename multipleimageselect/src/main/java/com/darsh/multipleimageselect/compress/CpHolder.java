@@ -48,6 +48,8 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import pl.droidsonroids.gif.GifImageView;
 
+import static com.hss01248.media.mymediastore.smb.SmbjUtil.getShare;
+
 
 /**
  * Created by hss on 2018/12/16.
@@ -148,10 +150,15 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
         //showImage(originalPath,context);
 
-        showImage2(s,context,i);
+       /* if(getShare() != null){
+            showImage2(s,context,i);
+        }else {
+            showImage(originalPath,context);
+        }*/
 
+        //showImage(originalPath,context);
         showInfo(originalPath);
-
+        showImage2(s,context,i);
 
 
 

@@ -16,6 +16,7 @@ import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.fileapi.JavaFile;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 
 import org.greenrobot.greendao.annotation.Entity;
@@ -47,30 +48,7 @@ public class BaseMediaInfo {
 
     public void genFile(){
         if(pathOrUri.startsWith("smb://")){
-            Uri uri = Uri.parse(pathOrUri);
-            String path = uri.getPath();
-            path = path.substring(path.indexOf("/")+1);
-            String  root = path.substring(0,path.indexOf("/"));
-            String parentPath = path.substring(root.length(),path.lastIndexOf("/"));
-            String key = uri.getHost()+"/"+path;
-            String fileName = uri.getPath().substring(uri.getPath().lastIndexOf("/")+1);
-
-            Log.w("smb","parentPath:"+parentPath+", path:"+path+",this.path:"+this.path);
-            if( SmbjUtil.share.fileExists(this.path)){
-                File smbFile =  SmbjUtil.share.openFile(this.path, EnumSet.of(AccessMask.GENERIC_READ),
-                        null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
-                FileAllInformation information = SmbjUtil.share.getFileInformation(smbFile.getFileId());
-
-                FileIdBothDirectoryInformation information1 = InformationTrans.trans(information,fileName);
-                //information1.getFileName()
-                Log.w("smb","FileAllInformation getFileName:"+information.getNameInformation());
-
-                FileApiForSmb  file = new FileApiForSmb(information1);
-                file.setContext(uri.getHost(),root);
-                file.setShare(SmbjUtil.share,parentPath);
-                file.printInfo();
-                this.file = file;
-            }
+            this.file = SmbToHttp.getFile(pathOrUri);
         }else if(pathOrUri.startsWith("content://")){
             file = new IDocumentFile(SafUtil.findFile(SafUtil.sdRoot,pathOrUri));
         }else if(pathOrUri.startsWith("/storage/")){

@@ -27,6 +27,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;

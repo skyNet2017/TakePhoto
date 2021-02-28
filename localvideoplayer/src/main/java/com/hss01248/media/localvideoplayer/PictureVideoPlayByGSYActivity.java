@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 import com.shuyu.gsyvideoplayer.GSYBaseActivityDetail;
 import com.shuyu.gsyvideoplayer.builder.GSYVideoOptionBuilder;
 import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
@@ -166,11 +167,8 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
     }
 
     private void playVideo(String url ,int position) {
-        String uri = url;
-        if(url.startsWith("/storage/")){
-            uri = "file://"+uri;
-        }
-        Log.w("click","on playVideo:"+uri);
+        String uri = parseUrl(url);
+
         // 播放一个视频结束后，直接调用此方法，切换到下一个
         // ?（问题：全屏播放的时候，播放结束了，自动回来调用在这个方法想播放下一个，只有声音，但画面没改变，黑的）
         //detailPlayer.release();
@@ -180,6 +178,19 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
                 .build(detailPlayer.getCurrentPlayer());
         //getGSYVideoOptionBuilder().build(detailPlayer);
         detailPlayer.getCurrentPlayer().startPlayLogic();
+    }
+
+    private String parseUrl(String url) {
+        String uri = url;
+        if(url.startsWith("/storage/")){
+            uri = "file://"+uri;
+        }else if(url.startsWith("content")){
+            uri = url;
+        }else if(url.startsWith("smb://")){
+            uri = SmbToHttp.getHttpUrlFromSmb(url);
+        }
+        Log.w("parseUrl","on playVideo:"+uri);
+        return uri;
     }
 
 
@@ -193,11 +204,7 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         //内置封面可参考SampleCoverVideo
        // ImageView imageView = new ImageView(this);
         //loadCover(imageView, url);
-        String uri = videoPath;
-        if(videoPath.startsWith("/storage/")){
-            uri = "file://"+uri;
-        }
-        Log.w("click","uri:"+uri);
+        String uri = parseUrl(videoPath);
         return new GSYVideoOptionBuilder()
                 //.setThumbImageView(imageView)
                 //.setUrl(url)

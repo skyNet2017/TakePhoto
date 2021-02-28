@@ -38,6 +38,10 @@ public class SmbjUtil {
     private static final String SHARE_SRC_DIR = "D";
     static Map<String,DiskShare> map = new HashMap<>();
 
+    public static DiskShare getShare() {
+        return share;
+    }
+
     public static DiskShare share;
 
     public static void connect(){
@@ -67,6 +71,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
              share = (DiskShare) session.connectShare(SHARE_SRC_DIR);
             map.put(ip+"/"+SHARE_SRC_DIR,share);
             Log.w("smb", "request path:"+share.toString());
+            SmbToHttp.startServer();
            // share.openDirectory("..",)
 // https://github.com/hierynomus/smbj/issues/344   连接根目录的解决方案  https://github.com/rapid7/smbj-rpc
 
@@ -76,7 +81,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
             String folder = SHARE_SRC_DIR ;
             String dstRoot = new java.io.File(Environment.getExternalStorageDirectory(),"smbdownloa").getAbsolutePath();	// 如: D:/smd2/
 
-            for (FileIdBothDirectoryInformation f : list) {
+            /*for (FileIdBothDirectoryInformation f : list) {
                 //, "*.mp4"
                 String filePath = folder + f.getFileName();
                 String dstPath = dstRoot + f.getFileName();
@@ -106,39 +111,8 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                     }
                 });
 
-               /* if(api.isDirectory() ){//&& "360Downloads".equals(api.getName())
-                    IFile[] files = api.listFiles();
-                    if(files != null){
-                        for (IFile file : files) {
-                            file.printInfo();
-                        }
-                    }
-                }*/
 
-
-                /*FileOutputStream fos = new FileOutputStream(dstPath);
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-                if (share.fileExists(filePath)) {
-                    System.out.println("正在下载文件:" + f.getFileName());
-
-                    File smbFileRead = share.openFile(filePath, EnumSet.of(AccessMask.GENERIC_READ), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
-                    InputStream in = smbFileRead.getInputStream();
-                    byte[] buffer = new byte[4096];
-                    int len = 0;
-                    while ((len = in.read(buffer, 0, buffer.length)) != -1) {
-                        bos.write(buffer, 0, len);
-                    }
-
-                    bos.flush();
-                    bos.close();
-
-                    System.out.println("文件下载成功");
-                    System.out.println("==========================");
-                } else {
-                    System.out.println("文件不存在");
-                }*/
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

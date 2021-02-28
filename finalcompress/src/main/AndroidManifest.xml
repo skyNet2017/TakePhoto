@@ -22,6 +22,7 @@ com.orhanobut.logger,es.dmoral.toasty,pl.droidsonroids.gif,pl.droidsonroids.reli
         android:roundIcon="@mipmap/icon_app"
         android:supportsRtl="true"
         android:name=".BaseApp"
+        android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">

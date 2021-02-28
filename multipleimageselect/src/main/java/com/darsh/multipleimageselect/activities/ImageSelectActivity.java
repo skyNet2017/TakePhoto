@@ -295,6 +295,7 @@ public class ImageSelectActivity extends HelperActivity {
         String[] desc = new String[2];
         desc[0] = "开启图片选择模式"  ;
         desc[1] ="删除此文件";
+        desc[2] ="点赞+1";
 
         floatMenu.items(desc);
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {

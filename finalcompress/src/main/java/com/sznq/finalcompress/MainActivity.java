@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //smb();
+        smbj(null);
 
 
 

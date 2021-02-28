@@ -15,10 +15,12 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
+import com.darsh.multipleimageselect.helpers.LoggingListener;
 import com.darsh.multipleimageselect.models.Image;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,11 +91,14 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         }else if(image.pathOrUri.startsWith("/storage/")){
             uri = Uri.fromFile(new File(image.pathOrUri));
         }else {
-            uri = Uri.parse(image.pathOrUri);
+            String url = SmbToHttp.getHttpUrlFromSmb(image.pathOrUri);
+            uri = Uri.parse(url);
+
         }
         Glide.with(context)
                 .load(uri)
                 .thumbnail(0.2f)
+                .listener(new LoggingListener<>())
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
         //viewHolder.tvInfo.setText("");

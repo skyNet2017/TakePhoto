@@ -128,7 +128,7 @@ public class SafFileFinder22<T extends IFile>{
             public void run() {
                 //手机图片/20190206早上
                 boolean isTarget = false;
-                if("手机图片".equals(dir.getName()) || "20190206早上".equals(dir.getName())){
+                if(dir.getPath().contains("手机图片") || dir.getPath().contains("索尼微单缓存")){
                     isTarget = true;
                 }
                 if(!isTarget){
@@ -524,7 +524,7 @@ public class SafFileFinder22<T extends IFile>{
         return guessTypeByName(name) == BaseMediaInfo.TYPE_AUDIO;
     }
 
-    private static String getTypeForName(String name) {
+    public static String getTypeForName(String name) {
         final int lastDot = name.lastIndexOf('.');
         if (lastDot >= 0) {
             final String extension = name.substring(lastDot + 1).toLowerCase();
