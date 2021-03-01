@@ -52,6 +52,7 @@ public class BaseMediaFolderInfo {
 
     public String path;
 
+
     public void generateTheId(){
         pathAndType = type+"-"+pathOrUri;
     }

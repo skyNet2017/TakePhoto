@@ -26,7 +26,19 @@ public class FileApiForUsb extends BaseFileApi<UsbFile> {
 
     @Override
     public IFile[] listFiles() {
-        return new IFile[0];
+        if(isDirectory()){
+            try {
+                UsbFile[] usbFiles = file.listFiles();
+                IFile[] files = new IFile[usbFiles.length];
+                for (int i = 0; i < usbFiles.length; i++) {
+                    files[i] = new FileApiForUsb(usbFiles[i]);
+                }
+                return files;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     @Override
