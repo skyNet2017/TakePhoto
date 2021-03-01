@@ -2,18 +2,22 @@ package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.models.Album;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,8 +61,25 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
 
 
         viewHolder.textView.setText(desc);
+
+        String cover = arrayList.get(position).cover;
+        Uri uri = null;
+        if(cover.startsWith("content")){
+            uri = Uri.parse(cover);
+        }else if(cover.startsWith("/storage/")){
+            uri = Uri.fromFile(new File(cover));
+        }else if(cover.startsWith("smb")){
+            String url = SmbToHttp.getHttpUrlFromSmb(cover);
+            uri = Uri.parse(url);
+        }else {
+            uri = Uri.parse(cover);
+        }
+
+
         Glide.with(context)
-                .load(arrayList.get(position).cover)
+                .load(uri)
+                .thumbnail(0.2f)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
 
 

@@ -1,5 +1,6 @@
 package com.hss01248.media.mymediastore.smb;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -46,6 +47,9 @@ public class SmbjUtil {
 
     static boolean hasFinished;
 
+    public static String username;
+    public static String password;
+
     public static void connect(){
         // 设置超时时间(可选)
         SmbConfig config = SmbConfig.builder().withTimeout(120, TimeUnit.SECONDS)
@@ -55,8 +59,8 @@ public class SmbjUtil {
 
 
         String ip = "192.168.3.8";
-        String username = "Administrator";
-        String password = "614511qc";
+         username = "Administrator";
+         password = "614511qc";
         // 如果不设置超时时间	SMBClient client = new SMBClient();
         SMBClient client = new SMBClient(config);
 
@@ -77,11 +81,11 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
            // share.openDirectory("..",)
 // https://github.com/hierynomus/smbj/issues/344   连接根目录的解决方案  https://github.com/rapid7/smbj-rpc
 
-            if(hasFinished){
-                Log.w("smb", "已经扫描过,app进程挂掉前不再扫描");
+            /*if(SafUtil.context.getSharedPreferences("smb", Context.MODE_PRIVATE).getBoolean("hassmbfinished"+SHARE_SRC_DIR,false)){
+                Log.w("smb", SHARE_SRC_DIR+"已经扫描过,app进程挂掉前不再扫描");
                 return;
-            }
-            List<FileIdBothDirectoryInformation> list = share.list("");
+            }*/
+            /*List<FileIdBothDirectoryInformation> list = share.list("");
             Log.w("smb", "files in smb: num "+list.size()+","+Arrays.toString(list.toArray()));
 
             String folder = SHARE_SRC_DIR ;
@@ -98,7 +102,8 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                 SafFileFinder22.start(api, new ScanFolderCallback() {
                     @Override
                     public void onComplete() {
-                        hasFinished = true;
+                        *//*SafUtil.context.getSharedPreferences("smb", Context.MODE_PRIVATE)
+                                .edit().putBoolean("hassmbfinished"+SHARE_SRC_DIR,true).apply();*//*
                     }
 
                     @Override
@@ -118,7 +123,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                 });
 
 
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

@@ -1,6 +1,7 @@
 package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.LoggingListener;
@@ -27,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -90,14 +93,16 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
             uri = Uri.parse(image.pathOrUri);
         }else if(image.pathOrUri.startsWith("/storage/")){
             uri = Uri.fromFile(new File(image.pathOrUri));
-        }else {
+        }else if(image.pathOrUri.startsWith("smb")){
             String url = SmbToHttp.getHttpUrlFromSmb(image.pathOrUri);
             uri = Uri.parse(url);
-
+        }else {
+            uri = Uri.parse(image.pathOrUri);
         }
         Glide.with(context)
                 .load(uri)
                 .thumbnail(0.2f)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .listener(new LoggingListener<>())
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
@@ -113,6 +118,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                         if(viewHolder.image.type == 1){
                             viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
                         }else {
+                            boolean getInfoFail = false;
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
                                 if(viewHolder.image.pathOrUri.startsWith("content")){
@@ -120,14 +126,27 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                             context.getContentResolver()
                                                     .openFileDescriptor(
                                                             Uri.parse(viewHolder.image.pathOrUri),"r").getFileDescriptor());
-                                }else {
+                                }else if(viewHolder.image.pathOrUri.startsWith("/storage/")){
                                     retriever.setDataSource(viewHolder.image.pathOrUri);
+                                }else if(viewHolder.image.pathOrUri.startsWith("smb")){
+                                    retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
+                                   Bitmap bitmap = retriever.getFrameAtTime();
+                                   if(bitmap!=null){
+                                       parent.post(new Runnable() {
+                                           @Override
+                                           public void run() {
+                                               viewHolder.imageView.setImageBitmap(bitmap);
+                                           }
+                                       });
+                                   }
                                 }
 
                             }catch (Throwable throwable){
+                                getInfoFail = true;
                                 throwable.printStackTrace();
 
                             }
+
 
 
                             int duration = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;//视频的长度 s
@@ -153,7 +172,13 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                 }
                                 desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+"   "+formatTime(duration)+"\n"+path2;
                             }
-                            viewHolder.desc = desc;
+                            if(getInfoFail){
+                                viewHolder.desc = URLDecoder.decode(viewHolder.image.pathOrUri);
+                                viewHolder.desc = viewHolder.desc.substring(viewHolder.desc.lastIndexOf("/")+1);
+                            }else {
+                                viewHolder.desc = desc;
+                            }
+
                         }
 
                     }

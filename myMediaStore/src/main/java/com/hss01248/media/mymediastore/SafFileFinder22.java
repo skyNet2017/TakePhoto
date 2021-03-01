@@ -15,12 +15,14 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -282,7 +284,7 @@ public class SafFileFinder22<T extends IFile>{
                                                         .openFileDescriptor(
                                                                 Uri.parse(image.pathOrUri),"r").getFileDescriptor());
                                     }else {
-                                        retriever.setDataSource(image.pathOrUri);
+                                        retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
                                     }
 
                                 }catch (Throwable throwable){
@@ -337,7 +339,7 @@ public class SafFileFinder22<T extends IFile>{
                                                         .openFileDescriptor(
                                                                 Uri.parse(image.pathOrUri),"r").getFileDescriptor());
                                     }else {
-                                        retriever.setDataSource(image.pathOrUri);
+                                        retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
                                     }
 
                                 }catch (Throwable throwable){

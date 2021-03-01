@@ -1,5 +1,6 @@
 package com.darsh.multipleimageselect.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,6 +57,7 @@ import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.noober.menu.FloatMenu;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
@@ -238,8 +240,13 @@ public class ImageSelectActivity extends HelperActivity {
                         //点击去预览
                         CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
                     }else {
+                        if(files.get(position).startsWith("smb:")){
+                            playByOther(images.get(position).pathOrUri);
+                        }else {
+                            VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
+                        }
                         //viewVideo(images.get(position));
-                        VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
+
                     }
 
                 }
@@ -286,6 +293,23 @@ public class ImageSelectActivity extends HelperActivity {
 
         initMenu();
         loadImages();
+    }
+
+    private void playByOther(String pathOrUri) {
+        try {
+            Uri uri = Uri.parse(pathOrUri);
+            String host = uri.getHost();
+            String newHost = SmbjUtil.username+":"+SmbjUtil.password+"@"+host;
+            pathOrUri = pathOrUri.replace(host,newHost);
+            uri = Uri.parse(pathOrUri);
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setDataAndType(uri, "video/mp4");
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void showLongPressMenu(int position, View view) {
