@@ -44,6 +44,8 @@ public class SmbjUtil {
 
     public static DiskShare share;
 
+    static boolean hasFinished;
+
     public static void connect(){
         // 设置超时时间(可选)
         SmbConfig config = SmbConfig.builder().withTimeout(120, TimeUnit.SECONDS)
@@ -75,13 +77,17 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
            // share.openDirectory("..",)
 // https://github.com/hierynomus/smbj/issues/344   连接根目录的解决方案  https://github.com/rapid7/smbj-rpc
 
+            if(hasFinished){
+                Log.w("smb", "已经扫描过,app进程挂掉前不再扫描");
+                return;
+            }
             List<FileIdBothDirectoryInformation> list = share.list("");
             Log.w("smb", "files in smb: num "+list.size()+","+Arrays.toString(list.toArray()));
 
             String folder = SHARE_SRC_DIR ;
             String dstRoot = new java.io.File(Environment.getExternalStorageDirectory(),"smbdownloa").getAbsolutePath();	// 如: D:/smd2/
 
-            /*for (FileIdBothDirectoryInformation f : list) {
+            for (FileIdBothDirectoryInformation f : list) {
                 //, "*.mp4"
                 String filePath = folder + f.getFileName();
                 String dstPath = dstRoot + f.getFileName();
@@ -92,7 +98,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                 SafFileFinder22.start(api, new ScanFolderCallback() {
                     @Override
                     public void onComplete() {
-
+                        hasFinished = true;
                     }
 
                     @Override
@@ -112,7 +118,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                 });
 
 
-            }*/
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

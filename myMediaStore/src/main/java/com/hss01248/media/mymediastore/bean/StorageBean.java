@@ -3,6 +3,7 @@ package com.hss01248.media.mymediastore.bean;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class StorageBean {
@@ -24,6 +25,87 @@ public class StorageBean {
     public String safDir;
 
     public String usbName;
+
+    @Generated(hash = 2138551919)
+    public StorageBean(int id, int usable, int type, String diskId, String smbHost,
+            String smbRootDir, String safDir, String usbName) {
+        this.id = id;
+        this.usable = usable;
+        this.type = type;
+        this.diskId = diskId;
+        this.smbHost = smbHost;
+        this.smbRootDir = smbRootDir;
+        this.safDir = safDir;
+        this.usbName = usbName;
+    }
+
+    @Generated(hash = 806242961)
+    public StorageBean() {
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUsable() {
+        return this.usable;
+    }
+
+    public void setUsable(int usable) {
+        this.usable = usable;
+    }
+
+    public int getType() {
+        return this.type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getDiskId() {
+        return this.diskId;
+    }
+
+    public void setDiskId(String diskId) {
+        this.diskId = diskId;
+    }
+
+    public String getSmbHost() {
+        return this.smbHost;
+    }
+
+    public void setSmbHost(String smbHost) {
+        this.smbHost = smbHost;
+    }
+
+    public String getSmbRootDir() {
+        return this.smbRootDir;
+    }
+
+    public void setSmbRootDir(String smbRootDir) {
+        this.smbRootDir = smbRootDir;
+    }
+
+    public String getSafDir() {
+        return this.safDir;
+    }
+
+    public void setSafDir(String safDir) {
+        this.safDir = safDir;
+    }
+
+    public String getUsbName() {
+        return this.usbName;
+    }
+
+    public void setUsbName(String usbName) {
+        this.usbName = usbName;
+    }
 
 
 }

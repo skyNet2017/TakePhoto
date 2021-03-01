@@ -25,6 +25,7 @@ import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.gc.materialdesign.views.ButtonRectangle;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
+import com.hss01248.media.mymediastore.usb.UsbUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -112,8 +113,15 @@ public class MainActivity extends AppCompatActivity {
         //smb();
         smbj(null);
 
+        //usb();
 
 
+
+
+    }
+
+    private void usb() {
+        UsbUtil.regist(this);
     }
 
     private void smb() {

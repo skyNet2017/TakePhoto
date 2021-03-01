@@ -127,13 +127,13 @@ public class SafFileFinder22<T extends IFile>{
             @Override
             public void run() {
                 //手机图片/20190206早上
-                boolean isTarget = false;
+               /* boolean isTarget = false;
                 if(dir.getPath().contains("手机图片") || dir.getPath().contains("索尼微单缓存")){
                     isTarget = true;
                 }
                 if(!isTarget){
                     return;
-                }
+                }*/
                 IFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
                     DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);

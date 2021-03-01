@@ -17,6 +17,11 @@ import com.github.mjdev.libaums.fs.FileSystemFactory;
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.github.mjdev.libaums.partition.Partition;
 import com.github.mjdev.libaums.usb.UsbCommunicationFactory;
+import com.hss01248.media.mymediastore.fileapi.IFile;
+
+import java.util.Arrays;
+
+import me.jahnen.libaums.libusbcommunication.LibusbCommunicationCreator;
 
 /**
  * https://www.codenong.com/cs70146041/
@@ -33,12 +38,14 @@ public class UsbUtil {
     static {
 
         FileSystemFactory.registerFileSystem(new JavaFsFileSystemCreator());
-       // UsbCommunicationFactory.registerCommunication(new LibusbCommunicationCreator());
-        //    underlyingUsbCommunication = UsbCommunicationFactory.UnderlyingUsbCommunication.OTHER
+        UsbCommunicationFactory.registerCommunication(new LibusbCommunicationCreator());
+        UsbCommunicationFactory.UnderlyingUsbCommunication  underlyingUsbCommunication
+                = UsbCommunicationFactory.UnderlyingUsbCommunication.OTHER;
+        UsbCommunicationFactory.setUnderlyingUsbCommunication(underlyingUsbCommunication);
 
     }
     public static void regist(Context context){
-        UsbUtil.context = context.getApplicationContext();
+        UsbUtil.context = context;
         if(mUsbReceiver == null){
             //监听otg插入 拔出
             IntentFilter usbDeviceStateFilter = new IntentFilter();
@@ -47,8 +54,9 @@ public class UsbUtil {
 //注册监听自定义广播
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
             mUsbReceiver = initUsbReceiver();
-            context.getApplicationContext().registerReceiver(mUsbReceiver, filter);
+            context.registerReceiver(mUsbReceiver, filter);
         }
+        readUsbDevice(null);
 
     }
 
@@ -96,6 +104,7 @@ public class UsbUtil {
         UsbManager usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
         //枚举设备
         UsbMassStorageDevice[] storageDevices = UsbMassStorageDevice.getMassStorageDevices(context);//获取存储设备
+        Log.w("usb", Arrays.toString(storageDevices));
         //需要activity?
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
         for (UsbMassStorageDevice device : storageDevices) {//可能有几个 一般只有一个 因为大部分手机只有1个otg插口
@@ -110,20 +119,29 @@ public class UsbUtil {
     private static void read(UsbMassStorageDevice massDevice) {
         // before interacting with a device you need to call init()!
         try {
+
             massDevice.init();//初始化
+            Log.w("usbread","massDevice:"+massDevice.getUsbDevice().toString());
+            Log.w("usbread","patitions:"+ Arrays.toString(massDevice.getPartitions().toArray()));
             //Only uses the first partition on the device
             Partition partition = massDevice.getPartitions().get(0);
             FileSystem currentFs = partition.getFileSystem();
             //fileSystem.getVolumeLabel()可以获取到设备的标识
             //通过FileSystem可以获取当前U盘的一些存储信息，包括剩余空间大小，容量等等
-            Log.d(TAG, "Capacity: " + currentFs.getCapacity());
-            Log.d(TAG, "Occupied Space: " + currentFs.getOccupiedSpace());
-            Log.d(TAG, "Free Space: " + currentFs.getFreeSpace());
-            Log.d(TAG, "Chunk size: " + currentFs.getChunkSize());
+            Log.w(TAG, "Capacity: " + currentFs.getCapacity());
+            Log.w(TAG, "Occupied Space: " + currentFs.getOccupiedSpace());
+            Log.w(TAG, "Free Space: " + currentFs.getFreeSpace());
+            Log.w(TAG, "Chunk size: " + currentFs.getChunkSize());
             UsbFile root = currentFs.getRootDirectory();
+            FileApiForUsb usb = new FileApiForUsb(root);
+            usb.printInfo();
+            IFile[] iFiles = usb.listFiles();
+            for (IFile iFile : iFiles) {
+                iFile.printInfo();
+            }
         } catch (Throwable e) {
             e.printStackTrace();
-            TShow("读取失败");
+            TShow("读取失败"+e.getMessage());
         }
     }
 

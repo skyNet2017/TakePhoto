@@ -116,6 +116,9 @@ dependencies {
     implementation group: 'jcifs', name: 'jcifs', version: '1.3.17'
     implementation group: 'com.hierynomus', name: 'smbj', version: '0.10.0'
 
+    debugImplementation 'com.hjq:logcat:9.5'
+
+
 
 
 }
