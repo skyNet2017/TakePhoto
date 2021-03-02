@@ -38,6 +38,23 @@ public class SafFileFinder22<T extends IFile>{
         listFromDb(observer,onlyDb);
     }
 
+    public static List<String> folderToSkip = new ArrayList<>();
+    static {
+        folderToSkip.add("projects");
+        folderToSkip.add("dev");
+        folderToSkip.add("MicroMsg");
+        folderToSkip.add("MobileQQ");
+        //360驱动大师目录
+        folderToSkip.add("360驱动大师目录");
+        //Program Files
+        folderToSkip.add("Program Files");
+        //node_modules
+        folderToSkip.add("node_modules");
+        //resources
+        folderToSkip.add("resources");
+        folderToSkip.add("res");
+    }
+
     private static void listFromDb(ScanFolderCallback observer, boolean onlyDb) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
@@ -124,6 +141,13 @@ public class SafFileFinder22<T extends IFile>{
      * @param observer
      */
       public void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
+          //todo 6500个文件夹. 最后将其归并显示
+
+          if(folderToSkip.contains(dir.getName())){
+              Log.e("smb","跳过文件夹:"+dir.getUri());
+              return;
+          }
+
         Log.w(SafUtil.TAG, "开始遍历当前文件夹,原子count计数:" + countGetSaf.incrementAndGet() + ", " + dir.getPath()+", name:"+dir.getName());
         executorService.execute(new Runnable() {
             @Override
@@ -183,17 +207,14 @@ public class SafFileFinder22<T extends IFile>{
                 for (IFile file : files) {
                     file.printInfo();
                     if (file.isDirectory()) {
-                        //todo 6500个文件夹. 最后将其归并显示
-                        if ("MicroMsg".equals(file.getName())) {
+                       if( folderToSkip.contains(file.getName())){
+                           Log.e("smb","跳过文件夹:"+file.getUri());
                             continue;
                         }
-                        //700多个
-                        if ("MobileQQ".equals(file.getName())) {
-                            continue;
-                        }
+
                         //Log.d("监听","进入文件夹遍历:"+dir.getAbsolutePath());
                         //todo 单线程时为深度优先.  那么前后两次要反着来
-                        new SafFileFinder22<FileApiForSmb>().getAlbums((FileApiForSmb) file, executorService, observer);
+                        getAlbums((T) file, executorService, observer);
                     } else {
                         String name = file.getName();
                         if(TextUtils.isEmpty(name)){
@@ -239,11 +260,14 @@ public class SafFileFinder22<T extends IFile>{
                             image.type = BaseMediaInfo.TYPE_IMAGE;
                             images.add(image);
 
-                            //图片宽高:
-                            int[] imageWidthHeight = SafUtil.getImageWidthHeight(file.getUri().toString());
-                            if(imageWidthHeight != null && imageWidthHeight.length == 2){
-                                image.maxSide = Math.max(imageWidthHeight[0],imageWidthHeight[1]);
+                            if(!image.pathOrUri.startsWith("smb")){
+//图片宽高:
+                                int[] imageWidthHeight = SafUtil.getImageWidthHeight(file.getUri().toString());
+                                if(imageWidthHeight != null && imageWidthHeight.length == 2){
+                                    image.maxSide = Math.max(imageWidthHeight[0],imageWidthHeight[1]);
+                                }
                             }
+
 
                         } else if (type == BaseMediaInfo.TYPE_VIDEO) {
                             videoCount++;
@@ -275,34 +299,37 @@ public class SafFileFinder22<T extends IFile>{
                             image.type = BaseMediaInfo.TYPE_VIDEO;
                             videos.add(image);
 
-                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                            try {
+                            if(!image.pathOrUri.startsWith("smb")){
+                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                                 try {
-                                    if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(
-                                                SafUtil.context.getContentResolver()
-                                                        .openFileDescriptor(
-                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
-                                    }else {
-                                        retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
-                                    }
+                                    try {
+                                        if(image.pathOrUri.startsWith("content")){
+                                            retriever.setDataSource(
+                                                    SafUtil.context.getContentResolver()
+                                                            .openFileDescriptor(
+                                                                    Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                        }else {
+                                            retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
+                                        }
 
+                                    }catch (Throwable throwable){
+                                        Log.w("errorv",image.pathOrUri);
+                                        throwable.printStackTrace();
+                                    }
+                                    image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+                                    videoDuration = videoDuration + image.duration;
+                                    int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
+                                    int height = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
+                                    image.maxSide = Math.max(width,height);
                                 }catch (Throwable throwable){
-                                    Log.w("errorv",image.pathOrUri);
                                     throwable.printStackTrace();
-                                }
-                                image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
-                                videoDuration = videoDuration + image.duration;
-                                int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
-                                int height = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
-                                image.maxSide = Math.max(width,height);
-                            }catch (Throwable throwable){
-                                throwable.printStackTrace();
-                            }finally {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    retriever.close();
+                                }finally {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        retriever.close();
+                                    }
                                 }
                             }
+
                         } else if (type == BaseMediaInfo.TYPE_AUDIO) {
                             audioCount++;
                             audioFileSize = audioFileSize + file.length();
@@ -330,33 +357,33 @@ public class SafFileFinder22<T extends IFile>{
                             image.type = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
 
-                            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                            try {
+                            if(!image.pathOrUri.startsWith("smb")){
+                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                                 try {
-                                    if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(
-                                                SafUtil.context.getContentResolver()
-                                                        .openFileDescriptor(
-                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
-                                    }else {
-                                        retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
-                                    }
+                                    try {
+                                        if(image.pathOrUri.startsWith("content")){
+                                            retriever.setDataSource(
+                                                    SafUtil.context.getContentResolver()
+                                                            .openFileDescriptor(
+                                                                    Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                        }else {
+                                            retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
+                                        }
 
+                                    }catch (Throwable throwable){
+                                        Log.w("error",image.pathOrUri);
+                                        throwable.printStackTrace();
+                                    }
+                                    audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
                                 }catch (Throwable throwable){
-                                    Log.w("error",image.pathOrUri);
                                     throwable.printStackTrace();
-                                }
-                                audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
-                            }catch (Throwable throwable){
-                                throwable.printStackTrace();
-                            }finally {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    retriever.close();
+                                }finally {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        retriever.close();
+                                    }
                                 }
                             }
                         }
-
-
                     }
                 }
 

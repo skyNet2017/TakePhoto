@@ -133,6 +133,8 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
 
 
     public static void connect(){
+
+        SmbToHttp.startServer();
         // 设置超时时间(可选)
         SmbConfig config = SmbConfig.builder().withTimeout(120, TimeUnit.SECONDS)
                 .withTimeout(120, TimeUnit.SECONDS) // 超时设置读，写和Transact超时（默认为60秒）
@@ -150,7 +152,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
             Connection connection = client.connect(ip);	// 如:123.123.123.123
             AuthenticationContext ac = new AuthenticationContext(username, password.toCharArray(), ip);
             Session session = connection.authenticate(ac);
-            SmbToHttp.startServer();
+
 
             checkRootDirs(session,ip);
 
@@ -242,7 +244,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                 }
                 map.get(ip).put(rootDir,share);
                 Log.w("smb", "request path:"+share.toString());
-                scanRootDir(ip,rootDir,share);
+                //scanRootDir(ip,rootDir,share);
             }catch (Throwable throwable){
                 throwable.printStackTrace();
             }
