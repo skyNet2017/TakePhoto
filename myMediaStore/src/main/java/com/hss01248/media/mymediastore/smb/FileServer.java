@@ -105,7 +105,7 @@ public class FileServer extends Thread implements HTTPRequestListener {
         public void httpRequestRecieved(HTTPRequest httpReq) {
 
             String uri = httpReq.getURI();
-            Log.w("smb","httpRequestRecieved uri*****->" + uri);
+            Log.w("smb",Thread.currentThread().getName()+",httpRequestRecieved uri*****->" + uri);
 
             Log.w("smb","httpRequestRecieved headers*****->" + httpReq.getHeader());
             //User-Agent: Lavf/58.12.100
