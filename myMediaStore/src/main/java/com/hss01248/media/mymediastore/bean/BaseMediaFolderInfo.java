@@ -44,8 +44,10 @@ public class BaseMediaFolderInfo {
     /**
      * 可能是纯文件路径,或者saf拿到的content://xxxx
      */
-
     public String pathOrUri;
+
+    public String smbHost;
+    public String smbRootDir;//不带/
 
     @Id
     public String pathAndType;
@@ -79,6 +81,22 @@ public class BaseMediaFolderInfo {
 
     public void setPathOrUri(String pathOrUri) {
         this.pathOrUri = pathOrUri;
+    }
+
+    public String getSmbHost() {
+        return this.smbHost;
+    }
+
+    public void setSmbHost(String smbHost) {
+        this.smbHost = smbHost;
+    }
+
+    public String getSmbRootDir() {
+        return this.smbRootDir;
+    }
+
+    public void setSmbRootDir(String smbRootDir) {
+        this.smbRootDir = smbRootDir;
     }
 
     public String getPathAndType() {
@@ -154,6 +172,8 @@ public class BaseMediaFolderInfo {
     }
 
 
+
+
     public int count;
     public long fileSize;
     public int hidden;//1: true 0 :false
@@ -171,13 +191,16 @@ public class BaseMediaFolderInfo {
 
     public int type;
 
-    @Generated(hash = 1287292362)
+    @Generated(hash = 1788600874)
     public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
-            String pathAndType, String path, int count, long fileSize, int hidden,
-            long updatedTime, long duration, int order, int type) {
+            String smbHost, String smbRootDir, String pathAndType, String path,
+            int count, long fileSize, int hidden, long updatedTime, long duration,
+            int order, int type) {
         this.name = name;
         this.cover = cover;
         this.pathOrUri = pathOrUri;
+        this.smbHost = smbHost;
+        this.smbRootDir = smbRootDir;
         this.pathAndType = pathAndType;
         this.path = path;
         this.count = count;
@@ -192,6 +215,8 @@ public class BaseMediaFolderInfo {
     @Generated(hash = 1055136609)
     public BaseMediaFolderInfo() {
     }
+
+
 
 
 

@@ -66,7 +66,7 @@ public class SafUtil {
     public static void getRootDir(FragmentActivity activity, ISdRoot callback){
         context = activity.getApplicationContext();
 
-        ArrayList<StorageBean> storageData = getStorageData(activity.getApplicationContext());
+        ArrayList<TfCardBean> storageData = getStorageData(activity.getApplicationContext());
         if(storageData ==null || storageData.size() <=1){
             Log.w(SafUtil.TAG,"没有额外sd卡");
             return;
@@ -234,7 +234,7 @@ public class SafUtil {
 
    // private static final String TAG = StorageUtils.class.getSimpleName();
 
-    public static ArrayList<StorageBean> getStorageData(Context pContext) {
+    public static ArrayList<TfCardBean> getStorageData(Context pContext) {
         final StorageManager storageManager = (StorageManager) pContext.getSystemService(Context.STORAGE_SERVICE);
         try {
             //得到StorageManager中的getVolumeList()方法的对象
@@ -264,7 +264,7 @@ public class SafUtil {
             final Object invokeVolumeList = getVolumeList.invoke(storageManager);
             //---------------------------------------------------------------------
             final int length = Array.getLength(invokeVolumeList);
-            ArrayList<StorageBean> list = new ArrayList<>();
+            ArrayList<TfCardBean> list = new ArrayList<>();
             for (int i = 0; i < length; i++) {
                 final Object storageValume = Array.get(invokeVolumeList, i);//得到StorageVolume对象
                 final String path = (String) getPath.invoke(storageValume);
@@ -298,7 +298,7 @@ public class SafUtil {
                         + ",total size==" + totalSize + "(" + fmtSpace(totalSize) + ")"
                         + ",availale size==" + availaleSize + "(" + fmtSpace(availaleSize) + ")";
                 Log.e(TAG, msg);
-                StorageBean storageBean = new StorageBean();
+                TfCardBean storageBean = new TfCardBean();
                 storageBean.setAvailableSize(availaleSize);
                 storageBean.setTotalSize(totalSize);
                 storageBean.setMounted(state);

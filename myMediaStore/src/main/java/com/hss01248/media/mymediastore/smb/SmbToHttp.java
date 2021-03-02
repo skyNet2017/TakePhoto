@@ -51,10 +51,10 @@ public class SmbToHttp {
         Log.w("smb","subPath:"+subPath);
 
         Log.w("smb","parentPath:"+parentPath+", path:"+path+",this.path:"+subPath);
-        if( SmbjUtil.share.fileExists(subPath)){
-            File smbFile =  SmbjUtil.share.openFile(subPath, EnumSet.of(AccessMask.GENERIC_READ),
+        if( SmbjUtil.getShare(uri.getHost(),root) != null && SmbjUtil.getShare(uri.getHost(),root).fileExists(subPath)){
+            File smbFile =  SmbjUtil.getShare(uri.getHost(),root).openFile(subPath, EnumSet.of(AccessMask.GENERIC_READ),
                     null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
-            FileAllInformation information = SmbjUtil.share.getFileInformation(smbFile.getFileId());
+            FileAllInformation information = SmbjUtil.getShare(uri.getHost(),root).getFileInformation(smbFile.getFileId());
 
             FileIdBothDirectoryInformation information1 = InformationTrans.trans(information,fileName);
             //information1.getFileName()
@@ -62,7 +62,7 @@ public class SmbToHttp {
 
             FileApiForSmb  file = new FileApiForSmb(information1);
             file.setContext(uri.getHost(),root);
-            file.setShare(SmbjUtil.share,parentPath);
+            file.setShare(SmbjUtil.getShare(uri.getHost(),root),parentPath);
             file.printInfo();
             return file;
         }

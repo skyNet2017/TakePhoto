@@ -3,7 +3,7 @@ package com.hss01248.media.mymediastore;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class StorageBean implements Parcelable {
+public class TfCardBean implements Parcelable {
     private String path;
     private String mounted;
     private boolean removable;
@@ -65,10 +65,10 @@ public class StorageBean implements Parcelable {
         dest.writeLong(this.availableSize);
     }
 
-    public StorageBean() {
+    public TfCardBean() {
     }
 
-    protected StorageBean(Parcel in) {
+    protected TfCardBean(Parcel in) {
         this.path = in.readString();
         this.mounted = in.readString();
         this.removable = in.readByte() != 0;
@@ -76,15 +76,15 @@ public class StorageBean implements Parcelable {
         this.availableSize = in.readLong();
     }
 
-    public static final Creator<StorageBean> CREATOR = new Creator<StorageBean>() {
+    public static final Creator<TfCardBean> CREATOR = new Creator<TfCardBean>() {
         @Override
-        public StorageBean createFromParcel(Parcel source) {
-            return new StorageBean(source);
+        public TfCardBean createFromParcel(Parcel source) {
+            return new TfCardBean(source);
         }
 
         @Override
-        public StorageBean[] newArray(int size) {
-            return new StorageBean[size];
+        public TfCardBean[] newArray(int size) {
+            return new TfCardBean[size];
         }
     };
 }

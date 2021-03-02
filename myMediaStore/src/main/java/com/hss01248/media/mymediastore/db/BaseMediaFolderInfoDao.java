@@ -27,15 +27,17 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         public final static Property Name = new Property(0, String.class, "name", false, "NAME");
         public final static Property Cover = new Property(1, String.class, "cover", false, "COVER");
         public final static Property PathOrUri = new Property(2, String.class, "pathOrUri", false, "PATH_OR_URI");
-        public final static Property PathAndType = new Property(3, String.class, "pathAndType", true, "PATH_AND_TYPE");
-        public final static Property Path = new Property(4, String.class, "path", false, "PATH");
-        public final static Property Count = new Property(5, int.class, "count", false, "COUNT");
-        public final static Property FileSize = new Property(6, long.class, "fileSize", false, "FILE_SIZE");
-        public final static Property Hidden = new Property(7, int.class, "hidden", false, "HIDDEN");
-        public final static Property UpdatedTime = new Property(8, long.class, "updatedTime", false, "UPDATED_TIME");
-        public final static Property Duration = new Property(9, long.class, "duration", false, "DURATION");
-        public final static Property Order = new Property(10, int.class, "order", false, "ORDER");
-        public final static Property Type = new Property(11, int.class, "type", false, "TYPE");
+        public final static Property SmbHost = new Property(3, String.class, "smbHost", false, "SMB_HOST");
+        public final static Property SmbRootDir = new Property(4, String.class, "smbRootDir", false, "SMB_ROOT_DIR");
+        public final static Property PathAndType = new Property(5, String.class, "pathAndType", true, "PATH_AND_TYPE");
+        public final static Property Path = new Property(6, String.class, "path", false, "PATH");
+        public final static Property Count = new Property(7, int.class, "count", false, "COUNT");
+        public final static Property FileSize = new Property(8, long.class, "fileSize", false, "FILE_SIZE");
+        public final static Property Hidden = new Property(9, int.class, "hidden", false, "HIDDEN");
+        public final static Property UpdatedTime = new Property(10, long.class, "updatedTime", false, "UPDATED_TIME");
+        public final static Property Duration = new Property(11, long.class, "duration", false, "DURATION");
+        public final static Property Order = new Property(12, int.class, "order", false, "ORDER");
+        public final static Property Type = new Property(13, int.class, "type", false, "TYPE");
     }
 
 
@@ -54,15 +56,17 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
                 "\"NAME\" TEXT," + // 0: name
                 "\"COVER\" TEXT," + // 1: cover
                 "\"PATH_OR_URI\" TEXT," + // 2: pathOrUri
-                "\"PATH_AND_TYPE\" TEXT PRIMARY KEY NOT NULL ," + // 3: pathAndType
-                "\"PATH\" TEXT," + // 4: path
-                "\"COUNT\" INTEGER NOT NULL ," + // 5: count
-                "\"FILE_SIZE\" INTEGER NOT NULL ," + // 6: fileSize
-                "\"HIDDEN\" INTEGER NOT NULL ," + // 7: hidden
-                "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 8: updatedTime
-                "\"DURATION\" INTEGER NOT NULL ," + // 9: duration
-                "\"ORDER\" INTEGER NOT NULL ," + // 10: order
-                "\"TYPE\" INTEGER NOT NULL );"); // 11: type
+                "\"SMB_HOST\" TEXT," + // 3: smbHost
+                "\"SMB_ROOT_DIR\" TEXT," + // 4: smbRootDir
+                "\"PATH_AND_TYPE\" TEXT PRIMARY KEY NOT NULL ," + // 5: pathAndType
+                "\"PATH\" TEXT," + // 6: path
+                "\"COUNT\" INTEGER NOT NULL ," + // 7: count
+                "\"FILE_SIZE\" INTEGER NOT NULL ," + // 8: fileSize
+                "\"HIDDEN\" INTEGER NOT NULL ," + // 9: hidden
+                "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 10: updatedTime
+                "\"DURATION\" INTEGER NOT NULL ," + // 11: duration
+                "\"ORDER\" INTEGER NOT NULL ," + // 12: order
+                "\"TYPE\" INTEGER NOT NULL );"); // 13: type
     }
 
     /** Drops the underlying database table. */
@@ -90,22 +94,32 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
             stmt.bindString(3, pathOrUri);
         }
  
+        String smbHost = entity.getSmbHost();
+        if (smbHost != null) {
+            stmt.bindString(4, smbHost);
+        }
+ 
+        String smbRootDir = entity.getSmbRootDir();
+        if (smbRootDir != null) {
+            stmt.bindString(5, smbRootDir);
+        }
+ 
         String pathAndType = entity.getPathAndType();
         if (pathAndType != null) {
-            stmt.bindString(4, pathAndType);
+            stmt.bindString(6, pathAndType);
         }
  
         String path = entity.getPath();
         if (path != null) {
-            stmt.bindString(5, path);
+            stmt.bindString(7, path);
         }
-        stmt.bindLong(6, entity.getCount());
-        stmt.bindLong(7, entity.getFileSize());
-        stmt.bindLong(8, entity.getHidden());
-        stmt.bindLong(9, entity.getUpdatedTime());
-        stmt.bindLong(10, entity.getDuration());
-        stmt.bindLong(11, entity.getOrder());
-        stmt.bindLong(12, entity.getType());
+        stmt.bindLong(8, entity.getCount());
+        stmt.bindLong(9, entity.getFileSize());
+        stmt.bindLong(10, entity.getHidden());
+        stmt.bindLong(11, entity.getUpdatedTime());
+        stmt.bindLong(12, entity.getDuration());
+        stmt.bindLong(13, entity.getOrder());
+        stmt.bindLong(14, entity.getType());
     }
 
     @Override
@@ -127,27 +141,37 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
             stmt.bindString(3, pathOrUri);
         }
  
+        String smbHost = entity.getSmbHost();
+        if (smbHost != null) {
+            stmt.bindString(4, smbHost);
+        }
+ 
+        String smbRootDir = entity.getSmbRootDir();
+        if (smbRootDir != null) {
+            stmt.bindString(5, smbRootDir);
+        }
+ 
         String pathAndType = entity.getPathAndType();
         if (pathAndType != null) {
-            stmt.bindString(4, pathAndType);
+            stmt.bindString(6, pathAndType);
         }
  
         String path = entity.getPath();
         if (path != null) {
-            stmt.bindString(5, path);
+            stmt.bindString(7, path);
         }
-        stmt.bindLong(6, entity.getCount());
-        stmt.bindLong(7, entity.getFileSize());
-        stmt.bindLong(8, entity.getHidden());
-        stmt.bindLong(9, entity.getUpdatedTime());
-        stmt.bindLong(10, entity.getDuration());
-        stmt.bindLong(11, entity.getOrder());
-        stmt.bindLong(12, entity.getType());
+        stmt.bindLong(8, entity.getCount());
+        stmt.bindLong(9, entity.getFileSize());
+        stmt.bindLong(10, entity.getHidden());
+        stmt.bindLong(11, entity.getUpdatedTime());
+        stmt.bindLong(12, entity.getDuration());
+        stmt.bindLong(13, entity.getOrder());
+        stmt.bindLong(14, entity.getType());
     }
 
     @Override
     public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3);
+        return cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5);
     }    
 
     @Override
@@ -156,15 +180,17 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // name
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // cover
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // pathOrUri
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // pathAndType
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // path
-            cursor.getInt(offset + 5), // count
-            cursor.getLong(offset + 6), // fileSize
-            cursor.getInt(offset + 7), // hidden
-            cursor.getLong(offset + 8), // updatedTime
-            cursor.getLong(offset + 9), // duration
-            cursor.getInt(offset + 10), // order
-            cursor.getInt(offset + 11) // type
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // smbHost
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // smbRootDir
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // pathAndType
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // path
+            cursor.getInt(offset + 7), // count
+            cursor.getLong(offset + 8), // fileSize
+            cursor.getInt(offset + 9), // hidden
+            cursor.getLong(offset + 10), // updatedTime
+            cursor.getLong(offset + 11), // duration
+            cursor.getInt(offset + 12), // order
+            cursor.getInt(offset + 13) // type
         );
         return entity;
     }
@@ -174,15 +200,17 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         entity.setName(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
         entity.setCover(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setPathOrUri(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setPathAndType(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setPath(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setCount(cursor.getInt(offset + 5));
-        entity.setFileSize(cursor.getLong(offset + 6));
-        entity.setHidden(cursor.getInt(offset + 7));
-        entity.setUpdatedTime(cursor.getLong(offset + 8));
-        entity.setDuration(cursor.getLong(offset + 9));
-        entity.setOrder(cursor.getInt(offset + 10));
-        entity.setType(cursor.getInt(offset + 11));
+        entity.setSmbHost(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setSmbRootDir(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setPathAndType(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setPath(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setCount(cursor.getInt(offset + 7));
+        entity.setFileSize(cursor.getLong(offset + 8));
+        entity.setHidden(cursor.getInt(offset + 9));
+        entity.setUpdatedTime(cursor.getLong(offset + 10));
+        entity.setDuration(cursor.getLong(offset + 11));
+        entity.setOrder(cursor.getInt(offset + 12));
+        entity.setType(cursor.getInt(offset + 13));
      }
     
     @Override

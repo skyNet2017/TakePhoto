@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -17,6 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.darsh.multipleimageselect.saf.SafUtil;
@@ -26,6 +33,7 @@ import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
@@ -48,7 +56,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import pl.droidsonroids.gif.GifImageView;
 
-import static com.hss01248.media.mymediastore.smb.SmbjUtil.getShare;
 
 
 /**
@@ -192,48 +199,67 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
             }
 
 
+            if(s.contains("smb")){
+                String http = SmbToHttp.getHttpUrlFromSmb(s);
+                Glide.with(context)
+                        .load(http)
+                        .downloadOnly(new SimpleTarget<File>() {
+                            @Override
+                            public void onResourceReady(File resource, GlideAnimation<? super File> glideAnimation) {
+                                try {
+                                    ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                    tvOriginal.setText(e.getMessage());
+                                }
+                            }
+
+                            @Override
+                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                super.onLoadFailed(e, errorDrawable);
+                                if(e !=null){
+                                    tvOriginal.setText(e.getMessage());
+                                }
+                            }
+                        });
+            }else {
+                Observable.just(uri)
+                        .subscribeOn(Schedulers.io())
+                        .map(new Function<Uri, InputStreamBitmapDecoderFactory>() {
+                            @Override
+                            public InputStreamBitmapDecoderFactory apply(Uri uri) throws Exception {
+                                IFile iFile = ImageSelectActivity.images.get(idx).getFile();
+                                // return new InputStreamBitmapDecoderFactory(
+                                //        new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor()));
+                                return new InputStreamBitmapDecoderFactory(iFile.getInputStream());
+                            }
+                        }).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<InputStreamBitmapDecoderFactory>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(InputStreamBitmapDecoderFactory inputStreamBitmapDecoderFactory) {
+                                ivOriginalSaf.setImage(inputStreamBitmapDecoderFactory);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+            }
 
             //tvOriginal.setText(s);
-            Observable.just(uri)
-                    .subscribeOn(Schedulers.io())
-                    .map(new Function<Uri, InputStreamBitmapDecoderFactory>() {
-                        @Override
-                        public InputStreamBitmapDecoderFactory apply(Uri uri) throws Exception {
-                            IFile iFile = ImageSelectActivity.images.get(idx).getFile();
-                            // return new InputStreamBitmapDecoderFactory(
-                            //        new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor()));
-                            return new InputStreamBitmapDecoderFactory(iFile.getInputStream());
-                        }
-                    }).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<InputStreamBitmapDecoderFactory>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
 
-                        }
 
-                        @Override
-                        public void onNext(InputStreamBitmapDecoderFactory inputStreamBitmapDecoderFactory) {
-                            ivOriginalSaf.setImage(inputStreamBitmapDecoderFactory);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            e.printStackTrace();
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
-
-            try {
-                //ivOriginalSaf.setImage());
-                   /* ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(
-                            context.getContentResolver().openInputStream(uri)));*/
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 

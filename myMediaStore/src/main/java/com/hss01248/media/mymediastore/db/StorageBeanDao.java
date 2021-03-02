@@ -29,9 +29,11 @@ public class StorageBeanDao extends AbstractDao<StorageBean, Integer> {
         public final static Property Type = new Property(2, int.class, "type", false, "TYPE");
         public final static Property DiskId = new Property(3, String.class, "diskId", false, "DISK_ID");
         public final static Property SmbHost = new Property(4, String.class, "smbHost", false, "SMB_HOST");
-        public final static Property SmbRootDir = new Property(5, String.class, "smbRootDir", false, "SMB_ROOT_DIR");
-        public final static Property SafDir = new Property(6, String.class, "safDir", false, "SAF_DIR");
-        public final static Property UsbName = new Property(7, String.class, "usbName", false, "USB_NAME");
+        public final static Property SmbUName = new Property(5, String.class, "smbUName", false, "SMB_UNAME");
+        public final static Property SmbPw = new Property(6, String.class, "smbPw", false, "SMB_PW");
+        public final static Property SmbRootDirs = new Property(7, String.class, "smbRootDirs", false, "SMB_ROOT_DIRS");
+        public final static Property SafRoot = new Property(8, String.class, "safRoot", false, "SAF_ROOT");
+        public final static Property UsbName = new Property(9, String.class, "usbName", false, "USB_NAME");
     }
 
 
@@ -52,9 +54,11 @@ public class StorageBeanDao extends AbstractDao<StorageBean, Integer> {
                 "\"TYPE\" INTEGER NOT NULL ," + // 2: type
                 "\"DISK_ID\" TEXT," + // 3: diskId
                 "\"SMB_HOST\" TEXT," + // 4: smbHost
-                "\"SMB_ROOT_DIR\" TEXT," + // 5: smbRootDir
-                "\"SAF_DIR\" TEXT," + // 6: safDir
-                "\"USB_NAME\" TEXT);"); // 7: usbName
+                "\"SMB_UNAME\" TEXT," + // 5: smbUName
+                "\"SMB_PW\" TEXT," + // 6: smbPw
+                "\"SMB_ROOT_DIRS\" TEXT," + // 7: smbRootDirs
+                "\"SAF_ROOT\" TEXT," + // 8: safRoot
+                "\"USB_NAME\" TEXT);"); // 9: usbName
     }
 
     /** Drops the underlying database table. */
@@ -80,19 +84,29 @@ public class StorageBeanDao extends AbstractDao<StorageBean, Integer> {
             stmt.bindString(5, smbHost);
         }
  
-        String smbRootDir = entity.getSmbRootDir();
-        if (smbRootDir != null) {
-            stmt.bindString(6, smbRootDir);
+        String smbUName = entity.getSmbUName();
+        if (smbUName != null) {
+            stmt.bindString(6, smbUName);
         }
  
-        String safDir = entity.getSafDir();
-        if (safDir != null) {
-            stmt.bindString(7, safDir);
+        String smbPw = entity.getSmbPw();
+        if (smbPw != null) {
+            stmt.bindString(7, smbPw);
+        }
+ 
+        String smbRootDirs = entity.getSmbRootDirs();
+        if (smbRootDirs != null) {
+            stmt.bindString(8, smbRootDirs);
+        }
+ 
+        String safRoot = entity.getSafRoot();
+        if (safRoot != null) {
+            stmt.bindString(9, safRoot);
         }
  
         String usbName = entity.getUsbName();
         if (usbName != null) {
-            stmt.bindString(8, usbName);
+            stmt.bindString(10, usbName);
         }
     }
 
@@ -113,19 +127,29 @@ public class StorageBeanDao extends AbstractDao<StorageBean, Integer> {
             stmt.bindString(5, smbHost);
         }
  
-        String smbRootDir = entity.getSmbRootDir();
-        if (smbRootDir != null) {
-            stmt.bindString(6, smbRootDir);
+        String smbUName = entity.getSmbUName();
+        if (smbUName != null) {
+            stmt.bindString(6, smbUName);
         }
  
-        String safDir = entity.getSafDir();
-        if (safDir != null) {
-            stmt.bindString(7, safDir);
+        String smbPw = entity.getSmbPw();
+        if (smbPw != null) {
+            stmt.bindString(7, smbPw);
+        }
+ 
+        String smbRootDirs = entity.getSmbRootDirs();
+        if (smbRootDirs != null) {
+            stmt.bindString(8, smbRootDirs);
+        }
+ 
+        String safRoot = entity.getSafRoot();
+        if (safRoot != null) {
+            stmt.bindString(9, safRoot);
         }
  
         String usbName = entity.getUsbName();
         if (usbName != null) {
-            stmt.bindString(8, usbName);
+            stmt.bindString(10, usbName);
         }
     }
 
@@ -142,9 +166,11 @@ public class StorageBeanDao extends AbstractDao<StorageBean, Integer> {
             cursor.getInt(offset + 2), // type
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // diskId
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // smbHost
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // smbRootDir
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // safDir
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // usbName
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // smbUName
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // smbPw
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // smbRootDirs
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // safRoot
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // usbName
         );
         return entity;
     }
@@ -156,9 +182,11 @@ public class StorageBeanDao extends AbstractDao<StorageBean, Integer> {
         entity.setType(cursor.getInt(offset + 2));
         entity.setDiskId(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setSmbHost(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setSmbRootDir(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setSafDir(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setUsbName(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setSmbUName(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setSmbPw(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setSmbRootDirs(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setSafRoot(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setUsbName(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }
     
     @Override

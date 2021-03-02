@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //smb();
-        smbj(null);
 
         //usb();
 
@@ -261,11 +260,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void smbj(View view) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SmbjUtil.connect();
-            }
-        }).start();
+
     }
 }

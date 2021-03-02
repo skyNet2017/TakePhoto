@@ -35,6 +35,9 @@ public class BaseMediaInfo {
 
     public String folderPathOrUri;
 
+    public String smbHost;
+    public String smbRootDir;//不带/
+
     public String name;
 
     public IFile getFile() {
@@ -92,11 +95,13 @@ public class BaseMediaInfo {
 
     public int type;
 
-    @Generated(hash = 175926384)
-    public BaseMediaInfo(String folderPathOrUri, String name, String pathOrUri,
-            long fileSize, long updatedTime, int maxSide, int duration, String path,
-            int type) {
+    @Generated(hash = 577682592)
+    public BaseMediaInfo(String folderPathOrUri, String smbHost, String smbRootDir,
+            String name, String pathOrUri, long fileSize, long updatedTime,
+            int maxSide, int duration, String path, int type) {
         this.folderPathOrUri = folderPathOrUri;
+        this.smbHost = smbHost;
+        this.smbRootDir = smbRootDir;
         this.name = name;
         this.pathOrUri = pathOrUri;
         this.fileSize = fileSize;
@@ -110,6 +115,8 @@ public class BaseMediaInfo {
     @Generated(hash = 1446686172)
     public BaseMediaInfo() {
     }
+
+
 
     public boolean isImage(){
         return type == TYPE_IMAGE;
@@ -129,6 +136,22 @@ public class BaseMediaInfo {
 
     public void setFolderPathOrUri(String folderPathOrUri) {
         this.folderPathOrUri = folderPathOrUri;
+    }
+
+    public String getSmbHost() {
+        return this.smbHost;
+    }
+
+    public void setSmbHost(String smbHost) {
+        this.smbHost = smbHost;
+    }
+
+    public String getSmbRootDir() {
+        return this.smbRootDir;
+    }
+
+    public void setSmbRootDir(String smbRootDir) {
+        this.smbRootDir = smbRootDir;
     }
 
     public String getName() {
@@ -194,6 +217,8 @@ public class BaseMediaInfo {
     public void setType(int type) {
         this.type = type;
     }
+
+
 
 
 }

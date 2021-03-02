@@ -22,22 +22,25 @@ public class StorageBean {
     public String smbHost;
     public String smbUName;
     public String smbPw;
-    public String smbRootDir;
+    public String smbRootDirs;//不带/, String数组,逗号相连,比如D,F
 
-    public String safDir;
+    public String safRoot;
 
     public String usbName;
 
-    @Generated(hash = 2138551919)
+    @Generated(hash = 1915755558)
     public StorageBean(int id, int usable, int type, String diskId, String smbHost,
-            String smbRootDir, String safDir, String usbName) {
+            String smbUName, String smbPw, String smbRootDirs, String safRoot,
+            String usbName) {
         this.id = id;
         this.usable = usable;
         this.type = type;
         this.diskId = diskId;
         this.smbHost = smbHost;
-        this.smbRootDir = smbRootDir;
-        this.safDir = safDir;
+        this.smbUName = smbUName;
+        this.smbPw = smbPw;
+        this.smbRootDirs = smbRootDirs;
+        this.safRoot = safRoot;
         this.usbName = usbName;
     }
 
@@ -85,20 +88,36 @@ public class StorageBean {
         this.smbHost = smbHost;
     }
 
-    public String getSmbRootDir() {
-        return this.smbRootDir;
+    public String getSmbUName() {
+        return this.smbUName;
     }
 
-    public void setSmbRootDir(String smbRootDir) {
-        this.smbRootDir = smbRootDir;
+    public void setSmbUName(String smbUName) {
+        this.smbUName = smbUName;
     }
 
-    public String getSafDir() {
-        return this.safDir;
+    public String getSmbPw() {
+        return this.smbPw;
     }
 
-    public void setSafDir(String safDir) {
-        this.safDir = safDir;
+    public void setSmbPw(String smbPw) {
+        this.smbPw = smbPw;
+    }
+
+    public String getSmbRootDirs() {
+        return this.smbRootDirs;
+    }
+
+    public void setSmbRootDirs(String smbRootDirs) {
+        this.smbRootDirs = smbRootDirs;
+    }
+
+    public String getSafRoot() {
+        return this.safRoot;
+    }
+
+    public void setSafRoot(String safRoot) {
+        this.safRoot = safRoot;
     }
 
     public String getUsbName() {
@@ -108,6 +127,10 @@ public class StorageBean {
     public void setUsbName(String usbName) {
         this.usbName = usbName;
     }
+
+
+
+
 
 
 }

@@ -25,6 +25,7 @@ import com.fanjun.keeplive.config.KeepLiveService;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.SafUtil;
+import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.shizhefei.view.largeimage.BlockImageLoader;
 import com.simple.spiderman.SpiderMan;
 
@@ -81,6 +82,14 @@ public class BaseApp extends Application {
           MyImageWatcher.init();
           Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
+
+
+          new Thread(new Runnable() {
+              @Override
+              public void run() {
+                  SmbjUtil.connect();
+              }
+          }).start();
       }
 
 

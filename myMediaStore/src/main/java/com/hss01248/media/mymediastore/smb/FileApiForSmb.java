@@ -31,6 +31,7 @@ public class FileApiForSmb extends BaseFileApi<FileIdBothDirectoryInformation> {
 
     File smbFile;
     Directory directory;
+
     String path;
     String host;
     String rootDir;
