@@ -25,6 +25,10 @@ import java.util.List;
 
 public class FileApiForSmb extends BaseFileApi<FileIdBothDirectoryInformation> {
 
+    public File getSmbFile() {
+        return smbFile;
+    }
+
     File smbFile;
     Directory directory;
     String path;
@@ -239,6 +243,7 @@ public void setContext(String host,String rootDir){
         if(isDirectory()){
             return null;
         }
+        //smbFile.read()
         return smbFile.getOutputStream();
     }
 }

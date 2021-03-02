@@ -5,6 +5,7 @@ import android.util.Log;
 import com.hss01248.media.mymediastore.SafFileFinder22;
 import com.hss01248.media.mymediastore.SafUtil;
 
+import org.cybergarage.http.HTTPHeader;
 import org.cybergarage.http.HTTPRequest;
 import org.cybergarage.http.HTTPRequestListener;
 import org.cybergarage.http.HTTPResponse;
@@ -102,22 +103,24 @@ public class FileServer extends Thread implements HTTPRequestListener {
         }
 
         @Override
-        public void httpRequestRecieved(HTTPRequest httpReq) {
+        public void httpRequestRecieved(HTTPRequest request) {
 
-            String uri = httpReq.getURI();
+            String uri = request.getURI();
             Log.w("smb",Thread.currentThread().getName()+",httpRequestRecieved uri*****->" + uri);
 
-            Log.w("smb","httpRequestRecieved headers*****->" + httpReq.getHeader());
+            Log.w("smb","httpRequestRecieved headers*****->" + request.getHeader());
             //User-Agent: Lavf/58.12.100
            // Accept: */*
    // Range: bytes=74130294-
+            //Range: bytes=0-1024
+            //响应range: https://blog.csdn.net/qq_32099833/article/details/109703883
   //  Connection: close
    // Host: 192.168.3.24:2223
    // Icy-MetaData: 1
 
             //   /smb/D/%E6%89%8B%E6%9C%BA%E5%9B%BE%E7%89%87/20190206%E6%97%A9%E4%B8%8A/IMG_20190206_080333.jpg
             if (uri.startsWith(CONTENT_EXPORT_URI) == false) {
-                httpReq.returnBadRequest();
+                request.returnBadRequest();
                 return;
             }
             try {
@@ -148,31 +151,66 @@ public class FileServer extends Thread implements HTTPRequestListener {
                 String contentType = SafFileFinder22.getTypeForName(file.getName());
                 Log.w("smb","contentType=====" + contentType);
                 // 获取文文件流
-                InputStream contentIn = file.getInputStream();
 
-                if (contentLen <= 0 || contentType.length() <= 0
-                        || contentIn == null) {
-                    Log.e("smb","contentLen <= 0 || contentType.length() <= 0:"+uri);
-                    httpReq.returnBadRequest();
-                    return;
+
+                HTTPResponse response = new HTTPResponse();
+                response.setContentType(contentType);
+                response.setStatusCode(HTTPStatus.OK);
+
+                //处理range:
+                // Range: bytes=74130294-
+                //Range: bytes=0-1024
+                //响应range: https://blog.csdn.net/qq_32099833/article/details/109703883
+                //httpRes.setContentRange();
+                if(request.hasHeader("Range")){
+                    String valueStr = request.getHeader("Range").getValue();
+                   String[] strings = valueStr.split("=");
+                   String range = strings[1];
+                   long start = Long.parseLong(range.substring(0,range.indexOf("-")));
+                   long end = 0;
+                   if(!range.endsWith("-")){
+                       end = Long.parseLong(range.substring(range.indexOf("-")+1));
+                   }
+
+                   int bufferLen = 3*1024 * 1024;
+                    byte[] bytes = new byte[ bufferLen];
+                    int len = file.getSmbFile().read(bytes,start,0,bufferLen);
+                    response.setContentLength(len);
+                    //todo 边界值
+
+                    response.setHeader("Content-Range", "bytes "+range+"-"+(range+len));
+                    response.setContent(bytes,true);
+
+                    //response.setContentLength(len);
+                    //		//设置此次相应返回的数据范围
+                    //		response.setHeader("Content-Range", "bytes "+range+"-"+(fileLength-1)+"/"+fileLength);
+                    //		// 将这1MB的视频流响应给客户端
+                    //		outputStream.write(bytes, 0, len);
+
+                }else {
+                    InputStream contentIn = file.getInputStream();
+
+                    if (contentLen <= 0 || contentType.length() <= 0
+                            || contentIn == null) {
+                        Log.e("smb","contentLen <= 0 || contentType.length() <= 0:"+uri);
+                        request.returnBadRequest();
+                        return;
+                    }
+                    response.setContentLength(contentLen);
+                    response.setContentInputStream(contentIn);
+                    response.setContentRange(0,contentLen,contentLen);
+                    try {
+                        contentIn.close();
+                    }catch (Throwable throwable){
+                        throwable.printStackTrace();
+                    }
+
                 }
+                request.post(response);
 
-                HTTPResponse httpRes = new HTTPResponse();
-                httpRes.setContentType(contentType);
-                httpRes.setStatusCode(HTTPStatus.OK);
-                httpRes.setContentLength(contentLen);
-                httpRes.setContentInputStream(contentIn);
-                httpRes.setContentRange(0,contentLen,contentLen);
 
-                httpReq.post(httpRes);
-
-                contentIn.close();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                 httpReq.returnBadRequest();
-                return;
-            }  catch (Throwable e) {
-                 httpReq.returnBadRequest();
+           }  catch (Throwable e) {
+                 request.returnBadRequest();
                 e.printStackTrace();
                 return;
             }

@@ -20,6 +20,8 @@ public class StorageBean {
     public String diskId;
 
     public String smbHost;
+    public String smbUName;
+    public String smbPw;
     public String smbRootDir;
 
     public String safDir;
