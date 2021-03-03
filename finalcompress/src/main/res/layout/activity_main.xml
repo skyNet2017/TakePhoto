@@ -13,6 +13,7 @@
         android:layout_height="100dp"
         android:text="@string/t_start_com" />
 
+
     <com.gc.materialdesign.views.ButtonRectangle
         android:id="@+id/btn_share"
         android:layout_below="@id/btn_selected"
@@ -29,11 +30,30 @@
         android:text="@string/t_star" />
     <com.gc.materialdesign.views.ButtonRectangle
         android:onClick="smbj"
+        android:id="@+id/smbj"
         android:layout_below="@id/btn_star"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_centerHorizontal="true"
         android:text="局域网" />
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:id="@+id/btn_allimage"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/smbj"
+        android:layout_marginTop="10dp"
+        android:layout_width="250dp"
+        android:layout_height="100dp"
+        android:onClick="listAllImages"
+        android:text="显示所有图片" />
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:id="@+id/btn_allvideo"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/btn_allimage"
+        android:layout_marginTop="10dp"
+        android:layout_width="250dp"
+        android:layout_height="100dp"
+        android:onClick="listAllVideo"
+        android:text="显示所有视频" />
     <TextView
         android:layout_below="@id/btn_selected"
         android:layout_width="match_parent"

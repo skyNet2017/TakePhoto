@@ -130,10 +130,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
                                 if(viewHolder.image.pathOrUri.startsWith("content")){
-                                    retriever.setDataSource(
-                                            context.getContentResolver()
-                                                    .openFileDescriptor(
-                                                            Uri.parse(viewHolder.image.pathOrUri),"r").getFileDescriptor());
+                                    retriever.setDataSource(context,Uri.parse(viewHolder.image.pathOrUri));
                                 }else if(viewHolder.image.pathOrUri.startsWith("/storage/")){
                                     retriever.setDataSource(viewHolder.image.pathOrUri);
                                 }else if(viewHolder.image.pathOrUri.contains("smb")){

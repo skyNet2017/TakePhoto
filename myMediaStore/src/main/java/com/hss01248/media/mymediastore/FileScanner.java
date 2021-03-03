@@ -214,10 +214,7 @@ public class FileScanner {
                             try {
                                 try {
                                     if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(
-                                                SafUtil.context.getContentResolver()
-                                                        .openFileDescriptor(
-                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.pathOrUri));
                                     }else {
                                         FileInputStream inputStream = new FileInputStream(new File(image.pathOrUri).getAbsolutePath());
                                         retriever.setDataSource(inputStream.getFD());

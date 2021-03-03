@@ -20,10 +20,12 @@ import android.view.View;
 
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 
+import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.gc.materialdesign.views.ButtonRectangle;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.hss01248.media.mymediastore.usb.UsbUtil;
 
@@ -261,5 +263,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void smbj(View view) {
 
+    }
+
+    public void listAllImages(View view) {
+        ImageSelectActivity.listAll(this, BaseMediaInfo.TYPE_IMAGE);
+    }
+
+    public void listAllVideo(View view) {
+        ImageSelectActivity.listAll(this, BaseMediaInfo.TYPE_VIDEO);
     }
 }

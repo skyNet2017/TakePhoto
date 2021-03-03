@@ -255,10 +255,7 @@ public class SafFileFinder {
                             try {
                                 try {
                                     if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(
-                                                SafUtil.context.getContentResolver()
-                                                        .openFileDescriptor(
-                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.pathOrUri));
                                     }else {
                                         retriever.setDataSource(image.pathOrUri);
                                     }
@@ -309,10 +306,7 @@ public class SafFileFinder {
                             try {
                                 try {
                                     if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(
-                                                SafUtil.context.getContentResolver()
-                                                        .openFileDescriptor(
-                                                                Uri.parse(image.pathOrUri),"r").getFileDescriptor());
+                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.pathOrUri));
                                     }else {
                                         retriever.setDataSource(image.pathOrUri);
                                     }

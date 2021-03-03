@@ -30,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -247,15 +248,11 @@ public class SafUtil {
 
     private static void alterDocument(Uri uri,String content,Context context) {
         try {
-            ParcelFileDescriptor pfd = context.getContentResolver().
-                    openFileDescriptor(uri, "w");
-            FileOutputStream fileOutputStream =
-                    new FileOutputStream(pfd.getFileDescriptor());
+            OutputStream fileOutputStream = context.getContentResolver().openOutputStream(uri);
             fileOutputStream.write(content.getBytes());
             fileOutputStream.flush();
             // Let the document provider know you're done by closing the stream.
             fileOutputStream.close();
-            pfd.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

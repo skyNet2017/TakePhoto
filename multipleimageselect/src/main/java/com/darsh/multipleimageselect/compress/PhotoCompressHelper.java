@@ -601,7 +601,7 @@ public class PhotoCompressHelper {
             uri = Uri.parse(filePath);
             try {
                 imageView.setImage(new InputStreamBitmapDecoderFactory(
-                        new FileInputStream(imageView.getContext().getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor())));
+                        imageView.getContext().getContentResolver().openInputStream(Uri.parse(filePath))));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

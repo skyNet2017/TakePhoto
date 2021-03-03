@@ -207,8 +207,13 @@ public class DbUtil {
         long start = System.currentTimeMillis();
 
         QueryBuilder<BaseMediaInfo> builder =
-         getDaoSession().getBaseMediaInfoDao().queryBuilder()
-                .where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir));
+         getDaoSession().getBaseMediaInfoDao().queryBuilder();
+        if(TextUtils.isEmpty(dir)){
+            builder.where(BaseMediaInfoDao.Properties.Type.eq(type),BaseMediaInfoDao.Properties.FileSize.gt(50*1024));
+        }else {
+            builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir));
+        }
+
 
         orderFiles(builder,type);
                // .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime);

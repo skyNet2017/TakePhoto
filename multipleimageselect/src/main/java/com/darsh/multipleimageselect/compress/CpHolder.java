@@ -164,8 +164,9 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         }*/
 
         //showImage(originalPath,context);
-        showInfo(originalPath);
         showImage2(s,context,i);
+        showInfo(originalPath);
+
 
 
 
@@ -189,7 +190,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
             gif.setVisibility(View.GONE);
             ivOriginalSaf.setVisibility(View.VISIBLE);
             ivCompressedSaf.setVisibility(View.VISIBLE);
-            Uri uri = Uri.parse(s);
+            //Uri uri = Uri.parse(s);
             if(!isPreview){
                 rlCompressed.setVisibility(View.VISIBLE);
                 //tvOriginal.setText(context.getResources().getString(R.string.c_origianl)+":"+ImageInfoFormater.formatImagInfo(originalPath,true));
@@ -199,7 +200,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
             }
 
 
-            if(s.contains("smb")){
+            if(s.startsWith("smb") || s.startsWith("http")){
                 String http = SmbToHttp.getHttpUrlFromSmb(s);
                 Glide.with(context)
                         .load(http)
@@ -223,15 +224,18 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                             }
                         });
             }else {
-                Observable.just(uri)
+                Observable.just(s)
                         .subscribeOn(Schedulers.io())
-                        .map(new Function<Uri, InputStreamBitmapDecoderFactory>() {
+                        .map(new Function<String, InputStreamBitmapDecoderFactory>() {
                             @Override
-                            public InputStreamBitmapDecoderFactory apply(Uri uri) throws Exception {
-                                IFile iFile = ImageSelectActivity.images.get(idx).getFile();
-                                // return new InputStreamBitmapDecoderFactory(
-                                //        new FileInputStream(context.getContentResolver().openFileDescriptor(uri,"r").getFileDescriptor()));
-                                return new InputStreamBitmapDecoderFactory(iFile.getInputStream());
+                            public InputStreamBitmapDecoderFactory apply(String uri) throws Exception {
+                                if(uri.startsWith("content")){
+                                    return new InputStreamBitmapDecoderFactory(
+                                            context.getContentResolver().openInputStream(Uri.parse(s)));
+                                }else if(uri.startsWith("/storage/")){
+                                    return new InputStreamBitmapDecoderFactory(new FileInputStream(new File(s)));
+                                }
+                                return new InputStreamBitmapDecoderFactory(new FileInputStream(new File(s)));
                             }
                         }).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Observer<InputStreamBitmapDecoderFactory>() {

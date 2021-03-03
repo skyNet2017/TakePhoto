@@ -109,16 +109,7 @@ public class AlbumSelectActivity extends HelperActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), ImageSelectActivity.class);
-                intent.putExtra(Constants.INTENT_EXTRA_ALBUM, albums.get(position).name);
-                intent.putExtra(Constants.INTENT_EXTRA_TYPE, albums.get(position).type);
-
-                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, albums.get(position).pathOrUri);
-                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API, albums.get(position).pathOrUri.startsWith("/storage/"));
-                intent.putExtra(Constants.INTENT_EXTRA_ALBUM_IS_SAF_API, albums.get(position).pathOrUri.startsWith("content"));
-
-
-                startActivityForResult(intent, Constants.REQUEST_CODE);
+                ImageSelectActivity.list(AlbumSelectActivity.this,albums.get(position));
             }
         });
 

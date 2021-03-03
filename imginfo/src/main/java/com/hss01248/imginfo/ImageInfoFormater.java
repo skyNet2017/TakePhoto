@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -34,7 +35,7 @@ public class ImageInfoFormater {
         if (path.startsWith("content")) {
             Uri uri = Uri.parse(path);
             try {
-                FileInputStream inputStream = new FileInputStream(context.getContentResolver().openFileDescriptor(uri, "r").getFileDescriptor());
+                InputStream inputStream = context.getContentResolver().openInputStream(uri);
                 int len = inputStream.available();
                 inputStream.close();
                 return len;
@@ -50,9 +51,8 @@ public class ImageInfoFormater {
 
     public static String formatImagInfo(String path, boolean showFullPath) {
         if (path.startsWith("content://")) {
-            Uri uri = Uri.parse(path);
             try {
-                FileInputStream inputStream = new FileInputStream(context.getContentResolver().openFileDescriptor(uri, "r").getFileDescriptor());
+                InputStream inputStream = context.getContentResolver().openInputStream(Uri.parse(path));
                 int len = inputStream.available();
                 inputStream.close();
                 String size = formatFileSize(len);
@@ -124,8 +124,8 @@ public class ImageInfoFormater {
         options.inJustDecodeBounds = true;
         if (path.startsWith("content://")) {
             try {
-                Bitmap bitmap = BitmapFactory.decodeFileDescriptor(
-                        context.getContentResolver().openFileDescriptor(Uri.parse(path), "r").getFileDescriptor(),
+                Bitmap bitmap = BitmapFactory.decodeStream(
+                        context.getContentResolver().openInputStream(Uri.parse(path)),
                         null, options);
                 // 此时返回的bitmap为null
             } catch (FileNotFoundException e) {

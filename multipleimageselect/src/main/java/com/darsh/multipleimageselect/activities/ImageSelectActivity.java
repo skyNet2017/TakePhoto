@@ -1,5 +1,6 @@
 package com.darsh.multipleimageselect.activities;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -107,8 +108,31 @@ public class ImageSelectActivity extends HelperActivity {
     private Handler handler;
     private Thread thread;
     private boolean isSelectAll;
-    boolean isAlbumFromFileApi;
     int type;
+
+    public static void list(Activity activity,BaseMediaFolderInfo info){
+        Intent intent = new Intent(activity, ImageSelectActivity.class);
+        intent.putExtra(Constants.INTENT_EXTRA_ALBUM, info.name);
+        intent.putExtra(Constants.INTENT_EXTRA_TYPE, info.type);
+
+        intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, info.pathOrUri);
+
+
+        activity.startActivityForResult(intent, Constants.REQUEST_CODE);
+    }
+
+    public static void listAll(Activity activity,int type){
+        Intent intent = new Intent(activity, ImageSelectActivity.class);
+        intent.putExtra(Constants.INTENT_EXTRA_ALBUM, "all");
+        intent.putExtra(Constants.INTENT_EXTRA_TYPE, type);
+
+        intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, "");
+
+
+        activity.startActivityForResult(intent, Constants.REQUEST_CODE);
+    }
+
+
     private ActionMode.Callback callback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -207,7 +231,7 @@ public class ImageSelectActivity extends HelperActivity {
         }
         album = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM);
         albumDir = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM_PATH);
-        isAlbumFromFileApi = intent.getBooleanExtra(Constants.INTENT_EXTRA_ALBUM_IS_FILE_API,false);
+
         type = intent.getIntExtra(Constants.INTENT_EXTRA_TYPE,0);
 
         String name = intent.getStringExtra(Constants.INTENT_EXTRA_ALBUM);
@@ -804,14 +828,17 @@ public class ImageSelectActivity extends HelperActivity {
 
     private void loadImages() {
 
+        progressBar.setVisibility(View.VISIBLE);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 images.clear();
-                images.addAll(DbUtil.getAllContentInFolders(albumDir,type))    ;
+                images.addAll(DbUtil.getAllContentInFolders(albumDir,type)) ;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        titleBar.getLeftTextView().setText("count:"+images.size());
                         adapter.notifyDataSetChanged();
                     }
                 });
