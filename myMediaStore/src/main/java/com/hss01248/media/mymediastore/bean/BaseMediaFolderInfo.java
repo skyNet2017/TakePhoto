@@ -174,6 +174,8 @@ public class BaseMediaFolderInfo {
 
 
 
+
+
     public int count;
     public long fileSize;
     public int hidden;//1: true 0 :false
@@ -215,6 +217,8 @@ public class BaseMediaFolderInfo {
     @Generated(hash = 1055136609)
     public BaseMediaFolderInfo() {
     }
+
+
 
 
 

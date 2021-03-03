@@ -28,13 +28,14 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         public final static Property SmbHost = new Property(1, String.class, "smbHost", false, "SMB_HOST");
         public final static Property SmbRootDir = new Property(2, String.class, "smbRootDir", false, "SMB_ROOT_DIR");
         public final static Property Name = new Property(3, String.class, "name", false, "NAME");
-        public final static Property PathOrUri = new Property(4, String.class, "pathOrUri", true, "PATH_OR_URI");
-        public final static Property FileSize = new Property(5, long.class, "fileSize", false, "FILE_SIZE");
-        public final static Property UpdatedTime = new Property(6, long.class, "updatedTime", false, "UPDATED_TIME");
-        public final static Property MaxSide = new Property(7, int.class, "maxSide", false, "MAX_SIDE");
-        public final static Property Duration = new Property(8, int.class, "duration", false, "DURATION");
-        public final static Property Path = new Property(9, String.class, "path", false, "PATH");
-        public final static Property Type = new Property(10, int.class, "type", false, "TYPE");
+        public final static Property IsHiden = new Property(4, int.class, "isHiden", false, "IS_HIDEN");
+        public final static Property PathOrUri = new Property(5, String.class, "pathOrUri", true, "PATH_OR_URI");
+        public final static Property FileSize = new Property(6, long.class, "fileSize", false, "FILE_SIZE");
+        public final static Property UpdatedTime = new Property(7, long.class, "updatedTime", false, "UPDATED_TIME");
+        public final static Property MaxSide = new Property(8, int.class, "maxSide", false, "MAX_SIDE");
+        public final static Property Duration = new Property(9, int.class, "duration", false, "DURATION");
+        public final static Property Path = new Property(10, String.class, "path", false, "PATH");
+        public final static Property Type = new Property(11, int.class, "type", false, "TYPE");
     }
 
 
@@ -54,13 +55,14 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
                 "\"SMB_HOST\" TEXT," + // 1: smbHost
                 "\"SMB_ROOT_DIR\" TEXT," + // 2: smbRootDir
                 "\"NAME\" TEXT," + // 3: name
-                "\"PATH_OR_URI\" TEXT PRIMARY KEY NOT NULL ," + // 4: pathOrUri
-                "\"FILE_SIZE\" INTEGER NOT NULL ," + // 5: fileSize
-                "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 6: updatedTime
-                "\"MAX_SIDE\" INTEGER NOT NULL ," + // 7: maxSide
-                "\"DURATION\" INTEGER NOT NULL ," + // 8: duration
-                "\"PATH\" TEXT," + // 9: path
-                "\"TYPE\" INTEGER NOT NULL );"); // 10: type
+                "\"IS_HIDEN\" INTEGER NOT NULL ," + // 4: isHiden
+                "\"PATH_OR_URI\" TEXT PRIMARY KEY NOT NULL ," + // 5: pathOrUri
+                "\"FILE_SIZE\" INTEGER NOT NULL ," + // 6: fileSize
+                "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 7: updatedTime
+                "\"MAX_SIDE\" INTEGER NOT NULL ," + // 8: maxSide
+                "\"DURATION\" INTEGER NOT NULL ," + // 9: duration
+                "\"PATH\" TEXT," + // 10: path
+                "\"TYPE\" INTEGER NOT NULL );"); // 11: type
     }
 
     /** Drops the underlying database table. */
@@ -92,21 +94,22 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         if (name != null) {
             stmt.bindString(4, name);
         }
+        stmt.bindLong(5, entity.getIsHiden());
  
         String pathOrUri = entity.getPathOrUri();
         if (pathOrUri != null) {
-            stmt.bindString(5, pathOrUri);
+            stmt.bindString(6, pathOrUri);
         }
-        stmt.bindLong(6, entity.getFileSize());
-        stmt.bindLong(7, entity.getUpdatedTime());
-        stmt.bindLong(8, entity.getMaxSide());
-        stmt.bindLong(9, entity.getDuration());
+        stmt.bindLong(7, entity.getFileSize());
+        stmt.bindLong(8, entity.getUpdatedTime());
+        stmt.bindLong(9, entity.getMaxSide());
+        stmt.bindLong(10, entity.getDuration());
  
         String path = entity.getPath();
         if (path != null) {
-            stmt.bindString(10, path);
+            stmt.bindString(11, path);
         }
-        stmt.bindLong(11, entity.getType());
+        stmt.bindLong(12, entity.getType());
     }
 
     @Override
@@ -132,26 +135,27 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         if (name != null) {
             stmt.bindString(4, name);
         }
+        stmt.bindLong(5, entity.getIsHiden());
  
         String pathOrUri = entity.getPathOrUri();
         if (pathOrUri != null) {
-            stmt.bindString(5, pathOrUri);
+            stmt.bindString(6, pathOrUri);
         }
-        stmt.bindLong(6, entity.getFileSize());
-        stmt.bindLong(7, entity.getUpdatedTime());
-        stmt.bindLong(8, entity.getMaxSide());
-        stmt.bindLong(9, entity.getDuration());
+        stmt.bindLong(7, entity.getFileSize());
+        stmt.bindLong(8, entity.getUpdatedTime());
+        stmt.bindLong(9, entity.getMaxSide());
+        stmt.bindLong(10, entity.getDuration());
  
         String path = entity.getPath();
         if (path != null) {
-            stmt.bindString(10, path);
+            stmt.bindString(11, path);
         }
-        stmt.bindLong(11, entity.getType());
+        stmt.bindLong(12, entity.getType());
     }
 
     @Override
     public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4);
+        return cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5);
     }    
 
     @Override
@@ -161,13 +165,14 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // smbHost
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // smbRootDir
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // name
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // pathOrUri
-            cursor.getLong(offset + 5), // fileSize
-            cursor.getLong(offset + 6), // updatedTime
-            cursor.getInt(offset + 7), // maxSide
-            cursor.getInt(offset + 8), // duration
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // path
-            cursor.getInt(offset + 10) // type
+            cursor.getInt(offset + 4), // isHiden
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // pathOrUri
+            cursor.getLong(offset + 6), // fileSize
+            cursor.getLong(offset + 7), // updatedTime
+            cursor.getInt(offset + 8), // maxSide
+            cursor.getInt(offset + 9), // duration
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // path
+            cursor.getInt(offset + 11) // type
         );
         return entity;
     }
@@ -178,13 +183,14 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         entity.setSmbHost(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setSmbRootDir(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setPathOrUri(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setFileSize(cursor.getLong(offset + 5));
-        entity.setUpdatedTime(cursor.getLong(offset + 6));
-        entity.setMaxSide(cursor.getInt(offset + 7));
-        entity.setDuration(cursor.getInt(offset + 8));
-        entity.setPath(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setType(cursor.getInt(offset + 10));
+        entity.setIsHiden(cursor.getInt(offset + 4));
+        entity.setPathOrUri(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setFileSize(cursor.getLong(offset + 6));
+        entity.setUpdatedTime(cursor.getLong(offset + 7));
+        entity.setMaxSide(cursor.getInt(offset + 8));
+        entity.setDuration(cursor.getInt(offset + 9));
+        entity.setPath(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setType(cursor.getInt(offset + 11));
      }
     
     @Override

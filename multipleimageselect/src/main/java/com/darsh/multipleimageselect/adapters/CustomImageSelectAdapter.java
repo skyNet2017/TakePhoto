@@ -21,6 +21,7 @@ import com.darsh.multipleimageselect.helpers.LoggingListener;
 import com.darsh.multipleimageselect.models.Image;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
@@ -101,6 +102,8 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         }
 
         if(image.type == BaseMediaInfo.TYPE_VIDEO && image.pathOrUri.contains("/smb/")){
+
+            viewHolder.tvInfo.setText(uri.getPath().substring(uri.getPath().lastIndexOf("/")+1)+"\n"+ ImageInfoFormater.formatFileSize(image.fileSize));
             return convertView;
         }
 
