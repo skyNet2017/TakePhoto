@@ -19,12 +19,10 @@ import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -152,14 +150,6 @@ public class SafFileFinder22<T extends IFile>{
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                //手机图片/20190206早上
-               /* boolean isTarget = false;
-                if(dir.getPath().contains("手机图片") || dir.getPath().contains("索尼微单缓存")){
-                    isTarget = true;
-                }
-                if(!isTarget){
-                    return;
-                }*/
                 IFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
                     DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
@@ -171,38 +161,10 @@ public class SafFileFinder22<T extends IFile>{
 
                     return;
                 }
-                /*if (countGetSaf.get() == 1) {
-                    //根目录. 随机逆序
-                    boolean random = new Random().nextBoolean();
-                    if (random) {
-                        List<T> list = new ArrayList<T>((Collection<? extends T>) Arrays.asList(files));
-                        Collections.reverse(list);
-                        for (int i = 0; i < list.size(); i++) {
-                            files[i] = list.get(i);
-                        }
-                    }
-                }*/
-                List<BaseMediaFolderInfo> folderInfos = new ArrayList<>();
 
-                BaseMediaFolderInfo imageFolder = null;
-                int imageCount = 0;
-                long imagesFileSize = 0;
-                int isHiden = 0;
-
-                BaseMediaFolderInfo videoFolder = null;
-                int videoCount = 0;
-                long videoFileSize = 0;
-                long videoDuration = 0;
-
-                BaseMediaFolderInfo audioFolder = null;
-                int audioCount = 0;
-                long audioFileSize = 0;
-                long audioDuration = 0;
-
-
-                List<BaseMediaInfo> images = null;
-                List<BaseMediaInfo> videos = null;
-                List<BaseMediaInfo> audios = null;
+                Map<Integer,BaseMediaFolderInfo> folderMap = new HashMap<>();
+                Map<Integer,List<BaseMediaInfo>> filesMap = new HashMap<>();
+                int  isHiden = 0;
 
                 for (IFile file : files) {
                     file.printInfo();
@@ -222,200 +184,64 @@ public class SafFileFinder22<T extends IFile>{
                             continue;
                         }
                         if(".nomedia".equals(name)){
-                            isHiden = 1;
+                             isHiden = 1;
                             continue;
                         }
                         if(file.length() <=0){
                             Log.e("smb","file.length() <=0:"+file.getPath());
                             continue;
                         }
+
                         int type = guessTypeByName(file.getName());
 
-                        if (type == BaseMediaInfo.TYPE_IMAGE) {
-                            imageCount++;
-                            imagesFileSize = imagesFileSize + file.length();
-
-                            if (imageFolder == null) {
-                                imageFolder = new BaseMediaFolderInfo();
-                                imageFolder.name = dir.getName();
-                                imageFolder.cover = file.getUri().toString();
-                                imageFolder.type = BaseMediaInfo.TYPE_IMAGE;
-                                imageFolder.updatedTime = file.lastModified();
-                                imageFolder.path = file.getPath();
-                                imageFolder.pathOrUri = dir.getUri().toString();
-                                Log.w("扫描", "添加有图文件夹:" + dir.getUri().toString());
-                            }
-
-                            //内部文件uri的保存:
-                            if (images == null) {
-                                images = new ArrayList<>(files.length / 2);
-                            }
-                            BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getUri().toString();
-                            image.pathOrUri = file.getUri().toString();
-                            image.updatedTime = file.lastModified();
-                            image.name = file.getName();
-                            image.path = file.getPath();
-                            image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_IMAGE;
-                            images.add(image);
-
-                            if(!image.pathOrUri.startsWith("smb")){
-//图片宽高:
-                                int[] imageWidthHeight = SafUtil.getImageWidthHeight(file.getUri().toString());
-                                if(imageWidthHeight != null && imageWidthHeight.length == 2){
-                                    image.maxSide = Math.max(imageWidthHeight[0],imageWidthHeight[1]);
-                                }
-                            }
-
-
-                        } else if (type == BaseMediaInfo.TYPE_VIDEO) {
-                            videoCount++;
-                            videoFileSize = videoFileSize + file.length();
-
-
-                            if (videoFolder == null) {
-                                videoFolder = new BaseMediaFolderInfo();
-                                videoFolder.name = dir.getName();
-                                videoFolder.cover = file.getUri().toString();
-                                videoFolder.updatedTime = file.lastModified();
-                                videoFolder.type = BaseMediaInfo.TYPE_VIDEO;
-                                videoFolder.pathOrUri = dir.getUri().toString();
-                                Log.w("扫描", "添加有视频文件夹:" + dir.getUri().toString());
-                            }
-
-
-                            //内部文件uri的保存:
-                            if (videos == null) {
-                                videos = new ArrayList<>(files.length / 2);
-                            }
-                            BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getUri().toString();
-                            image.pathOrUri = file.getUri().toString();
-                            image.updatedTime = file.lastModified();
-                            image.name = file.getName();
-                            image.fileSize = file.length();
-                            image.path = file.getPath();
-                            image.type = BaseMediaInfo.TYPE_VIDEO;
-                            videos.add(image);
-
-                            if(!image.pathOrUri.startsWith("smb")){
-                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                                try {
-                                    try {
-                                        if(image.pathOrUri.startsWith("content")){
-                                            retriever.setDataSource(
-                                                    SafUtil.context.getContentResolver()
-                                                            .openFileDescriptor(
-                                                                    Uri.parse(image.pathOrUri),"r").getFileDescriptor());
-                                        }else {
-                                            retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
-                                        }
-
-                                    }catch (Throwable throwable){
-                                        Log.w("errorv",image.pathOrUri);
-                                        throwable.printStackTrace();
-                                    }
-                                    image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
-                                    videoDuration = videoDuration + image.duration;
-                                    int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
-                                    int height = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
-                                    image.maxSide = Math.max(width,height);
-                                }catch (Throwable throwable){
-                                    throwable.printStackTrace();
-                                }finally {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                        retriever.close();
-                                    }
-                                }
-                            }
-
-                        } else if (type == BaseMediaInfo.TYPE_AUDIO) {
-                            audioCount++;
-                            audioFileSize = audioFileSize + file.length();
-                            if (audioFolder == null) {
-                                audioFolder = new BaseMediaFolderInfo();
-                                audioFolder.name = dir.getName();
-                                audioFolder.cover = file.getUri().toString();
-                                audioFolder.updatedTime = file.lastModified();
-                                audioFolder.type = BaseMediaInfo.TYPE_AUDIO;
-                                audioFolder.pathOrUri = dir.getUri().toString();
-                                Log.w("扫描", "添加有音频文件夹:" + dir.getUri().toString());
-                            }
-
-                            //内部文件uri的保存:
-                            if (audios == null) {
-                                audios = new ArrayList<>(files.length / 2);
-                            }
-                            BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getUri().toString();
-                            image.pathOrUri = file.getUri().toString();
-                            image.updatedTime = file.lastModified();
-                            image.name = file.getName();
-                            image.fileSize = file.length();
-                            image.path = file.getPath();
-                            image.type = BaseMediaInfo.TYPE_AUDIO;
-                            audios.add(image);
-
-                            if(!image.pathOrUri.startsWith("smb")){
-                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                                try {
-                                    try {
-                                        if(image.pathOrUri.startsWith("content")){
-                                            retriever.setDataSource(
-                                                    SafUtil.context.getContentResolver()
-                                                            .openFileDescriptor(
-                                                                    Uri.parse(image.pathOrUri),"r").getFileDescriptor());
-                                        }else {
-                                            retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
-                                        }
-
-                                    }catch (Throwable throwable){
-                                        Log.w("error",image.pathOrUri);
-                                        throwable.printStackTrace();
-                                    }
-                                    audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
-                                }catch (Throwable throwable){
-                                    throwable.printStackTrace();
-                                }finally {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                        retriever.close();
-                                    }
-                                }
-                            }
+                        if(!folderMap.containsKey(type)){
+                            BaseMediaFolderInfo folder = new BaseMediaFolderInfo();
+                            folder.name = dir.getName();
+                            folder.cover = file.getUri().toString();
+                            folder.type = BaseMediaInfo.TYPE_IMAGE;
+                            folder.updatedTime = file.lastModified();
+                            folder.path = file.getPath();
+                            folder.pathOrUri = dir.getUri().toString();
+                            Log.w("扫描", "添加文件夹:" + dir.getUri().toString());
+                            folderMap.put(type,folder);
                         }
+                        BaseMediaFolderInfo folderInfo =   folderMap.get(type);
+                        folderInfo.count++;
+                        folderInfo.fileSize += file.length();
+
+                        if(!filesMap.containsKey(type)){
+                            List<BaseMediaInfo> infos = new ArrayList<>();
+                            filesMap.put(type,infos);
+                        }
+                        List<BaseMediaInfo> fileInfos = filesMap.get(type);
+
+                        BaseMediaInfo image = new BaseMediaInfo();
+                        image.folderPathOrUri = dir.getUri().toString();
+                        image.pathOrUri = file.getUri().toString();
+                        image.updatedTime = file.lastModified();
+                        image.name = file.getName();
+                        image.path = file.getPath();
+                        image.fileSize = file.length();
+                        image.type = type;
+                        image.fillMediaInfo();
+                        fileInfos.add(image);
+                    }
+                }
+                //types:
+                for (int i = 1; i < 9; i++) {
+                    if(!filesMap.containsKey(i)){
+                        DbUtil.delete(dir.getUri().toString(),i);
                     }
                 }
 
-                if (imageFolder != null) {
-                    imageFolder.generateTheId();
-                    imageFolder.count = imageCount;
-                    imageFolder.fileSize = imagesFileSize;
-                    imageFolder.hidden = isHiden;
-                    folderInfos.add(imageFolder);
-                }else {
-                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE);
-                }
-                if (videoFolder != null) {
-                    videoFolder.generateTheId();
-                    videoFolder.count = videoCount;
-                    videoFolder.fileSize = videoFileSize;
-                    videoFolder.hidden = isHiden;
-                    videoFolder.duration = videoDuration;
-                    folderInfos.add(videoFolder);
-                }else {
-                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_VIDEO);
-                }
-
-                if (audioFolder != null) {
-                    audioFolder.generateTheId();
-                    audioFolder.hidden = isHiden;
-                    audioFolder.count = audioCount;
-                    audioFolder.fileSize = audioFileSize;
-                    audioFolder.duration = audioDuration;
-                    folderInfos.add(audioFolder);
-                }else {
-                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_AUDIO);
+                List<BaseMediaFolderInfo> folderInfos = new ArrayList<>();
+                Iterator<Map.Entry<Integer, BaseMediaFolderInfo>> iterator1 = folderMap.entrySet().iterator();
+                while (iterator1.hasNext()){
+                    Map.Entry<Integer, BaseMediaFolderInfo> next = iterator1.next();
+                    BaseMediaFolderInfo value = next.getValue();
+                    value.hidden = isHiden;
+                    value.generateTheId();
+                    folderInfos.add(value);
                 }
                 if (folderInfos.size() != 0) {
                     print(folderInfos, true);
@@ -429,9 +255,9 @@ public class SafFileFinder22<T extends IFile>{
                         }
                     }
                 }else {
-                    Log.e("dd0","no media exist in path:"+dir.getPath()+"/"+dir.getName());
+                    Log.e("dd0","no media or doc exist in path:"+dir.getPath()+"/"+dir.getName());
                 }
-                writeDB(dir, folderInfos, images, videos, audios);
+                writeDB(dir, folderInfos, filesMap);
 
                 int count0 = countGetSaf.decrementAndGet();
                 Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getPath()+", name:"+dir.getName());
@@ -443,7 +269,7 @@ public class SafFileFinder22<T extends IFile>{
 
     }
 
-     static void writeDB(IFile dir, List<BaseMediaFolderInfo> folderInfos, List<BaseMediaInfo> images, List<BaseMediaInfo> videos, List<BaseMediaInfo> audios) {
+     static void writeDB(IFile dir, List<BaseMediaFolderInfo> folderInfos, Map<Integer,List<BaseMediaInfo>> filesMap) {
         long start = System.currentTimeMillis();
         //文件夹:
         if (folderInfos.size() > 0) {
@@ -453,15 +279,13 @@ public class SafFileFinder22<T extends IFile>{
             // 如何不更新里面的hidden值?
             // 已删除文件的处理:DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_AUDIO);
         }
-        if (images != null) {
-            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(images);
-        }
-        if (videos != null) {
-            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(videos);
-        }
-        if (audios != null) {
-            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(audios);
-        }
+
+         Iterator<Map.Entry<Integer, List<BaseMediaInfo>>> iterator = filesMap.entrySet().iterator();
+         while (iterator.hasNext()){
+             Map.Entry<Integer, List<BaseMediaInfo>> next = iterator.next();
+             DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(next.getValue());
+
+         }
         if (folderInfos.size() > 0) {
             Log.w(SafUtil.TAG, URLDecoder.decode(dir.getUri().toString()) + "  路径下更新数据库完成!!!!!!!!!!!!!!! 耗时(ms):" + (System.currentTimeMillis() - start));
         }
@@ -516,7 +340,13 @@ public class SafFileFinder22<T extends IFile>{
      */
     public static int guessTypeByName(String name) {
         if (TextUtils.isEmpty(name)) {
-            return -1;
+            return BaseMediaInfo.TYPE_UNKNOWN;
+        }
+        if(name.endsWith(".txt")){
+            return BaseMediaInfo.TYPE_DOC_TXT;
+        }
+        if(name.endsWith(".pdf")){
+            return BaseMediaInfo.TYPE_DOC_PDF;
         }
         String mime = getTypeForName(name);
         if (mime.startsWith("image/")) {
@@ -525,6 +355,12 @@ public class SafFileFinder22<T extends IFile>{
             return BaseMediaInfo.TYPE_VIDEO;
         } else if (mime.startsWith("audio/")) {
             return BaseMediaInfo.TYPE_AUDIO;
+        }else if (mime.contains("msword")) {
+            return BaseMediaInfo.TYPE_DOC_WORD;
+        }else if (mime.contains("excel")) {
+            return BaseMediaInfo.TYPE_AUDIO;
+        }else if (mime.contains("powerpoint")) {
+            return BaseMediaInfo.TYPE_DOC_PPT;
         }
         /*if (name.endsWith(".jpg") || name.endsWith(".png") || name.endsWith(".gif")
                 || name.endsWith(".webp") || name.endsWith(".JPG") || name.endsWith(".jpeg")
@@ -538,7 +374,7 @@ public class SafFileFinder22<T extends IFile>{
                 || name.endsWith(".wma") || name.endsWith(".mid") || name.endsWith(".ape") || name.endsWith(".flac")){
             return BaseMediaInfo.TYPE_AUDIO;
         }*/
-        return -1;
+        return BaseMediaInfo.TYPE_UNKNOWN;
     }
 
     public static boolean isVideo(String name) {

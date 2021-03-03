@@ -32,6 +32,13 @@ public class BaseMediaInfo {
     public static final int TYPE_IMAGE = 1;
     public static final int TYPE_VIDEO = 2;
     public static final int TYPE_AUDIO = 3;
+    public static final int TYPE_DOC_PDF = 4;//pdf
+    public static final int TYPE_DOC_WORD = 5;//msword
+    public static final int TYPE_DOC_EXCEL = 6;//excel
+    public static final int TYPE_DOC_PPT = 7;//powerpoint
+    public static final int TYPE_DOC_TXT = 8;  //文件名.txt
+
+    public static final int TYPE_UNKNOWN = -1;
 
     public String folderPathOrUri;
 
@@ -39,6 +46,8 @@ public class BaseMediaInfo {
     public String smbRootDir;//不带/
 
     public String name;
+
+    public int  isHiden = 1;
 
     public IFile getFile() {
         if(file == null){
@@ -78,6 +87,20 @@ public class BaseMediaInfo {
         }
         return 908;
     }
+
+    public void fillMediaInfo(){
+
+    }
+
+    public boolean isMedia(){
+        return type <4 && type !=0;
+    }
+
+    public boolean isDoc(){
+        return type >3 ;
+    }
+
+
 
     /**
      * 可能是纯文件路径,或者saf拿到的content://xxxx
