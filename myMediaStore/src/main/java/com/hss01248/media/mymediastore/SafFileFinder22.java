@@ -48,6 +48,13 @@ public class SafFileFinder22<T extends IFile>{
         folderToSkip.add("Program Files");
         //node_modules
         folderToSkip.add("node_modules");
+        folderToSkip.add(".idea");
+        folderToSkip.add("build");
+        folderToSkip.add(".cxx");
+        folderToSkip.add(".gradle");
+        folderToSkip.add(".externalNativeBuild");
+        folderToSkip.add(".m2");
+        folderToSkip.add(".npm");
         //resources
         folderToSkip.add("resources");
         folderToSkip.add("res");
@@ -156,7 +163,7 @@ public class SafFileFinder22<T extends IFile>{
                     int count0 = countGetSaf.decrementAndGet();
                     Log.e(SafUtil.TAG, "当前文件夹为空,原子count计数:" + count0 + ", " + dir.getPath()+", name:"+dir.getName());
                     if (count0 == 0) {
-                        onComplete(observer,true,safStart);
+                        onComplete(observer,true,safStart,dir);
                     }
 
                     return;
@@ -262,14 +269,16 @@ public class SafFileFinder22<T extends IFile>{
                 int count0 = countGetSaf.decrementAndGet();
                 Log.w(SafUtil.TAG, "遍历当前一层文件夹完成,原子count计数:" + count0 + ", " + dir.getPath()+", name:"+dir.getName());
                 if (count0 == 0) {
-                    onComplete(observer,true,safStart);
+                    onComplete(observer,true,safStart,dir);
                 }
             }
         });
 
     }
 
-     static void writeDB(IFile dir, List<BaseMediaFolderInfo> folderInfos, Map<Integer,List<BaseMediaInfo>> filesMap) {
+
+
+    static void writeDB(IFile dir, List<BaseMediaFolderInfo> folderInfos, Map<Integer,List<BaseMediaInfo>> filesMap) {
         long start = System.currentTimeMillis();
         //文件夹:
         if (folderInfos.size() > 0) {
@@ -287,7 +296,7 @@ public class SafFileFinder22<T extends IFile>{
 
          }
         if (folderInfos.size() > 0) {
-            Log.w(SafUtil.TAG, URLDecoder.decode(dir.getUri().toString()) + "  路径下更新数据库完成!!!!!!!!!!!!!!! 耗时(ms):" + (System.currentTimeMillis() - start));
+            Log.w(SafUtil.TAG, URLDecoder.decode(dir.getUri().toString()) + "  路径下更新数据库完成,耗时(ms):" + (System.currentTimeMillis() - start));
         }
 
         //todo 已经删除的文件,怎么删除数据库里的条目?
@@ -301,19 +310,19 @@ public class SafFileFinder22<T extends IFile>{
         }
     }
 
-     static void onComplete(ScanFolderCallback observer,boolean isSaf,long safStart) {
+      void onComplete(ScanFolderCallback observer,boolean isSaf,long safStart,T root) {
         List<BaseMediaFolderInfo> infos = DbUtil.getAllFolders2();
         observer.onScanFinished(infos);
         observer.onComplete();
-        Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, "遍历所有文件夹完成!!!!!!!!!!!!!!! 耗时(s):" + (System.currentTimeMillis() - safStart) / 1000);
+        Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, URLDecoder.decode(root.getUri().toString())+"  遍历所有文件夹完成!!!!!!!!!!!!!!! 耗时(s):" + (System.currentTimeMillis() - safStart) / 1000);
 
-        if(isSaf){
+        /*if(isSaf){
             SharedPreferences sp = SafUtil.context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sp.edit();
 
             editor.putBoolean("isScaning", false).commit();
             editor.putLong("latScanFinishedTime", System.currentTimeMillis()).commit();
-        }
+        }*/
 
     }
 
