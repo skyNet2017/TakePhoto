@@ -63,6 +63,7 @@ public class SmbToHttp {
             FileApiForSmb  file = new FileApiForSmb(information1);
             file.setContext(uri.getHost(),root);
             file.setShare(SmbjUtil.getShare(uri.getHost(),root),parentPath);
+            file.setSmbFile(smbFile);
             file.printInfo();
             return file;
         }

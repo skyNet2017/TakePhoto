@@ -26,10 +26,52 @@ import java.util.List;
 public class FileApiForSmb extends BaseFileApi<FileIdBothDirectoryInformation> {
 
     public File getSmbFile() {
+        if(isDirectory()){
+            return null;
+        }
+        try {
+            if(smbFile != null){
+                return smbFile;
+            }
+           if(share.fileExists(path)){
+                smbFile = share.openFile(path, EnumSet.of(AccessMask.GENERIC_READ),
+                        null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+
+            }else {
+                Log.e("smb","其他类型:filePath:"+ path +",type:"+getAttrDesc(file.getFileAttributes())+","+file.getFileName());
+                //其他类型:filePath:360Downloads/2032943.jpg,type:32,  FILE_ATTRIBUTE_ARCHIVE
+            }
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
         return smbFile;
     }
 
+    public void setSmbFile(File smbFile) {
+        this.smbFile = smbFile;
+    }
+
     File smbFile;
+
+    public Directory getDirectory() {
+        if(!isDirectory()){
+            return null;
+        }
+        if(directory != null){
+            return directory;
+        }
+        try {
+            directory = share.openDirectory(path, EnumSet.of(AccessMask.GENERIC_READ),
+                    null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
+
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+
+
+        return directory;
+    }
+
     Directory directory;
 
     String path;
@@ -64,22 +106,7 @@ public void setContext(String host,String rootDir){
             return;
         }
 
-        try {
-            if(isDirectory()){
-                directory = share.openDirectory(path, EnumSet.of(AccessMask.GENERIC_READ),
-                        null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
-            }else if(share.fileExists(path)){
-                smbFile = share.openFile(path, EnumSet.of(AccessMask.GENERIC_READ),
-                        null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
 
-
-            }else {
-                Log.e("smb","其他类型:filePath:"+ path +",type:"+getAttrDesc(file.getFileAttributes())+","+file.getFileName());
-                //其他类型:filePath:360Downloads/2032943.jpg,type:32,  FILE_ATTRIBUTE_ARCHIVE
-            }
-        }catch (Throwable throwable){
-            throwable.printStackTrace();
-        }
 
 
     }
@@ -121,7 +148,7 @@ public void setContext(String host,String rootDir){
 
     @Override
     public IFile[] listFiles() {
-        if(directory != null){
+        if(getDirectory() != null){
             List<FileIdBothDirectoryInformation> list = directory.list();
             if(list != null && list.size() > 0){
                 List<IFile> files = new ArrayList<>(list.size());
@@ -167,7 +194,7 @@ public void setContext(String host,String rootDir){
 
     @Override
     public boolean isFile() {
-        return smbFile != null;
+        return !isDirectory();
     }
 
     @Override
@@ -196,7 +223,7 @@ public void setContext(String host,String rootDir){
         if(isDirectory()){
             directory.deleteOnClose();
         }else {
-            smbFile.deleteOnClose();
+            getSmbFile().deleteOnClose();
         }
 
         return true;

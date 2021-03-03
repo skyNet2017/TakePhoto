@@ -99,10 +99,15 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         }else {
             uri = Uri.parse(image.pathOrUri);
         }
+
+        if(image.type == BaseMediaInfo.TYPE_VIDEO && image.pathOrUri.contains("/smb/")){
+            return convertView;
+        }
+
         Glide.with(context)
                 .load(uri)
                 .thumbnail(0.2f)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                //.diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .listener(new LoggingListener<>())
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
@@ -128,8 +133,8 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                                             Uri.parse(viewHolder.image.pathOrUri),"r").getFileDescriptor());
                                 }else if(viewHolder.image.pathOrUri.startsWith("/storage/")){
                                     retriever.setDataSource(viewHolder.image.pathOrUri);
-                                }else if(viewHolder.image.pathOrUri.startsWith("smb")){
-                                    retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
+                                }else if(viewHolder.image.pathOrUri.contains("smb")){
+                                    /*retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
                                    Bitmap bitmap = retriever.getFrameAtTime();
                                    if(bitmap!=null){
                                        parent.post(new Runnable() {
@@ -138,7 +143,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                                viewHolder.imageView.setImageBitmap(bitmap);
                                            }
                                        });
-                                   }
+                                   }*/
                                 }
 
                             }catch (Throwable throwable){
