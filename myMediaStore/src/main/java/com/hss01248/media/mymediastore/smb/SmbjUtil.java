@@ -244,7 +244,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
                 }
                 map.get(ip).put(rootDir,share);
                 Log.w("smb", "request path:"+share.toString());
-                scanRootDir(ip,rootDir,share);
+                //scanRootDir(ip,rootDir,share);
             }catch (Throwable throwable){
                 throwable.printStackTrace();
             }
