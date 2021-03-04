@@ -55,10 +55,10 @@ public class HttpHelper {
         HttpFile[] files = EverythingParser.start(url);
         if(files !=null && files.length > 0){
             for (HttpFile file : files) {
-                if(file.getPath().contains("/C%3A")){
-                    continue;
+                if(file.getPath().contains("/G%3A")||file.getPath().contains("/H%3A") ||file.getPath().contains("/I%3A")){
+                    new SafFileFinder22<HttpFile>().getAlbums(file, Executors.newFixedThreadPool(2), observer);
                 }
-                new SafFileFinder22<HttpFile>().getAlbums(file, Executors.newFixedThreadPool(4), observer);
+
             }
         }
         SafUtil.context.getSharedPreferences(SafFileFinder.SP_NAME, Context.MODE_PRIVATE)
