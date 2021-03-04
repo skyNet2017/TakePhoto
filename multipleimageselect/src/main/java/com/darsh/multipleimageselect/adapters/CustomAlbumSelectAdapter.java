@@ -79,7 +79,6 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
         Glide.with(context)
                 .load(uri)
                 .thumbnail(0.2f)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
 
 

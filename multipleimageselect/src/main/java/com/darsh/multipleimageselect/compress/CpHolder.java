@@ -2,6 +2,7 @@ package com.darsh.multipleimageselect.compress;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
@@ -9,6 +10,8 @@ import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -21,13 +24,23 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.disklrucache.DiskLruCache;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.Key;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.engine.cache.DiskCache;
+
 import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.RequestOptions;
+
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.signature.EmptySignature;
+import com.bumptech.glide.util.LruCache;
+import com.bumptech.glide.util.Util;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.darsh.multipleimageselect.helpers.LoggingListener;
@@ -50,8 +63,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -211,52 +228,34 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
             if(s.startsWith("smb") || s.startsWith("http")){
                 String http = SmbToHttp.getHttpUrlFromSmb(s);
-                Glide.with(context)
-                        .load(http)
-                        .priority(Priority.IMMEDIATE)
+                 getFile(http, context, new Observer<File>() {
+                    @Override
+                    public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
 
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                android.util.Log.e("GLIDE", String.format(Locale.ROOT,
-                                        "onException(%s, %s, %s, %s)", e, model, target, isFirstResource), e);
-                                return false;
-                            }
+                    }
 
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                android.util.Log.w("GLIDE", String.format(Locale.ROOT,
-                                        "onResourceReady(%s, %s, %s, %s, %s)", resource, model, target, isFromMemoryCache, isFirstResource));
-                                Glide.with(context)
-                                        .load(http)
-                                        // .priority(Priority.HIGH)
-                                        .downloadOnly(new SimpleTarget<File>() {
-                                            @Override
-                                            public void onResourceReady(File resource, GlideAnimation<? super File> glideAnimation) {
-                                                try {
-                                                    Log.w("glide","onResourceReady->"+resource.getAbsolutePath());
-                                                    ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
-                                                    tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
-                                                } catch (FileNotFoundException e) {
-                                                    e.printStackTrace();
-                                                    tvOriginal.setText(e.getMessage());
-                                                }
-                                            }
+                    @Override
+                    public void onNext(@io.reactivex.annotations.NonNull File resource) {
 
-                                            @Override
-                                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                                super.onLoadFailed(e, errorDrawable);
-                                                if(e !=null){
-                                                    tvOriginal.setText(e.getMessage());
-                                                }
-                                            }
-                                        });
-                                return true;
-                            }
-                        })
-                        .into(ivGlide);
+                        try {
+                            ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
+                            tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                            tvOriginal.setText(e.getMessage());
+                        }
+                    }
 
+                    @Override
+                    public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                        getByGlide(http,s,context);
+                    }
 
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
 
             }else {
                 Observable.just(s)
@@ -300,6 +299,51 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
 
         }
+    }
+
+    private void getByGlide(String http, String s, Activity context) {
+        Glide.with(context)
+                .load(http)
+                .priority(Priority.IMMEDIATE)
+
+                .listener(new RequestListener< Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        android.util.Log.e("GLIDE", String.format(Locale.ROOT,
+                                "onException(%s, %s, %s, %s)", e, model, target, isFirstResource), e);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        android.util.Log.w("GLIDE", String.format(Locale.ROOT,
+                                "onResourceReady(%s, %s, %s, %s)", resource, model, target, isFirstResource));
+                        Glide.with(context)
+                                .load(http)
+                                // .priority(Priority.HIGH)
+                                .downloadOnly(new SimpleTarget<File>() {
+                                    @Override
+                                    public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                                        try {
+                                            Log.w("glide","onResourceReady->"+resource.getAbsolutePath());
+                                            ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
+                                            tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                            tvOriginal.setText(e.getMessage());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                        super.onLoadFailed(errorDrawable);
+
+                                    }
+                                });
+                        return false;
+                    }
+                })
+                .into(ivGlide);
     }
 
     private void showImage(String s, Context context) {
@@ -386,6 +430,132 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                // rlOriginal.setVisibility(View.GONE);
                 //FileApiForSmb smb =
             }
+        }
+    }
+
+    public void getFile(String url, Context context, Observer<File> callable){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File file = getFileFromCache(url,context);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(file != null){
+                            callable.onNext(file);
+                        }else {
+                            callable.onError(new Throwable("file not exist"));
+                        }
+                    }
+                });
+
+            }
+        }).start();
+    }
+
+    public File getFileFromCache(String url,Context context){
+        try {
+            //不能在主线程
+            File file  =  Glide.with(context).downloadOnly().load(url).apply(new RequestOptions().onlyRetrieveFromCache(true)).submit().get();
+            if(file.exists()){
+                return file;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean isCached(String url,Context context) {
+
+
+
+        OriginalKey originalKey = new OriginalKey(url, EmptySignature.obtain());
+        SafeKeyGenerator safeKeyGenerator = new SafeKeyGenerator();
+        String safeKey = safeKeyGenerator.getSafeKey(originalKey);
+        try {
+            DiskLruCache diskLruCache = DiskLruCache.open(new File(context.getCacheDir(), DiskCache.Factory.DEFAULT_DISK_CACHE_DIR), 1, 1, DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE);
+            DiskLruCache.Value value = diskLruCache.get(safeKey);
+            if (value != null && value.getFile(0).exists() && value.getFile(0).length() > 30) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+
+    }
+
+    private static class OriginalKey implements Key {
+
+        private final String id;
+        private final Key signature;
+
+        public OriginalKey(String id, Key signature) {
+            this.id = id;
+            this.signature = signature;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            OriginalKey that = (OriginalKey) o;
+
+            if (!id.equals(that.id)) {
+                return false;
+            }
+            if (!signature.equals(that.signature)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = id.hashCode();
+            result = 31 * result + signature.hashCode();
+            return result;
+        }
+
+        @Override
+        public void updateDiskCacheKey(MessageDigest messageDigest) {
+            try {
+                messageDigest.update(id.getBytes(STRING_CHARSET_NAME));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            signature.updateDiskCacheKey(messageDigest);
+        }
+    }
+
+    private static class SafeKeyGenerator {
+        private final LruCache<Key, String> loadIdToSafeHash = new LruCache<Key, String>(1000);
+
+        public String getSafeKey(Key key) {
+            String safeKey;
+            synchronized (loadIdToSafeHash) {
+                safeKey = loadIdToSafeHash.get(key);
+            }
+            if (safeKey == null) {
+                try {
+                    MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+                    key.updateDiskCacheKey(messageDigest);
+                    safeKey = Util.sha256BytesToHex(messageDigest.digest());
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
+                synchronized (loadIdToSafeHash) {
+                    loadIdToSafeHash.put(key, safeKey);
+                }
+            }
+            return safeKey;
         }
     }
 

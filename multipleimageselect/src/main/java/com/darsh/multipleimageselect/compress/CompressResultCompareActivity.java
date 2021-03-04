@@ -17,6 +17,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.darsh.multipleimageselect.R;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -106,7 +107,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
             setResult(RESULT_CANCELED,intent);
             finish();
         }else {
-            super.onBackPressed();
+            finish();
         }
 
     }
@@ -139,7 +140,6 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 files.add(new File(path));
             }
         }
-
         adapter = new SuperPagerAdapter(this) {
             @Override
             protected SuperPagerHolder generateNewHolder(Context context, ViewGroup viewGroup, int i) {
