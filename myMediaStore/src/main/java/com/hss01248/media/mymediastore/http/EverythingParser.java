@@ -80,13 +80,13 @@ public class EverythingParser {
             bean.fileSize = paseSize(sizeData);
             String name = "";
             String href = "";
-            boolean isFile = false;
+            boolean isDir = false;
             Element element1 = null;
 
             if("folder".equals(clazzName)){
                  element1 = element.selectFirst("td.folder > span > nobr > a");
+                 isDir = true;
             }else if("file".equals(clazzName)){
-                isFile = true;
                 element1  = element.selectFirst("td.file > span > nobr > a");
             }else {
                 Log.w("http","other type:"+clazzName);
@@ -96,11 +96,11 @@ public class EverythingParser {
                 href = element1.attr("href");
                 bean.name = name;
                 bean.url = host+href;
-                bean.isDir = !isFile;
+                bean.isDir = isDir;
                 beans.add(bean);
             }
 
-            Log.i("httpbean","modifieddata "+modifieddata+","+sizeData+","+name+",href:"+href+", is file:"+isFile+"\n"+bean);
+            Log.i("httpbean","modifieddata "+modifieddata+","+sizeData+","+name+",href:"+href+", is file:"+isDir+"\n"+bean);
 
         }
         return beans;
@@ -122,6 +122,7 @@ public class EverythingParser {
         }
         try {
             String[] strs = sizeData.split(" ");
+            strs[0] = strs[0].replaceAll(",","");
             float f = Float.parseFloat(strs[0]);
             if("MB".equalsIgnoreCase(strs[1])){
                 return (long) (f*1024*1024);
@@ -145,13 +146,19 @@ public class EverythingParser {
     }
 
   public static SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
+    public static SimpleDateFormat sdf2 = new SimpleDateFormat( "yyyy/MM/dd HH:mm" );
     ////2020-10-12 7:30
+    //"2021/1/6 21:09"
     private static long parseDate(String modifieddata) {
         Date date = null;
         try {
-            date = sdf.parse( modifieddata);
+            if(modifieddata.contains("-")){
+                date = sdf.parse( modifieddata);
+            }else if(modifieddata.contains("/")){
+                date = sdf2.parse( modifieddata);
+            }
             return date.getTime();
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }

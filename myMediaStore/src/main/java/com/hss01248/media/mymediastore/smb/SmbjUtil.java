@@ -154,7 +154,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
             Session session = connection.authenticate(ac);
 
 
-            checkRootDirs(session,ip);
+            //checkRootDirs(session,ip);
 
             /*after digging a bit deeper i found a solution, but in my opinion there is an inconsistant behavior.
 by calling share.getSecurityInfo("",...) for Root folder i'm getting an Error.

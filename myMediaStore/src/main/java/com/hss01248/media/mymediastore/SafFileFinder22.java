@@ -58,6 +58,9 @@ public class SafFileFinder22<T extends IFile>{
         //resources
         folderToSkip.add("resources");
         folderToSkip.add("res");
+        folderToSkip.add("ProgramData");
+        folderToSkip.add("Program Files");
+        folderToSkip.add("Windows");
     }
 
     private static void listFromDb(ScanFolderCallback observer, boolean onlyDb) {

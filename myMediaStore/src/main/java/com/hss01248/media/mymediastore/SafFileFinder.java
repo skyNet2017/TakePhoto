@@ -53,7 +53,7 @@ public class SafFileFinder {
                 }
 
                 //scanByFile(hasDataInDb, executorService, observer);
-                scanBySaf(hasDataInDb, executorService, observer);
+                //scanBySaf(hasDataInDb, executorService, observer);
 
             }
         });

@@ -20,7 +20,7 @@ public class LoggingListener<R> implements RequestListener<R> {
 
     @Override
     public boolean onResourceReady(R resource, Object model, Target<R> target, DataSource dataSource, boolean isFirstResource) {
-        android.util.Log.w("GLIDE", String.format(Locale.ROOT,
+        android.util.Log.d("GLIDE", String.format(Locale.ROOT,
                 "onResourceReady(%s, %s, %s, %s)", resource, model, target,  isFirstResource));
         return false;
     }

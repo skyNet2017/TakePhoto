@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.darsh.multipleimageselect.R;
+import com.darsh.multipleimageselect.helpers.LoggingListener;
 import com.darsh.multipleimageselect.models.Album;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
@@ -18,6 +19,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +61,22 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
             desc = desc+"\n"+formatTime(album.duration);
         }
 
+        Uri uri1 = Uri.parse(album.pathOrUri);
+        if(uri1 != null){
+            desc = desc+" "+uri1.getScheme();
+        }
+
 
         viewHolder.textView.setText(desc);
 
         String cover = arrayList.get(position).cover;
+
+        if(cover.startsWith("http") || cover.startsWith("smb")){
+            if(album.type == BaseMediaInfo.TYPE_AUDIO || cover.endsWith(".mp4")
+                    || cover.endsWith(".mkv")  || cover.endsWith(".r00") || cover.endsWith(".rar")){
+                return convertView;
+            }
+        }
         Uri uri = null;
         if(cover.startsWith("content")){
             uri = Uri.parse(cover);
@@ -75,10 +89,11 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
             uri = Uri.parse(cover);
         }
 
-
+        android.util.Log.i("GLIDE", "start load url:"+ URLDecoder.decode(uri.toString()));
         Glide.with(context)
                 .load(uri)
                 .thumbnail(0.2f)
+                .listener(new LoggingListener<>())
                 .placeholder(R.drawable.image_placeholder).centerCrop().into(viewHolder.imageView);
 
 
