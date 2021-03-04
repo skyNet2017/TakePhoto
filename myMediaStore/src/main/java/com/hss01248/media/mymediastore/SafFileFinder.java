@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SafFileFinder {
 
-    static final String SP_NAME = "DirPermission";
+   public static final String SP_NAME = "DirPermission";
 
     public static void listAllAlbum(final ScanFolderCallback observer, boolean onlyDb) {
         listFromDb(observer,onlyDb);
@@ -52,16 +52,16 @@ public class SafFileFinder {
                     return;
                 }
 
-                //scanByFile(hasDataInDb, executorService, observer);
-                //scanBySaf(hasDataInDb, executorService, observer);
+                scanByFile(hasDataInDb, executorService, observer);
+                scanBySaf(hasDataInDb, executorService, observer);
 
             }
         });
     }
 
     private static void scanByFile(boolean hasDataInDb, ExecutorService executorService, ScanFolderCallback observer) {
-        if(System.currentTimeMillis() - FileScanner.safStart < 60*1000*10){
-            //10min内不刷新
+        if(System.currentTimeMillis() - FileScanner.safStart < 60*1000*60){
+            //1h内不刷新
             return;
         }
         FileScanner.safStart = System.currentTimeMillis();
@@ -69,6 +69,10 @@ public class SafFileFinder {
     }
 
     volatile static boolean hasFinishedBefore;
+
+
+
+
     private static void scanBySaf(boolean hasDataInDb, ExecutorService executorService, ScanFolderCallback observer) {
         if (SafUtil.sdRoot == null) {
             Log.w(SafUtil.TAG, Thread.currentThread().getName() + "  SafUtil.sdRoot is null");
@@ -79,7 +83,8 @@ public class SafFileFinder {
         SharedPreferences sp = SafUtil.context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         if (hasDataInDb) {
             long latScanFinishedTime = sp.getLong("latScanFinishedTime", 0);
-            if (latScanFinishedTime != 0 && (System.currentTimeMillis() - latScanFinishedTime < 12 * 60 * 60 * 1000)) {
+            if (latScanFinishedTime != 0 && (System.currentTimeMillis() - latScanFinishedTime < 48 * 60 * 60 * 1000)) {
+
                 Log.w(SafUtil.TAG, "一天内只全量扫描一次");
                 //遍历所有文件夹完成!!!!!!!!!!!!!!! 耗时(s):1039
 

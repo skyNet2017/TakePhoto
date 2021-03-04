@@ -92,7 +92,7 @@ public class BaseApp extends Application {
               @Override
               public void run() {
                  // SmbjUtil.connect();
-                  /*HttpHelper.start("http://192.168.3.8:9265", new ScanFolderCallback() {
+                  HttpHelper.start("http://192.168.3.8:9265", new ScanFolderCallback() {
                       @Override
                       public void onComplete() {
 
@@ -112,7 +112,7 @@ public class BaseApp extends Application {
                       public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
 
                       }
-                  });*/
+                  });
               }
           }).start();
       }

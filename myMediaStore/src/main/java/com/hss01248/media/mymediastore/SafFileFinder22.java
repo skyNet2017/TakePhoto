@@ -162,7 +162,7 @@ public class SafFileFinder22<T extends IFile>{
             public void run() {
                 IFile[] files = dir.listFiles();
                 if (files == null || files.length == 0) {
-                    DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
+                    DbUtil.delete(dir.getPath(),BaseMediaInfo.TYPE_IMAGE,BaseMediaInfo.TYPE_VIDEO,BaseMediaInfo.TYPE_AUDIO);
                     int count0 = countGetSaf.decrementAndGet();
                     Log.e(SafUtil.TAG, "当前文件夹为空,原子count计数:" + count0 + ", " + dir.getPath()+", name:"+dir.getName());
                     if (count0 == 0) {
@@ -180,7 +180,7 @@ public class SafFileFinder22<T extends IFile>{
                     file.printInfo();
                     if (file.isDirectory()) {
                        if( folderToSkip.contains(file.getName())){
-                           Log.e("smb","跳过文件夹:"+file.getUri());
+                           Log.e("smb","跳过文件夹:"+file.getPath());
                             continue;
                         }
 
@@ -212,6 +212,7 @@ public class SafFileFinder22<T extends IFile>{
                             folder.updatedTime = file.lastModified();
                             folder.path = file.getPath();
                             folder.pathOrUri = dir.getUri().toString();
+                            folder.generateTheId();
                             Log.w("扫描", "添加文件夹:" + dir.getUri().toString());
                             folderMap.put(type,folder);
                         }

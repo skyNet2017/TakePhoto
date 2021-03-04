@@ -1,6 +1,12 @@
 package com.hss01248.media.mymediastore.http;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.SafFileFinder22;
+import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.ScanFolderCallback;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
 
@@ -31,15 +37,32 @@ public class HttpHelper {
 
     }
 
+    public static boolean shouldScan(){
+        SharedPreferences sp = SafUtil.context.getSharedPreferences(SafFileFinder.SP_NAME, Context.MODE_PRIVATE);
+        long latScanFinishedTime = sp.getLong("lasthttpScanTime", 0);
+        if(latScanFinishedTime ==0){
+            return true;
+        }
+        return   System.currentTimeMillis() - latScanFinishedTime > 3 * 60 * 60 * 1000;
+    }
+
     public static void start(String url, final ScanFolderCallback observer){
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        if(!shouldScan()){
+            Log.w("http","还没到扫描间隔");
+            return;
+        }
+        //ExecutorService executorService = Executors.newFixedThreadPool(2);
         HttpFile[] files = EverythingParser.start(url);
         if(files !=null && files.length > 0){
             for (HttpFile file : files) {
-                new SafFileFinder22<HttpFile>().getAlbums(file, executorService, observer);
+                if(file.getPath().contains("/C%3A")){
+                    continue;
+                }
+                new SafFileFinder22<HttpFile>().getAlbums(file, Executors.newFixedThreadPool(4), observer);
             }
-
         }
+        SafUtil.context.getSharedPreferences(SafFileFinder.SP_NAME, Context.MODE_PRIVATE)
+                .edit().putLong("lasthttpScanTime",System.currentTimeMillis()).commit();
     }
 
 
