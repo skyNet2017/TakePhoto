@@ -50,6 +50,11 @@ dependencies {
     api 'me.jahnen:libaums:0.8.0'//usb读写
     api project(':javafs')//usb-ntfs读取支持
     api 'me.jahnen:libaums-libusbcommunication:0.2'
+
+    api group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    api group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.13'
+    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.12.13'
+
 }
 
 

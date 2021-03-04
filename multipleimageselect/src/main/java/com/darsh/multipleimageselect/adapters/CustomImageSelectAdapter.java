@@ -115,6 +115,12 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
         //viewHolder.tvInfo.setText("");
+        if(viewHolder.image.pathOrUri.startsWith("smb") || viewHolder.image.pathOrUri.startsWith("http") ){
+            viewHolder.tvInfo.setText(uri.getPath().substring(uri.getPath().lastIndexOf("/")+1)+"\n"
+                    + ImageInfoFormater.formatFileSize(image.fileSize)
+                    +" "+ImageInfoFormater.formatTime(image.updatedTime));
+            return convertView;
+        }
 
         Observable.just(viewHolder1)
                 .subscribeOn(Schedulers.io())

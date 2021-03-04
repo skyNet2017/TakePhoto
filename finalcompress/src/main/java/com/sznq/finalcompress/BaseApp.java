@@ -25,12 +25,16 @@ import com.fanjun.keeplive.config.KeepLiveService;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.SafUtil;
+import com.hss01248.media.mymediastore.ScanFolderCallback;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.hss01248.media.mymediastore.http.HttpHelper;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.shizhefei.view.largeimage.BlockImageLoader;
 import com.simple.spiderman.SpiderMan;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.List;
 
 /**
  * Created by hss on 2018/12/22.
@@ -87,7 +91,28 @@ public class BaseApp extends Application {
           new Thread(new Runnable() {
               @Override
               public void run() {
-                  SmbjUtil.connect();
+                 // SmbjUtil.connect();
+                  /*HttpHelper.start("http://122.226.210.62:121/E%3A", new ScanFolderCallback() {
+                      @Override
+                      public void onComplete() {
+
+                      }
+
+                      @Override
+                      public void onFromDB(List<BaseMediaFolderInfo> folderInfos) {
+
+                      }
+
+                      @Override
+                      public void onScanEachFolder(List<BaseMediaFolderInfo> folderInfos) {
+
+                      }
+
+                      @Override
+                      public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
+
+                      }
+                  });*/
               }
           }).start();
       }

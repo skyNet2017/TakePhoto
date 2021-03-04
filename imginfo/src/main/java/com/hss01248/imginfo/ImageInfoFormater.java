@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import it.sephiroth.android.library.exif2.ExifInterface;
@@ -87,6 +89,10 @@ public class ImageInfoFormater {
         }
     }
 
+    public static SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
+    public static String formatTime(long time){
+        return sdf.format(new Date(time));
+    }
 
     public static String formatFileSize(long size) {
         try {
@@ -134,7 +140,6 @@ public class ImageInfoFormater {
         } else {
             Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
         }
-        Bitmap bitmap = BitmapFactory.decodeFile(path, options); // 此时返回的bitmap为null
         /**
          *options.outHeight为原始图片的高
          */

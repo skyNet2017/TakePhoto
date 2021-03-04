@@ -5,6 +5,7 @@ import android.app.Activity;
 import androidx.annotation.Nullable;
 
 import android.content.Context;
+import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -19,13 +20,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.activities.ImageSelectActivity;
+import com.darsh.multipleimageselect.helpers.LoggingListener;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.gson.Gson;
@@ -46,6 +51,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -81,6 +87,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
     LinearLayout llCompress;
     GifImageView gif;
+    ImageView ivGlide;
 
     public CpHolder setPreview(boolean preview) {
         isPreview = preview;
@@ -116,6 +123,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         ivOriginalSaf = rootView.findViewById(R.id.iv_original_saf);
         ivCompressedSaf = rootView.findViewById(R.id.iv_compressed_saf);
         gif = rootView.findViewById(R.id.gif_original);
+
+        ivGlide = rootView.findViewById(R.id.iv_glide);
 
     }
 
@@ -204,25 +213,51 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                 String http = SmbToHttp.getHttpUrlFromSmb(s);
                 Glide.with(context)
                         .load(http)
-                        .downloadOnly(new SimpleTarget<File>() {
+                        .priority(Priority.IMMEDIATE)
+
+                        .listener(new RequestListener<String, GlideDrawable>() {
                             @Override
-                            public void onResourceReady(File resource, GlideAnimation<? super File> glideAnimation) {
-                                try {
-                                    ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                    tvOriginal.setText(e.getMessage());
-                                }
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                android.util.Log.e("GLIDE", String.format(Locale.ROOT,
+                                        "onException(%s, %s, %s, %s)", e, model, target, isFirstResource), e);
+                                return false;
                             }
 
                             @Override
-                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                super.onLoadFailed(e, errorDrawable);
-                                if(e !=null){
-                                    tvOriginal.setText(e.getMessage());
-                                }
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                android.util.Log.w("GLIDE", String.format(Locale.ROOT,
+                                        "onResourceReady(%s, %s, %s, %s, %s)", resource, model, target, isFromMemoryCache, isFirstResource));
+                                Glide.with(context)
+                                        .load(http)
+                                        // .priority(Priority.HIGH)
+                                        .downloadOnly(new SimpleTarget<File>() {
+                                            @Override
+                                            public void onResourceReady(File resource, GlideAnimation<? super File> glideAnimation) {
+                                                try {
+                                                    Log.w("glide","onResourceReady->"+resource.getAbsolutePath());
+                                                    ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
+                                                    tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                                                } catch (FileNotFoundException e) {
+                                                    e.printStackTrace();
+                                                    tvOriginal.setText(e.getMessage());
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                                super.onLoadFailed(e, errorDrawable);
+                                                if(e !=null){
+                                                    tvOriginal.setText(e.getMessage());
+                                                }
+                                            }
+                                        });
+                                return true;
                             }
-                        });
+                        })
+                        .into(ivGlide);
+
+
+
             }else {
                 Observable.just(s)
                         .subscribeOn(Schedulers.io())
@@ -359,7 +394,12 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                 .map(new Function<String, String>() {
                     @Override
                     public String apply(String s) throws Exception {
-                        return ImageInfoFormater.formatImagInfo(s,true);
+                        if(s.startsWith("http") || s.startsWith("smb")){
+                            return s;
+                        }else {
+                            return ImageInfoFormater.formatImagInfo(s,true);
+                        }
+
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
