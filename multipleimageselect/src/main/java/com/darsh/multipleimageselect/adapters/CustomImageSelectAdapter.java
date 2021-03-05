@@ -102,9 +102,8 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
             uri = Uri.parse(image.pathOrUri);
         }
         if(image.pathOrUri.startsWith("http") || image.pathOrUri.startsWith("smb")){
-            if(image.type == BaseMediaInfo.TYPE_AUDIO|| image.pathOrUri.endsWith(".mp4")
-                    || image.pathOrUri.endsWith(".mkv")  || image.pathOrUri.endsWith(".r00") || image.pathOrUri.endsWith(".rar")){
-                viewHolder.tvInfo.setText(uri.getPath().substring(uri.getPath().lastIndexOf("/")+1)+"\n"+ ImageInfoFormater.formatFileSize(image.fileSize));
+            if(image.type != BaseMediaInfo.TYPE_IMAGE){
+                viewHolder.tvInfo.setText(image.pathOrUri+"\n"+ ImageInfoFormater.formatFileSize(image.fileSize));
                 return convertView;
             }
         }

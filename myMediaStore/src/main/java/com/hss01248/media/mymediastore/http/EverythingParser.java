@@ -55,6 +55,10 @@ public class EverythingParser {
 
     }
 
+    //http://122.226.210.62:121/?search=*.gif%7C*.jpg
+
+
+
 
     private static List<HttpResponseBean> parseHtml(String url, String html) {
         Document doc = Jsoup.parse(html);

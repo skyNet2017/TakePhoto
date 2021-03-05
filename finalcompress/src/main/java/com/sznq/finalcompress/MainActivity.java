@@ -28,6 +28,7 @@ import com.gc.materialdesign.views.ButtonRectangle;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.hss01248.media.mymediastore.usb.UsbUtil;
+import com.noober.menu.FloatMenu;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -266,10 +267,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void listAllImages(View view) {
-        ImageSelectActivity.listAll(this, BaseMediaInfo.TYPE_IMAGE);
+
+        final FloatMenu floatMenu = new FloatMenu(this, view);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[8];
+        desc[0] = "图片"  ;
+        desc[1] ="视频";
+        desc[2] = "音频"  ;
+        desc[3] ="pdf";
+        desc[4] = "word"  ;
+        desc[5] ="excel";
+        desc[6] = "ppt"  ;
+        desc[7] ="txt";
+        /* public static final int TYPE_IMAGE = 1;
+    public static final int TYPE_VIDEO = 2;
+    public static final int TYPE_AUDIO = 3;
+    public static final int TYPE_DOC_PDF = 4;//pdf
+    public static final int TYPE_DOC_WORD = 5;//msword
+    public static final int TYPE_DOC_EXCEL = 6;//excel
+    public static final int TYPE_DOC_PPT = 7;//powerpoint
+    public static final int TYPE_DOC_TXT = 8;  //文件名.txt*/
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                ImageSelectActivity.listAll(MainActivity.this,  position+1);
+            }
+        });
+        floatMenu.showAsDropDown(view);
+
     }
 
-    public void listAllVideo(View view) {
-        ImageSelectActivity.listAll(this, BaseMediaInfo.TYPE_VIDEO);
-    }
+
 }

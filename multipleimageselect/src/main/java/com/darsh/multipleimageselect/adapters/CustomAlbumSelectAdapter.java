@@ -3,6 +3,7 @@ package com.darsh.multipleimageselect.adapters;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,6 +15,7 @@ import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.helpers.LoggingListener;
 import com.darsh.multipleimageselect.models.Album;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
@@ -51,8 +53,8 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
         BaseMediaFolderInfo album = arrayList.get(position);
         viewHolder.imageView.getLayoutParams().width = size;
         viewHolder.imageView.getLayoutParams().height = size;
-        String desc = ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count+" "+typeDes(album.type);
-        if(album.type == BaseMediaInfo.TYPE_AUDIO){
+        String desc = ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count+" "+FileTypeUtil.getDesc(album.type);
+        if(album.type != BaseMediaInfo.TYPE_IMAGE){
             desc = album.pathOrUri+"\n"+desc;
         }else {
             desc =  album.name+"\n"+desc;
@@ -63,7 +65,11 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
 
         Uri uri1 = Uri.parse(album.pathOrUri);
         if(uri1 != null){
-            desc = desc+" "+uri1.getScheme();
+            String scheme = uri1.getScheme();
+            if(TextUtils.isEmpty(scheme)){
+                scheme = "file";
+            }
+            desc = desc+" "+scheme;
         }
 
 
@@ -72,8 +78,7 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
         String cover = arrayList.get(position).cover;
 
         if(cover.startsWith("http") || cover.startsWith("smb")){
-            if(album.type == BaseMediaInfo.TYPE_AUDIO || cover.endsWith(".mp4")
-                    || cover.endsWith(".mkv")  || cover.endsWith(".r00") || cover.endsWith(".rar")){
+            if(FileTypeUtil.getTypeByFileName(cover) != BaseMediaInfo.TYPE_IMAGE){
                 return convertView;
             }
         }

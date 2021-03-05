@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.Keep;
+
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.msfscc.fileinformation.FileAllInformation;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
@@ -26,6 +28,7 @@ import org.greenrobot.greendao.annotation.Generated;
 import java.util.EnumSet;
 import java.util.Objects;
 
+@Keep
 @Entity
 public class BaseMediaInfo {
 
@@ -47,7 +50,7 @@ public class BaseMediaInfo {
 
     public String name;
 
-    public int  isHiden = 1;
+    public int  isHiden = 0;
 
     public IFile getFile() {
         if(file == null){

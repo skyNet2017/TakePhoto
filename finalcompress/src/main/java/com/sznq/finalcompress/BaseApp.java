@@ -27,6 +27,8 @@ import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.ScanFolderCallback;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.http.EverythingSearchParser;
 import com.hss01248.media.mymediastore.http.HttpHelper;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.shizhefei.view.largeimage.BlockImageLoader;
@@ -87,12 +89,14 @@ public class BaseApp extends Application {
           Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
 
-
+          EverythingSearchParser.searchMediaType("http://122.226.210.62:121/");
+          EverythingSearchParser.searchDocType("http://122.226.210.62:121/");
           new Thread(new Runnable() {
               @Override
               public void run() {
                  // SmbjUtil.connect();
-                  HttpHelper.start("http://192.168.3.8:9265", new ScanFolderCallback() {
+
+                 /* HttpHelper.start("http://192.168.3.8:9265", new ScanFolderCallback() {
                       @Override
                       public void onComplete() {
 
@@ -112,7 +116,7 @@ public class BaseApp extends Application {
                       public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
 
                       }
-                  });
+                  });*/
               }
           }).start();
       }

@@ -260,17 +260,19 @@ public class ImageSelectActivity extends HelperActivity {
                     for (BaseMediaInfo image : images) {
                         files.add(image.pathOrUri);
                     }
-                    if(type == 1){
+                    if(type == BaseMediaInfo.TYPE_IMAGE){
                         //点击去预览
                         CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
-                    }else {
+                    }else if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
                         if(files.get(position).startsWith("smb:")){
                             playByOther(images.get(position).pathOrUri);
                         }else {
                             VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
                         }
-                        //viewVideo(images.get(position));
+                        //
 
+                    }else {
+                        viewVideo(images.get(position));
                     }
 
                 }
@@ -433,7 +435,7 @@ public class ImageSelectActivity extends HelperActivity {
     private void showSortMenu(View view) {
         final FloatMenu floatMenu = new FloatMenu(this, view);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[10];
+        String[] desc = new String[12];
         desc[0] ="按更新时间 新在前";
         desc[1] ="按更新时间顺序 旧在前";
         desc[2] = "文件大小从大到小";
@@ -443,9 +445,11 @@ public class ImageSelectActivity extends HelperActivity {
 
         desc[6] ="按画面尺寸 高分辨率在前";
         desc[7] ="按画面尺寸 低分辨率在前";
+        desc[8] ="按文件路径 顺序";
+        desc[9] ="按文件路径  倒序";
         if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
-            desc[8] = "按时长 长在前";
-            desc[9] ="按时长 短在前";
+            desc[10] = "按时长 长在前";
+            desc[11] ="按时长 短在前";
         }
 
 

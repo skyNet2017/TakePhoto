@@ -44,16 +44,8 @@
         android:layout_width="250dp"
         android:layout_height="100dp"
         android:onClick="listAllImages"
-        android:text="显示所有图片" />
-    <com.gc.materialdesign.views.ButtonRectangle
-        android:id="@+id/btn_allvideo"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/btn_allimage"
-        android:layout_marginTop="10dp"
-        android:layout_width="250dp"
-        android:layout_height="100dp"
-        android:onClick="listAllVideo"
-        android:text="显示所有视频" />
+        android:text="显示某个类型的所有文件" />
+
     <TextView
         android:layout_below="@id/btn_selected"
         android:layout_width="match_parent"
