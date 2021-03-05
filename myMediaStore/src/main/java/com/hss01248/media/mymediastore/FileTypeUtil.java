@@ -122,10 +122,17 @@ public class FileTypeUtil {
                 ext.add("mkv");
                 ext.add( "avi");
                 ext.add("mpeg");
+                ext.add("mpg");
+                ext.add("vob");
                 ext.add( "wmv");
+                ext.add( "asf");
                 ext.add("rmvb");
+                ext.add("rm");
                 ext.add( "mov");
+                ext.add( "vob");
                 ext.add("flv");
+                ext.add("ts");
+                ext.add("dat");
                 break;
             case BaseMediaInfo.TYPE_DOC_WORD:
                 ext.add( "doc");
@@ -135,6 +142,8 @@ public class FileTypeUtil {
                 ext.add( "jpg");
                 ext.add("jpeg");
                 ext.add( "webp");
+                ext.add( "gif");
+                ext.add( "png");
                 ext.add("avif");
                 ext.add( "heif");
                 break;

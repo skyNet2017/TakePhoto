@@ -51,4 +51,38 @@
         android:paddingLeft="1dp"
         android:paddingRight="1dp"
         android:stretchMode="columnWidth"/>
+    <LinearLayout
+        android:id="@+id/ll_pager"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="horizontal">
+        <TextView
+            android:onClick="pre"
+            android:text="pre"
+            android:gravity="center"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"/>
+        <SeekBar
+
+            android:id="@+id/sb_pager"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="40dp"/>
+        <TextView
+            android:onClick="next"
+            android:text="next"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"/>
+    </LinearLayout>
+
 </RelativeLayout>

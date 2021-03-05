@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,13 +82,15 @@ public class EverythingSearchParser {
                                 BaseMediaInfo info = new BaseMediaInfo();
                                 info.pathOrUri = bean.url;
                                 info.type = type;
-                                info.folderPathOrUri = bean.parentUrl;
+                                info.folderPathOrUri = bean.url.substring(0,bean.url.lastIndexOf("/"));
                                 info.fileSize = bean.fileSize;
                                 info.isHiden = 0;
                                 info.updatedTime = bean.lastModified;
+                                info.name = URLDecoder.decode(bean.url.substring(bean.url.lastIndexOf("/")+1));
                                 infos.add(info);
                             }
-                            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(infos);
+                            writeDb(infos);
+
 
                             if(hasScanAllPage){
                                 return;
@@ -121,6 +124,13 @@ public class EverythingSearchParser {
                 }
             }
         });
+    }
+
+    private static synchronized void writeDb(List<BaseMediaInfo> infos) {
+        if(infos.isEmpty()){
+            return;
+        }
+        DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(infos);
     }
 
     private static String getTypeSearchStr(int type) {
@@ -209,7 +219,7 @@ public class EverythingSearchParser {
                 if(parentPath != null){
                     bean.parentUrl = host+parentPath.attr("href");
                 }else {
-                    Log.e("http","parentUrl is null");
+                    Log.d("http","parentUrl is null");
                 }
                 beans.add(bean);
             }

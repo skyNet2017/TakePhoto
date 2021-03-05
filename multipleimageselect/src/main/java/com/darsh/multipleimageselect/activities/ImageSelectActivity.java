@@ -35,7 +35,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,6 +111,7 @@ public class ImageSelectActivity extends HelperActivity {
     private Thread thread;
     private boolean isSelectAll;
     int type;
+    LinearLayout llPager;
 
     public static void list(Activity activity,BaseMediaFolderInfo info){
         Intent intent = new Intent(activity, ImageSelectActivity.class);
@@ -133,83 +136,10 @@ public class ImageSelectActivity extends HelperActivity {
     }
 
 
-    private ActionMode.Callback callback = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            ImageSelectActivity.this.menu = menu;
-            MenuInflater menuInflater = mode.getMenuInflater();
-            menuInflater.inflate(R.menu.menu_contextual_action_bar, menu);
 
-            if (PhotoCompressHelper.isACompressedDr(new File(images.get(0).pathOrUri))) {
-                menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
-            }
-            actionMode = mode;
-            countSelected = 0;
-
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            int i = item.getItemId();
-            if (i == R.id.menu_item_add_image) {//压缩图片
-                sendIntent();
-                return true;
-            }
-            if (i == R.id.menu_item_select_all) {//全选与取消全选
-                isSelectAll = !isSelectAll;
-               /* for (Image image : images) {
-                    image.isSelected = isSelectAll;
-                }*/
-                if (actionMode != null) {
-                    countSelected = isSelectAll ? images.size() : 0;
-                    actionMode.setTitle(countSelected + " " + getString(R.string.selected));
-                }
-                adapter.notifyDataSetChanged();
-                return true;
-            }
-
-            if (i == R.id.menu_item_delete) {//删除选中项
-                confirmDelete();
-                return true;
-            }
-            if (i == R.id.menu_item_preview) {//预览选中项
-                getSelected();
-                if(countSelected <= 0){
-                    Toast.makeText(ImageSelectActivity.this, R.string.c_mot_selected, Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                ArrayList<String> paths = new ArrayList<>();
-                for (File image : selected) {
-                    paths.add(image.getAbsolutePath());
-                }
-                CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, paths, 0);
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            if (countSelected > 0) {
-                deselectAll();
-            }
-            countSelected = 0;
-            if(selected != null){
-                selected.clear();
-            }
-            isInSelectingMode = false;
-            toolbar.setTitle(R.string.image_preview);
-            actionMode = null;
-        }
-    };
     CommonTitleBar titleBar;
     private String albumDir;
+    SeekBar seekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,6 +151,26 @@ public class ImageSelectActivity extends HelperActivity {
             @Override
             public void onClick(View v) {
                 onBackPressed();
+            }
+        });
+        seekBar = findViewById(R.id.sb_pager);
+        llPager = findViewById(R.id.ll_pager);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                pageIndex[0] = seekBar.getProgress();
+                Toast.makeText(seekBar.getContext(),"跳到第"+(pageIndex[0]+1)+"页",Toast.LENGTH_LONG).show();
+                loadImages();
             }
         });
 
@@ -460,6 +410,8 @@ public class ImageSelectActivity extends HelperActivity {
             @Override
             public void onClick(View v, int position) {
                 DbUtil.fileSortType = position;
+                pageIndex[0] = 0;
+                pageIndex[1] = 0;
                 loadImages();
             }
         });
@@ -830,6 +782,7 @@ public class ImageSelectActivity extends HelperActivity {
 
     }
 
+   volatile int[] pageIndex = new int[]{0,0};
     private void loadImages() {
 
         progressBar.setVisibility(View.VISIBLE);
@@ -837,12 +790,26 @@ public class ImageSelectActivity extends HelperActivity {
             @Override
             public void run() {
                 images.clear();
-                images.addAll(DbUtil.getAllContentInFolders(albumDir,type)) ;
+                images.addAll(DbUtil.getAllContentInFolders(albumDir,type,pageIndex)) ;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        if(pageIndex[1] > 0){
+                            Log.w(SafUtil.TAG, " 需要分页:" );
+                            llPager.setVisibility(View.VISIBLE);
+                            seekBar.setProgress(pageIndex[0]);
+                            seekBar.setMax(pageIndex[1]);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                String text = pageIndex[0]+"/"+pageIndex[1];
+                                seekBar.setTooltipText(text);
+                            }
+                            titleBar.getLeftTextView().setText("page:"+(pageIndex[0]+1)+"/"+pageIndex[1]+",count:"+images.size());
+                        }else {
+                            llPager.setVisibility(View.GONE);
+                            titleBar.getLeftTextView().setText("count:"+images.size());
+                        }
                         progressBar.setVisibility(View.GONE);
-                        titleBar.getLeftTextView().setText("count:"+images.size());
+
                         adapter.notifyDataSetChanged();
                     }
                 });
@@ -881,11 +848,16 @@ public class ImageSelectActivity extends HelperActivity {
     }
 
 
+    public void next(View view) {
+        pageIndex[0]++;
+        loadImages();
+    }
 
-
-
-
-
-
-
+    public void pre(View view) {
+        int idx = pageIndex[0] - 1;
+        if (idx >=0){
+            pageIndex[0] = idx;
+            loadImages();
+        }
+    }
 }

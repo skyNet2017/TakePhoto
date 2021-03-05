@@ -207,7 +207,41 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
             if(s.startsWith("/storage/")){
                 gif.setImageURI(Uri.fromFile(new File(s)));
             }else {
-                gif.setImageURI(Uri.parse(s));
+                if( s.startsWith("http")){
+                    String http = s;
+                    getFile(http, context, new Observer<File>() {
+                        @Override
+                        public void onSubscribe(@io.reactivex.annotations.NonNull Disposable d) {
+
+                        }
+
+                        @Override
+                        public void onNext(@io.reactivex.annotations.NonNull File resource) {
+
+                            try {
+                                gif.setImageURI(Uri.fromFile(resource));
+                                tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                tvOriginal.setText(e.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onError(@io.reactivex.annotations.NonNull Throwable e) {
+                            getByGlide(http,s,context);
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
+
+                }else {
+                    gif.setImageURI(Uri.parse(s));
+                }
+
             }
 
             //下载,然后播放
@@ -326,9 +360,14 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                                     public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
                                         try {
                                             Log.w("glide","onResourceReady->"+resource.getAbsolutePath());
-                                            ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
+                                            if(s.contains(".gif")){
+                                                gif.setImageURI(Uri.fromFile(resource));
+                                            }else {
+                                                ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
+                                            }
+
                                             tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
-                                        } catch (FileNotFoundException e) {
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                             tvOriginal.setText(e.getMessage());
                                         }

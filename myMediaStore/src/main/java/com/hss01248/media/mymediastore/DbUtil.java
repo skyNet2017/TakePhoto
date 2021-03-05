@@ -203,23 +203,51 @@ public class DbUtil {
         }
     }
 
-    public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type) {
+    public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type, int[] pageIndex) {
         long start = System.currentTimeMillis();
 
         QueryBuilder<BaseMediaInfo> builder =
          getDaoSession().getBaseMediaInfoDao().queryBuilder();
         if(TextUtils.isEmpty(dir)){
-            builder.where(BaseMediaInfoDao.Properties.Type.eq(type),BaseMediaInfoDao.Properties.FileSize.gt(50*1024));
+            if(type == BaseMediaInfo.TYPE_IMAGE){
+                builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*50));
+            }else {
+                builder.where(BaseMediaInfoDao.Properties.Type.eq(type));
+            }
+
         }else {
             builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir));
         }
 
 
         orderFiles(builder,type);
+
+      if(pageIndex[0] ==0){
+          long count =   builder.count();
+          if(count> 2000){
+              //需要使用分页,每页两千
+              List<BaseMediaInfo> infos =    builder.limit(2000)
+                      .offset(pageIndex[0]*2000).list();
+              pageIndex[1] = (int) Math.ceil(count/2000f);//总条数
+              return infos;
+          }else {
+              List<BaseMediaInfo> infos  = builder .list();
+              Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" +
+                      (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
+              return infos;
+          }
+      }else {
+          List<BaseMediaInfo> infos =    builder.limit(2000)
+                  .offset(pageIndex[0]*2000).list();
+          Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" +
+                  (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
+          return infos;
+      }
+
                // .orderDesc(BaseMediaInfoDao.Properties.UpdatedTime);
-        List<BaseMediaInfo> infos  = builder .list();
-        Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
-        return infos;
+       // List<BaseMediaInfo> infos  = builder .list();
+
+       // return infos;
     }
 
     /**
