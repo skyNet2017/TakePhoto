@@ -4,29 +4,24 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class EverythingParser {
+public class EverythingSearchParser {
 
     //http://59.46.68.148:9999/
-    public static HttpFile[]  start(String url){
+    public static HttpFile[]  startSearch(String rootUrl,int type){
+        String url = rootUrl+"?search="+getTypeSearchStr(type);
         Request request = new Request.Builder()
                 .url(url)
                 .get().build();
@@ -56,8 +51,11 @@ public class EverythingParser {
     }
 
     //http://122.226.210.62:121/?search=*.gif%7C*.jpg
+    //body > center:nth-child(1) > table > tbody > tr:nth-child(4) > td.pathdata
 
 
+
+    
 
 
     private static List<HttpResponseBean> parseHtml(String url, String html) {
