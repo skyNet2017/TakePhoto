@@ -1,10 +1,12 @@
 package com.hss01248.media.mymediastore.bean;
 
 
+import androidx.annotation.Keep;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
-
+@Keep
 @Entity
 public class StorageBean {
 

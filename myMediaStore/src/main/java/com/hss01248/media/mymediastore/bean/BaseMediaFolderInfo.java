@@ -2,6 +2,8 @@ package com.hss01248.media.mymediastore.bean;
 
 import android.os.Build;
 
+import androidx.annotation.Keep;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
@@ -11,7 +13,7 @@ import java.util.Objects;
 import static com.hss01248.media.mymediastore.bean.BaseMediaInfo.TYPE_AUDIO;
 import static com.hss01248.media.mymediastore.bean.BaseMediaInfo.TYPE_IMAGE;
 import static com.hss01248.media.mymediastore.bean.BaseMediaInfo.TYPE_VIDEO;
-
+@Keep
 @Entity
 public class BaseMediaFolderInfo {
 
