@@ -209,7 +209,7 @@ public class DbUtil {
         QueryBuilder<BaseMediaInfo> builder =
          getDaoSession().getBaseMediaInfoDao().queryBuilder();
         if(TextUtils.isEmpty(dir)){
-            if(type == BaseMediaInfo.TYPE_IMAGE){
+            if(type == BaseMediaInfo.TYPE_IMAGE|| type == BaseMediaInfo.TYPE_VIDEO){
                 builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*50));
             }else {
                 builder.where(BaseMediaInfoDao.Properties.Type.eq(type));
