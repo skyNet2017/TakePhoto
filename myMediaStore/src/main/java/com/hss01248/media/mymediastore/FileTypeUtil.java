@@ -9,6 +9,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -212,6 +213,8 @@ public class FileTypeUtil {
     static Map<Class,Map<Object,String>> descMap = new HashMap<>();
 
 
+
+
     /**
      *
      * @param clazz
@@ -245,6 +248,15 @@ public class FileTypeUtil {
 
     public static String  getDesc(int type){
         return getMap(BaseMediaInfo.class,"TYPE_").get(type);
+    }
+
+    public static String getName(String uri){
+        uri = URLDecoder.decode(uri);
+        int idx = uri.lastIndexOf("/");
+        if(idx>0){
+            return uri.substring(idx+1);
+        }
+        return uri;
     }
 
 

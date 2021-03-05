@@ -131,9 +131,9 @@ public class DbUtil {
      */
     private static void doFilter(QueryBuilder<BaseMediaFolderInfo> builder) {
         if(folderFilterType == 0){
-            builder.whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),
+           /* builder.whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),
                     BaseMediaFolderInfoDao.Properties.Type.eq(2)
-                    , BaseMediaFolderInfoDao.Properties.Type.eq(3));
+                    , BaseMediaFolderInfoDao.Properties.Type.eq(3));*/
         }else if(folderFilterType == 1){
             builder.whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),
                     BaseMediaFolderInfoDao.Properties.Type.eq(2));
@@ -232,9 +232,11 @@ public class DbUtil {
 
      desc[6] ="按画面尺寸 高分辨率在前";
      desc[7] ="按画面尺寸 低分辨率在前";
+     desc[8] ="按文件路径 顺序";
+     desc[9] ="按文件路径  倒序";
      if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
-     desc[8] = "按时长 长在前";
-     desc[9] ="按时长 短在前";
+     desc[10] = "按时长 长在前";
+     desc[11] ="按时长 短在前";
      }
      * @param builder
      * @param type
@@ -271,8 +273,12 @@ public class DbUtil {
             }
 
         }else if(fileSortType == 8){
-            builder.orderDesc(BaseMediaInfoDao.Properties.Duration);
+            builder.orderAsc(BaseMediaInfoDao.Properties.PathOrUri);
         }else if(fileSortType == 9){
+            builder.orderDesc(BaseMediaInfoDao.Properties.PathOrUri);
+        }else if(fileSortType == 10){
+            builder.orderDesc(BaseMediaInfoDao.Properties.Duration);
+        }else if(fileSortType == 11){
             builder.orderAsc(BaseMediaInfoDao.Properties.Duration);
         }
     }

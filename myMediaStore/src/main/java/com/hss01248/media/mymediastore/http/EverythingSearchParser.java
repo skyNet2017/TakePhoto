@@ -152,8 +152,10 @@ public class EverythingSearchParser {
 
         //body > center:nth-child(2) > span:nth-child(6) > a
         if(totalPageCount != null && totalPageCount[0]==0 ){
-            Element numEl = doc.selectFirst("a.num");
-            if(numEl != null){
+            Elements numEls = doc.select("a.num");
+            if(numEls != null && numEls.size()> 0){
+                //最后一个
+                Element numEl = numEls.get(numEls.size()-1);
                 String text = numEl.text();
                 if(!TextUtils.isEmpty(text)){
                     totalPageCount[0] = Integer.parseInt(text);

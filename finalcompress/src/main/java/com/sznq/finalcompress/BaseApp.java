@@ -89,7 +89,8 @@ public class BaseApp extends Application {
           Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
 
-          new EverythingSearchParser().startSearch("http://122.226.210.62:121/", BaseMediaInfo.TYPE_DOC_PPT,0);
+          EverythingSearchParser.searchMediaType("http://122.226.210.62:121/");
+          EverythingSearchParser.searchDocType("http://122.226.210.62:121/");
           new Thread(new Runnable() {
               @Override
               public void run() {
