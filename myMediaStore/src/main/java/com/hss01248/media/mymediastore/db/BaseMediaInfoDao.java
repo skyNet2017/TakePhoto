@@ -36,6 +36,7 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         public final static Property Duration = new Property(9, int.class, "duration", false, "DURATION");
         public final static Property Path = new Property(10, String.class, "path", false, "PATH");
         public final static Property Type = new Property(11, int.class, "type", false, "TYPE");
+        public final static Property PraiseCount = new Property(12, Integer.class, "praiseCount", false, "PRAISE_COUNT");
     }
 
 
@@ -62,7 +63,8 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
                 "\"MAX_SIDE\" INTEGER NOT NULL ," + // 8: maxSide
                 "\"DURATION\" INTEGER NOT NULL ," + // 9: duration
                 "\"PATH\" TEXT," + // 10: path
-                "\"TYPE\" INTEGER NOT NULL );"); // 11: type
+                "\"TYPE\" INTEGER NOT NULL ," + // 11: type
+                "\"PRAISE_COUNT\" INTEGER);"); // 12: praiseCount
     }
 
     /** Drops the underlying database table. */
@@ -110,6 +112,11 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
             stmt.bindString(11, path);
         }
         stmt.bindLong(12, entity.getType());
+ 
+        Integer praiseCount = entity.getPraiseCount();
+        if (praiseCount != null) {
+            stmt.bindLong(13, praiseCount);
+        }
     }
 
     @Override
@@ -151,6 +158,11 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
             stmt.bindString(11, path);
         }
         stmt.bindLong(12, entity.getType());
+ 
+        Integer praiseCount = entity.getPraiseCount();
+        if (praiseCount != null) {
+            stmt.bindLong(13, praiseCount);
+        }
     }
 
     @Override
@@ -172,7 +184,8 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
             cursor.getInt(offset + 8), // maxSide
             cursor.getInt(offset + 9), // duration
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // path
-            cursor.getInt(offset + 11) // type
+            cursor.getInt(offset + 11), // type
+            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12) // praiseCount
         );
         return entity;
     }
@@ -191,6 +204,7 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         entity.setDuration(cursor.getInt(offset + 9));
         entity.setPath(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setType(cursor.getInt(offset + 11));
+        entity.setPraiseCount(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
      }
     
     @Override

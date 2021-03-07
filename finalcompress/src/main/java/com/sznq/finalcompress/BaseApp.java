@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.multidex.MultiDex;
 import android.util.Log;
 
+import com.blankj.utilcode.util.Utils;
 import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.facebook.stetho.Stetho;
 import com.fanjun.keeplive.KeepLive;
@@ -88,6 +89,7 @@ public class BaseApp extends Application {
           MyImageWatcher.init();
           Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
+          Utils.init(this);
 
           //EverythingSearchParser.searchMediaType("http://122.226.210.62:121/");
           //EverythingSearchParser.searchDocType("http://122.226.210.62:121/");

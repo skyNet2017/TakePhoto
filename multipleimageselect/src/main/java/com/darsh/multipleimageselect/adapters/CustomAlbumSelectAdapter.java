@@ -79,6 +79,7 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
 
         if(cover.startsWith("http") || cover.startsWith("smb")){
             if(FileTypeUtil.getTypeByFileName(cover) != BaseMediaInfo.TYPE_IMAGE){
+                viewHolder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.c_text_bg));
                 return convertView;
             }
         }

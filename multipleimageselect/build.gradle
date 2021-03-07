@@ -46,4 +46,6 @@ dependencies {
     api 'com.wuhenzhizao:titlebar:1.2.0'
 
     api project(':localvideoplayer')
+
+    api 'com.blankj:utilcodex:1.30.6'
 }

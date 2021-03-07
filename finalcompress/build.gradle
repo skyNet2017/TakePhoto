@@ -119,7 +119,7 @@ dependencies {
     debugImplementation 'com.hjq:logcat:9.5'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0' //注解处理器
-
+    api 'com.blankj:utilcodex:1.30.6'
 
 }
 configurations {

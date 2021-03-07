@@ -203,6 +203,49 @@ public class DbUtil {
         }
     }
 
+    public static void insertOrUpdate2(List<BaseMediaInfo> infos){
+        if(infos==null || infos.isEmpty()){
+            return;
+        }
+        List<BaseMediaInfo> update = new ArrayList<>();
+        List<BaseMediaInfo> insert = new ArrayList<>();
+
+        BaseMediaInfoDao dao = DbUtil.getDaoSession().getBaseMediaInfoDao();
+        for (BaseMediaInfo info : infos) {
+            List<BaseMediaInfo> list=    dao.queryBuilder().where(BaseMediaInfoDao.Properties.PathOrUri.eq(info.pathOrUri)).list();
+            if(list != null && list.size()>0){
+                info.praiseCount = list.get(0).praiseCount;
+                update.add(info);
+            }else {
+                insert.add(info);
+            }
+        }
+        //DbUtil.getDaoSession().getBaseMediaInfoDao().inse
+        dao.insertInTx(insert);
+        dao.updateInTx(update);
+    }
+
+    public static void insertOrUpdate(List<BaseMediaFolderInfo> infos){
+        if(infos==null || infos.isEmpty()){
+            return;
+        }
+        List<BaseMediaFolderInfo> update = new ArrayList<>();
+        List<BaseMediaFolderInfo> insert = new ArrayList<>();
+
+        BaseMediaFolderInfoDao dao = DbUtil.getDaoSession().getBaseMediaFolderInfoDao();
+        for (BaseMediaFolderInfo info : infos) {
+          List<BaseMediaFolderInfo> list=   dao.queryBuilder().where(BaseMediaFolderInfoDao.Properties.PathAndType.eq(info.pathAndType)).list();
+            if(list != null && list.size()>0){
+                update.add(info);
+            }else {
+                insert.add(info);
+            }
+        }
+        //DbUtil.getDaoSession().getBaseMediaInfoDao().inse
+        dao.insertInTx(insert);
+        dao.updateInTx(update);
+    }
+
     public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type, int[] pageIndex) {
         long start = System.currentTimeMillis();
 
@@ -212,7 +255,7 @@ public class DbUtil {
             if(type == BaseMediaInfo.TYPE_IMAGE|| type == BaseMediaInfo.TYPE_VIDEO){
                 builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*50));
             }else {
-                builder.where(BaseMediaInfoDao.Properties.Type.eq(type));
+                builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*10));
             }
 
         }else {
@@ -237,8 +280,10 @@ public class DbUtil {
               return infos;
           }
       }else {
+          long count =   builder.count();
           List<BaseMediaInfo> infos =    builder.limit(2000)
                   .offset(pageIndex[0]*2000).list();
+          pageIndex[1] = (int) Math.ceil(count/2000f);//总条数
           Log.w(SafUtil.TAG, " getAllContentInFolders 耗时(ms):" +
                   (System.currentTimeMillis() - start) + ", size:" + infos.size() + ", dir:" + dir);
           return infos;
@@ -308,6 +353,8 @@ public class DbUtil {
             builder.orderDesc(BaseMediaInfoDao.Properties.Duration);
         }else if(fileSortType == 11){
             builder.orderAsc(BaseMediaInfoDao.Properties.Duration);
+        }else if(fileSortType == 12){
+            builder.orderDesc(BaseMediaInfoDao.Properties.PraiseCount);
         }
     }
 

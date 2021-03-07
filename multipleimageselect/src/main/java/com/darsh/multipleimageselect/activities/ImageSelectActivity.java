@@ -1,6 +1,7 @@
 package com.darsh.multipleimageselect.activities;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +18,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
@@ -41,6 +44,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.EncryptUtils;
+import com.blankj.utilcode.util.FileIOUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.darsh.multipleimageselect.MySelectFileProvider;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
@@ -56,10 +62,13 @@ import com.google.gson.reflect.TypeToken;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.localvideoplayer.VideoPlayUtil;
 import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.http.EverythingSearchParser;
+import com.hss01248.media.mymediastore.http.HttpHelper;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.noober.menu.FloatMenu;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
@@ -72,6 +81,7 @@ import org.reactivestreams.Subscription;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -140,10 +150,24 @@ public class ImageSelectActivity extends HelperActivity {
     CommonTitleBar titleBar;
     private String albumDir;
     SeekBar seekBar;
+    int lastPosition;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("sortType",DbUtil.fileSortType);
+        outState.putInt("currentPage",pageIndex[0]);
+        outState.putInt("lastPosition",gridView.getFirstVisiblePosition());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(savedInstanceState != null){
+            DbUtil.fileSortType = savedInstanceState.getInt("sortType",0);
+            pageIndex[0] = savedInstanceState.getInt("currentPage");
+            lastPosition = savedInstanceState.getInt("lastPosition");
+        }
         setContentView(R.layout.activity_image_select);
 
         titleBar = findViewById(R.id.titlebar);
@@ -217,12 +241,15 @@ public class ImageSelectActivity extends HelperActivity {
                         if(files.get(position).startsWith("smb:")){
                             playByOther(images.get(position).pathOrUri);
                         }else {
-                            VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
-                        }
-                        //
+                            if(files.get(position).endsWith(".mp4")|| type == BaseMediaInfo.TYPE_AUDIO){
+                                VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
+                            }else {
+                                viewVideo(images.get(position).pathOrUri);
+                            }
 
+                        }
                     }else {
-                        viewVideo(images.get(position));
+                        viewVideo(images.get(position).pathOrUri);
                     }
 
                 }
@@ -292,7 +319,7 @@ public class ImageSelectActivity extends HelperActivity {
         BaseMediaInfo folderInfo = images.get(position);
         final FloatMenu floatMenu = new FloatMenu(this, view);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[2];
+        String[] desc = new String[3];
         desc[0] = "开启图片选择模式"  ;
         desc[1] ="删除此文件";
         desc[2] ="点赞+1";
@@ -305,6 +332,14 @@ public class ImageSelectActivity extends HelperActivity {
                     switchToSelectMode();
                 }else if(position == 1){
                     delete(folderInfo,position);
+                }else if(position == 2){
+                    if(folderInfo.praiseCount != null){
+                        folderInfo.praiseCount++;
+                    }else {
+                        folderInfo.praiseCount = 1;
+                    }
+                    adapter.notifyDataSetChanged();
+                    DbUtil.getDaoSession().getBaseMediaInfoDao().update(folderInfo);
                 }
             }
         });
@@ -385,7 +420,7 @@ public class ImageSelectActivity extends HelperActivity {
     private void showSortMenu(View view) {
         final FloatMenu floatMenu = new FloatMenu(this, view);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[12];
+        String[] desc = new String[13];
         desc[0] ="按更新时间 新在前";
         desc[1] ="按更新时间顺序 旧在前";
         desc[2] = "文件大小从大到小";
@@ -397,10 +432,12 @@ public class ImageSelectActivity extends HelperActivity {
         desc[7] ="按画面尺寸 低分辨率在前";
         desc[8] ="按文件路径 顺序";
         desc[9] ="按文件路径  倒序";
+
         if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
             desc[10] = "按时长 长在前";
             desc[11] ="按时长 短在前";
         }
+        desc[12] ="按点赞数 顺序";
 
 
         desc[DbUtil.fileSortType] =  desc[DbUtil.fileSortType] +"(now)";
@@ -420,34 +457,50 @@ public class ImageSelectActivity extends HelperActivity {
 
 
 
-    private void viewVideo(BaseMediaInfo baseMediaInfo) {
+    private void viewVideo(String pathOrUri) {
         try {
-            if (baseMediaInfo.pathOrUri.startsWith("/storage/")) {
+            if (pathOrUri.startsWith("/storage/") || pathOrUri.startsWith("/data/")) {
                 Uri uri = null;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     //判断版本是否在7.0以上
                     uri =
                             MySelectFileProvider.getUriForFile(getApplicationContext(),
                                     getPackageName() + ".selectfileprovider",
-                                    new File(baseMediaInfo.pathOrUri));
+                                    new File(pathOrUri));
                     //添加这一句表示对目标应用临时授权该Uri所代表的文件
                     Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 } else {
-                    uri = Uri.fromFile(new File(baseMediaInfo.pathOrUri));
+                    uri = Uri.fromFile(new File(pathOrUri));
                     Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
             } else {
-                Uri uri = Uri.parse(baseMediaInfo.pathOrUri);
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+
+                if(pathOrUri.startsWith("http")){
+                    int type = FileTypeUtil.getTypeByFileName(pathOrUri);
+                    if(type == BaseMediaInfo.TYPE_VIDEO ){
+                        Uri uri = Uri.parse(pathOrUri);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setDataAndType(uri, "video/*");
+                        startActivity(intent);
+                    }else {
+                        //先下载,下载完成后再调用此方法:
+                        downloadAndCache(pathOrUri);
+                    }
+                }else {
+                    Uri uri = Uri.parse(pathOrUri);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
             }
 
 
@@ -455,6 +508,63 @@ public class ImageSelectActivity extends HelperActivity {
             throwable.printStackTrace();
             Toast.makeText(this,throwable.getMessage(),Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void downloadAndCache(String pathOrUri) {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage("下载文件后打开:"+pathOrUri.substring(pathOrUri.lastIndexOf("/")+1));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String name = pathOrUri.substring(pathOrUri.lastIndexOf("/")+1,pathOrUri.lastIndexOf("."));
+                String suffix = pathOrUri.substring(pathOrUri.lastIndexOf("."));
+                String md5 = EncryptUtils.encryptMD2ToString(pathOrUri)+suffix;
+
+                String fileName = name+"-"+md5+suffix;
+
+                File dir  = new File(getExternalCacheDir(),"downloadxx");
+                dir.mkdirs();
+                File file = new File(dir,fileName);
+                if(file.exists()){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewVideo(file.getAbsolutePath());
+                        }
+                    });
+
+                    return;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.show();
+                    }
+                });
+
+                String[] msg = new String[1];
+                InputStream inputStream = HttpHelper.getInputStream(pathOrUri,msg);
+                if(inputStream == null){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.dismiss();
+                            ToastUtils.showLong("下载失败:"+msg[0]);
+
+                        }
+                    });
+                    return;
+                }
+                FileIOUtils.writeFileFromIS(file,inputStream);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        viewVideo(file.getAbsolutePath());
+                    }
+                });
+            }
+        }).start();
     }
 
     public void refresh() {
@@ -811,6 +921,10 @@ public class ImageSelectActivity extends HelperActivity {
                         progressBar.setVisibility(View.GONE);
 
                         adapter.notifyDataSetChanged();
+                        if(lastPosition>0){
+                            gridView.smoothScrollToPosition(lastPosition);
+                            lastPosition = 0;
+                        }
                     }
                 });
 

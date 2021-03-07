@@ -120,11 +120,13 @@ public class BaseMediaInfo {
     public String path;
 
     public int type;
+    public Integer praiseCount;
 
-    @Generated(hash = 1420155891)
+    @Generated(hash = 1817727138)
     public BaseMediaInfo(String folderPathOrUri, String smbHost, String smbRootDir,
             String name, int isHiden, String pathOrUri, long fileSize,
-            long updatedTime, int maxSide, int duration, String path, int type) {
+            long updatedTime, int maxSide, int duration, String path, int type,
+            Integer praiseCount) {
         this.folderPathOrUri = folderPathOrUri;
         this.smbHost = smbHost;
         this.smbRootDir = smbRootDir;
@@ -137,11 +139,14 @@ public class BaseMediaInfo {
         this.duration = duration;
         this.path = path;
         this.type = type;
+        this.praiseCount = praiseCount;
     }
 
     @Generated(hash = 1446686172)
     public BaseMediaInfo() {
     }
+
+
 
 
 
@@ -254,6 +259,16 @@ public class BaseMediaInfo {
     public void setType(int type) {
         this.type = type;
     }
+
+    public Integer getPraiseCount() {
+        return this.praiseCount;
+    }
+
+    public void setPraiseCount(Integer praiseCount) {
+        this.praiseCount = praiseCount;
+    }
+
+
 
 
 
