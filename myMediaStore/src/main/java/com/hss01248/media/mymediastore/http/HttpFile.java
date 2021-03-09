@@ -97,7 +97,7 @@ public class HttpFile extends BaseFileApi<HttpResponseBean> {
         if(isDirectory()){
             return null;
         }
-        return HttpHelper.getInputStream(file.url);
+        return HttpHelper.getInputStream(file.url,null);
     }
 
     @Override

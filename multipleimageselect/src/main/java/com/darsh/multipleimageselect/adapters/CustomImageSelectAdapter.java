@@ -103,7 +103,8 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         }
         if(image.pathOrUri.startsWith("http") || image.pathOrUri.startsWith("smb")){
             if(image.type != BaseMediaInfo.TYPE_IMAGE){
-                viewHolder.tvInfo.setText(image.pathOrUri+"\n"+ ImageInfoFormater.formatFileSize(image.fileSize));
+                viewHolder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.c_text_bg));
+                viewHolder.tvInfo.setText(image.pathOrUri+"\n"+ ImageInfoFormater.formatFileSize(image.fileSize)+" 点赞:"+image.praiseCount);
                 return convertView;
             }
         }
@@ -119,7 +120,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
         if(viewHolder.image.pathOrUri.startsWith("smb") || viewHolder.image.pathOrUri.startsWith("http") ){
             viewHolder.tvInfo.setText(uri.getPath().substring(uri.getPath().lastIndexOf("/")+1)+"\n"
                     + ImageInfoFormater.formatFileSize(image.fileSize)
-                    +" "+ImageInfoFormater.formatTime(image.updatedTime));
+                    +" "+ImageInfoFormater.formatTime(image.updatedTime)+" 点赞:"+image.praiseCount);
             return convertView;
         }
 
@@ -206,7 +207,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                             }else {
                                 viewHolder.tvInfo.setTextColor(viewHolder.imageView.getResources().getColor(R.color.img_tv_color));
                             }*/
-                            viewHolder.tvInfo.setText(viewHolder.desc);
+                            viewHolder.tvInfo.setText(viewHolder.desc+" 点赞:"+image.praiseCount);
                         }else {
                             //viewHolder.tvInfo.setText("");
                         }

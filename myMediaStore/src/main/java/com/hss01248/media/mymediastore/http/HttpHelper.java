@@ -26,8 +26,8 @@ public class HttpHelper {
     static OkHttpClient client;
     public static OkHttpClient getClient(){
         if(client == null){
-            OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                    //.addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
             client = builder.build();
         }
         return client;
@@ -67,17 +67,25 @@ public class HttpHelper {
 
 
 
-    public static InputStream getInputStream(String url){
+    public static InputStream getInputStream(String url,String[] msg){
         Request request = new Request.Builder()
                 .url(url)
                 .get().build();
         try {
             Response response =   HttpHelper.getClient().newCall(request).execute();
-            if(response.isSuccessful()){
-                return response.body().byteStream();
+            if(!response.isSuccessful()){
+                if(msg != null){
+                    msg[0] = response.code()+":"+response.message();
+                }
+                return null;
             }
+            return response.body().byteStream();
+
         } catch (Exception e) {
             e.printStackTrace();
+            if(msg != null){
+                msg[0] = e.getMessage();
+            }
         }
         return null;
     }

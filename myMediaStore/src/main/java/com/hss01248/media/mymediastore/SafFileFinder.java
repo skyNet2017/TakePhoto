@@ -391,22 +391,10 @@ public class SafFileFinder {
      static void writeDB(DocumentFile dir, List<BaseMediaFolderInfo> folderInfos, List<BaseMediaInfo> images, List<BaseMediaInfo> videos, List<BaseMediaInfo> audios) {
         long start = System.currentTimeMillis();
         //文件夹:
-        if (folderInfos.size() > 0) {
-            //其实是同一个文件夹,同时有图片,音视频,怎么处理? 用type-path作为id:
-            DbUtil.getDaoSession().getBaseMediaFolderInfoDao().insertOrReplaceInTx(folderInfos);
-            //DbUtil.getDaoSession().getBaseMediaFolderInfoDao().upda
-            // 如何不更新里面的hidden值?
-            // 已删除文件的处理:DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_AUDIO);
-        }
-        if (images != null) {
-            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(images);
-        }
-        if (videos != null) {
-            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(videos);
-        }
-        if (audios != null) {
-            DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(audios);
-        }
+         DbUtil.insertOrUpdate(folderInfos);
+         DbUtil.insertOrUpdate2(images);
+         DbUtil.insertOrUpdate2(videos);
+         DbUtil.insertOrUpdate2(audios);
         if (folderInfos.size() > 0) {
             Log.v(SafUtil.TAG, URLDecoder.decode(dir.getUri().toString()) + "  路径下更新数据库完成!!!!!!!!!!!!!!! 耗时(ms):" + (System.currentTimeMillis() - start));
         }

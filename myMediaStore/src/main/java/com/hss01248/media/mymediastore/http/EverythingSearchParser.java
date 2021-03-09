@@ -10,6 +10,7 @@ import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.db.BaseMediaInfoDao;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,7 +35,7 @@ public class EverythingSearchParser {
 
   private   static int pageSize = 32;
 
-    private static ExecutorService service = new ThreadPoolExecutor(0, 10,
+    public static ExecutorService service = new ThreadPoolExecutor(0, 10,
             45, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
 
@@ -127,10 +128,7 @@ public class EverythingSearchParser {
     }
 
     private static synchronized void writeDb(List<BaseMediaInfo> infos) {
-        if(infos.isEmpty()){
-            return;
-        }
-        DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(infos);
+       DbUtil.insertOrUpdate2(infos);
     }
 
     private static String getTypeSearchStr(int type) {
