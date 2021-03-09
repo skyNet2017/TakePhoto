@@ -46,4 +46,10 @@ dependencies {
     api 'com.wuhenzhizao:titlebar:1.2.0'
 
     api project(':localvideoplayer')
+
+    api 'androidx.recyclerview:recyclerview:1.1.0'
+
+    api 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.47'
+    //compile 'com.simplecityapps:recyclerview-fastscroll:1.0.20'
+    api 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
 }

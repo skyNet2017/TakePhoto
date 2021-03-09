@@ -32,6 +32,8 @@ com.orhanobut.logger,es.dmoral.toasty,pl.droidsonroids.gif,pl.droidsonroids.reli
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".filemanager.StorageListActivity" />
+        <activity android:name=".filemanager.FolderViewActivity" />
 
         <service android:name=".MyJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
