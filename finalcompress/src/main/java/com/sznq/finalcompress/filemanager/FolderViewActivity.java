@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.FileOpenUtil;
+import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafFileFinder22;
 import com.hss01248.media.mymediastore.SafUtil;
@@ -30,13 +31,22 @@ import com.hss01248.media.mymediastore.http.HttpResponseBean;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
 import com.hss01248.media.mymediastore.usb.FileApiForUsb;
 import com.hss01248.pagestate.PageStateManager;
+import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivityFolderBinding;
 import com.sznq.finalcompress.filemanager.adapter.FileItemAdapter;
+import com.sznq.finalcompress.filemanager.folder.BaseFolderSort;
+import com.sznq.finalcompress.filemanager.folder.sort.FileNameSortAes;
+import com.sznq.finalcompress.filemanager.folder.sort.FileNameSortDes;
+import com.sznq.finalcompress.filemanager.folder.sort.FileSizeSortAES;
+import com.sznq.finalcompress.filemanager.folder.sort.FileSizeSortDes;
+import com.sznq.finalcompress.filemanager.folder.sort.ModifyTimeSortAes;
+import com.sznq.finalcompress.filemanager.folder.sort.ModifyTimeSortDes;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -106,8 +116,14 @@ public class FolderViewActivity extends AppCompatActivity {
             }
         });
 
-        initMenu();
-        if(type == StorageBean.TYPE_HTTP_Everything){
+        binding.titlebar.getRightTextView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initMenu();
+            }
+        });
+
+        if(type != StorageBean.TYPE_EXTERNAL_STORAGE){
             stateManager = PageStateManager.initWhenUse(binding.recycler,null);
             stateManager.showContent();
         }
@@ -142,7 +158,83 @@ public class FolderViewActivity extends AppCompatActivity {
     }
 
     private void initMenu() {
+        final FloatMenu floatMenu = new FloatMenu(this, binding.titlebar.getRightTextView());
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[3];
+        desc[0] = "排序"  ;
+        desc[1] ="刷新当前文件夹和子文件夹";
+        desc[2] ="收藏当前文件夹";
 
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                if(position == 0){
+                    sortMenu();
+
+                }else if(position == 1){
+                    scanAll();
+
+
+                }else if(position == 2){
+
+                }
+            }
+        });
+
+        floatMenu.showAsDropDown(binding.titlebar.getRightTextView());
+    }
+
+    private void scanAll() {
+        new SafFileFinder22<IFile>().getAlbums(folder, Executors.newFixedThreadPool(3), new ScanFolderCallback() {
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onFromDB(List<BaseMediaFolderInfo> folderInfos) {
+
+            }
+
+            @Override
+            public void onScanEachFolder(List<BaseMediaFolderInfo> folderInfos) {
+
+            }
+
+            @Override
+            public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
+
+            }
+        });
+    }
+
+    private void sortMenu() {
+        final FloatMenu floatMenu = new FloatMenu(this, binding.titlebar.getRightTextView());
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[6];
+        desc[0] ="按文件名 顺序";
+        desc[1] ="按文件名  倒序";
+        desc[2] ="按更新时间 新在前";
+        desc[3] ="按更新时间顺序 旧在前";
+        desc[4] = "文件大小从大到小";
+        desc[5] ="文件大小从小到大";
+
+
+
+
+        desc[fileSortType] =  desc[fileSortType] +"(now)";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                fileSortType = position;
+                Collections.sort(files,comparators.get(position));
+                adapter.setNewData(files);
+            }
+        });
+        floatMenu.showAsDropDown(binding.titlebar.getRightTextView());
     }
 
     @Override
@@ -163,11 +255,22 @@ public class FolderViewActivity extends AppCompatActivity {
 
     IFile folder;
     List<IFile> files = new ArrayList<>();
+    static List<Comparator<IFile>> comparators;
+    static {
+        comparators = new ArrayList<>();
+        comparators.add(new FileNameSortAes());
+        comparators.add(new FileNameSortDes());
+        comparators.add(new ModifyTimeSortAes());
+        comparators.add(new ModifyTimeSortDes());
+        comparators.add(new FileSizeSortAES());
+        comparators.add(new FileSizeSortDes());
+    }
+    int fileSortType = 0;
     private void listFiles(IFile file) {
         Log.d("pp","path:"+file.getPath());
         folder = file;
         binding.tvPath.setText(file.getPath());
-        if(type == StorageBean.TYPE_HTTP_Everything){
+        if(stateManager != null){
             stateManager.showLoading();
         }
 
@@ -182,29 +285,35 @@ public class FolderViewActivity extends AppCompatActivity {
                         }
                         return files;
                     }
-                }).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<IFile[]>() {
+                }).map(new Function<IFile[], List<IFile>>() {
+            @Override
+            public List<IFile> apply(@NonNull IFile[] iFiles) throws Exception {
+                List<IFile> files = new ArrayList<>();
+                if(iFiles != null && iFiles.length> 0){
+                    for (IFile iFile : iFiles) {
+                        files.add(iFile);
+                    }
+                }
+                Collections.sort(files,comparators.get(fileSortType));
+                return files;
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<IFile>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(@NonNull IFile[] iFiles) {
+                    public void onNext(@NonNull List<IFile> iFiles) {
                         files.clear();
-                        if(iFiles != null && iFiles.length> 0){
-                            for (IFile iFile : iFiles) {
-                                files.add(iFile);
-                            }
-                        }
-                        //Collections.sort(files,);
+                        files.addAll(iFiles);
                         adapter.setNewData(files);
-                        if(type == StorageBean.TYPE_HTTP_Everything){
+                        if(stateManager != null){
                             stateManager.showContent();
                         }
-
                         //更新数据库
-                        updateDB(folder,new ArrayList(files));
+                        updateDB(folder,iFiles);
                     }
 
                     @Override
@@ -212,7 +321,7 @@ public class FolderViewActivity extends AppCompatActivity {
                         e.printStackTrace();
                         files.clear();
                         adapter.setNewData(files);
-                        if(type == StorageBean.TYPE_HTTP_Everything){
+                        if(stateManager != null){
                             stateManager.showError(e.getMessage());
                         }
 

@@ -6,9 +6,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.wuhenzhizao.titlebar.widget.CommonTitleBar
         android:layout_width="match_parent"
-        app:statusBarColor="@color/colorPrimary"
+        app:statusBarColor="@color/colorPrimaryDark"
+        app:fillStatusBar="true"
         app:leftType="textView"
+        app:leftDrawable="@drawable/ic_arrow_back"
         android:id="@+id/titlebar"
+        app:rightType="textView"
+        app:rightText="menu"
         android:layout_height="50dp"/>
     <TextView
         android:id="@+id/tv_path"

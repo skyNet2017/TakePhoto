@@ -63,6 +63,9 @@ public class AddHttpDialogViewHolder extends CommonViewHolder<Dialog, DialogAddH
         bean.name = binding.etHostname.getText().toString().trim();
         bean.uname = binding.etName.getText().toString().trim();
         bean.pw = binding.etPw.getText().toString().trim();
+        if(!bean.ip.startsWith("http")){
+            bean.ip= "http://"+bean.ip;
+        }
 
         long count = DbUtil.getDaoSession().getStorageBeanDao().queryBuilder()
                 .where(StorageBeanDao.Properties.Type.eq(StorageBean.TYPE_HTTP_Everything), StorageBeanDao.Properties.Ip.eq(bean.ip)).count();

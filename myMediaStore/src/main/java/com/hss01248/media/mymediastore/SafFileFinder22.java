@@ -215,7 +215,7 @@ public class SafFileFinder22<T extends IFile>{
                             BaseMediaFolderInfo folder = new BaseMediaFolderInfo();
                             folder.name = dir.getName();
                             folder.cover = file.getUri().toString();
-                            folder.type = BaseMediaInfo.TYPE_IMAGE;
+                            folder.type = type;
                             folder.updatedTime = file.lastModified();
                             folder.path = file.getPath();
                             folder.pathOrUri = dir.getUri().toString();
