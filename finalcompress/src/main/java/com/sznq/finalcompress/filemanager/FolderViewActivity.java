@@ -294,7 +294,7 @@ public class FolderViewActivity extends AppCompatActivity {
                         files.add(iFile);
                     }
                 }
-                Collections.sort(files,comparators.get(fileSortType));
+                //Collections.sort(files,comparators.get(fileSortType));
                 return files;
             }
         }).observeOn(AndroidSchedulers.mainThread())
