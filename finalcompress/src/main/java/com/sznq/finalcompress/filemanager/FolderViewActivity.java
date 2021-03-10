@@ -14,10 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.darsh.multipleimageselect.FileOpenUtil;
+import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafFileFinder22;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.ScanFolderCallback;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.bean.StorageBean;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
@@ -26,6 +29,7 @@ import com.hss01248.media.mymediastore.http.HttpFile;
 import com.hss01248.media.mymediastore.http.HttpResponseBean;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
 import com.hss01248.media.mymediastore.usb.FileApiForUsb;
+import com.hss01248.pagestate.PageStateManager;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivityFolderBinding;
 import com.sznq.finalcompress.filemanager.adapter.FileItemAdapter;
@@ -60,11 +64,17 @@ public class FolderViewActivity extends AppCompatActivity {
     ActivityFolderBinding binding;
     String ipOrPath, uName, pw;
     int type;
+    PageStateManager stateManager;
     private void parseIntent() {
         ipOrPath = getIntent().getStringExtra("ipOrPath");
         uName = getIntent().getStringExtra("uName");
         pw = getIntent().getStringExtra("pw");
         type = getIntent().getIntExtra("type",0);
+        if(type == StorageBean.TYPE_HTTP_Everything){
+            if(!ipOrPath.startsWith("http")){
+                ipOrPath = "http://"+ipOrPath;
+            }
+        }
     }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,11 +100,44 @@ public class FolderViewActivity extends AppCompatActivity {
                    listFiles(file);
                }else {
                    ToastUtils.showLong("打开文件:"+file.getPath());
+                   openFile(file,files);
+
                }
             }
         });
 
         initMenu();
+        if(type == StorageBean.TYPE_HTTP_Everything){
+            stateManager = PageStateManager.initWhenUse(binding.recycler,null);
+            stateManager.showContent();
+        }
+
+
+    }
+
+    private void openFile(IFile file, List<IFile> files) {
+        String path = file.getPath();
+        int type = FileTypeUtil.getTypeByFileName(path);
+        List<String> paths = new ArrayList<>();
+        int position = 0;
+        int realP = 0;
+        if(type == BaseMediaInfo.TYPE_IMAGE || type == BaseMediaInfo.TYPE_VIDEO){
+            for (IFile iFile : files) {
+                if(iFile.isDirectory()){
+                    continue;
+                }
+                if(FileTypeUtil.getTypeByFileName(iFile.getPath()) == type){
+                    if(iFile.equals(file)){
+                        realP = position;
+                    }
+                    paths.add(iFile.getPath());
+                    position++;
+                }
+            }
+            FileOpenUtil.open(FolderViewActivity.this,file.getPath(),paths,realP);
+        }else {
+            FileOpenUtil.open(FolderViewActivity.this,file.getPath());
+        }
 
     }
 
@@ -124,6 +167,10 @@ public class FolderViewActivity extends AppCompatActivity {
         Log.d("pp","path:"+file.getPath());
         folder = file;
         binding.tvPath.setText(file.getPath());
+        if(type == StorageBean.TYPE_HTTP_Everything){
+            stateManager.showLoading();
+        }
+
         Observable.just(file)
                 .subscribeOn(Schedulers.io())
                 .map(new Function<IFile, IFile[]>() {
@@ -152,6 +199,9 @@ public class FolderViewActivity extends AppCompatActivity {
                         }
                         //Collections.sort(files,);
                         adapter.setNewData(files);
+                        if(type == StorageBean.TYPE_HTTP_Everything){
+                            stateManager.showContent();
+                        }
 
                         //更新数据库
                         updateDB(folder,new ArrayList(files));
@@ -162,6 +212,9 @@ public class FolderViewActivity extends AppCompatActivity {
                         e.printStackTrace();
                         files.clear();
                         adapter.setNewData(files);
+                        if(type == StorageBean.TYPE_HTTP_Everything){
+                            stateManager.showError(e.getMessage());
+                        }
 
                     }
 

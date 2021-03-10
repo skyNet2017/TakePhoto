@@ -124,7 +124,7 @@ dependencies {
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0' //注解处理器
     api 'com.blankj:utilcodex:1.30.6'
-
+    compile 'com.github.hss01248:PageStateManager:3.0.1'
     // 权限请求框架：https://github.com/getActivity/XXPermissions
     //implementation 'com.hjq:xxpermissions:10.2'
 

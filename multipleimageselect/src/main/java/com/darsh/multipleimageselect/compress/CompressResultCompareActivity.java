@@ -56,7 +56,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
     FloatingActionMenu menu;
 
-    static ArrayList<String> paths ;
+    static List<String> paths ;
     boolean isPreview;
     boolean isAllSelected;
     RelativeLayout rlRoot;
@@ -80,18 +80,18 @@ public class CompressResultCompareActivity extends AppCompatActivity {
 
     }
 
-    public static void lauchForPreview(Activity activity, ArrayList<String> paths,int position){
+    public static void lauchForPreview(Context activity, List<String> paths,int position){
         try {
             Intent intent = new Intent(activity,CompressResultCompareActivity.class);
             if(paths.size() > 1000){
                 CompressResultCompareActivity.paths = paths;
             }else {
-                intent.putExtra("paths",paths);
+                intent.putExtra("paths",(ArrayList<String>)paths);
             }
             intent.putExtra("position",position);
             intent.putExtra("isPreview",true);
             intent.putExtra("isAllSelected",true);
-            activity.startActivityForResult(intent,980);
+            activity.startActivity(intent);
         }catch (Throwable throwable){
             throwable.printStackTrace();
         }

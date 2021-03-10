@@ -241,9 +241,19 @@ public class DbUtil {
                 insert.add(info);
             }
         }
+        try {
+            dao.insertInTx(insert);
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+        try {
+            dao.updateInTx(update);
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
         //DbUtil.getDaoSession().getBaseMediaInfoDao().inse
-        dao.insertInTx(insert);
-        dao.updateInTx(update);
+
+
     }
 
     public static List<BaseMediaInfo> getAllContentInFolders(String dir, int type, int[] pageIndex) {
