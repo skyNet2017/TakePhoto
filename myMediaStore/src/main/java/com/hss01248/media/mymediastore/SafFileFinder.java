@@ -52,8 +52,8 @@ public class SafFileFinder {
                     return;
                 }
 
-                scanByFile(hasDataInDb, executorService, observer);
-                scanBySaf(hasDataInDb, executorService, observer);
+                //scanByFile(hasDataInDb, executorService, observer);
+                //scanBySaf(hasDataInDb, executorService, observer);
 
             }
         });
