@@ -50,6 +50,16 @@ public class TfCardBean implements Parcelable {
         this.availableSize = availableSize;
     }
 
+    @Override
+    public String toString() {
+        return "TfCardBean{" +
+                "path='" + path + '\'' +
+                ", mounted='" + mounted + '\'' +
+                ", removable=" + removable +
+                ", totalSize=" + totalSize +
+                ", availableSize=" + availableSize +
+                '}';
+    }
 
     @Override
     public int describeContents() {

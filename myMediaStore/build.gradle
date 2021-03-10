@@ -53,15 +53,15 @@ dependencies {
 
     api group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
     api group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.13'
-    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.12.13'
-
+    api group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.12.13'
+    api 'com.blankj:utilcodex:1.30.6'
 }
 
 
 apply plugin: 'org.greenrobot.greendao'
 
 greendao {
-    schemaVersion 7  //我们的数据库的版本号  当数据库升级的时候可以在这里改版本
+    schemaVersion 9  //我们的数据库的版本号  当数据库升级的时候可以在这里改版本
     daoPackage 'com.hss01248.media.mymediastore.db'  //自动生成的DaoMaster、DaoSession、Dao的包名  根据自己想放的位置改变即可
     targetGenDir 'src/main/java'  //自动生成的DaoMaster、DaoSession、Dao的路径
 }

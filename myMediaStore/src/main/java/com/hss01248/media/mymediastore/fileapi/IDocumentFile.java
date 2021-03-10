@@ -86,7 +86,10 @@ public class IDocumentFile extends BaseFileApi<DocumentFile> {
 
     @Override
     public IFile getParentFile() {
-        return null;
+        if(file.getParentFile() == null){
+            return null;
+        }
+        return new IDocumentFile(file.getParentFile());
     }
 
 

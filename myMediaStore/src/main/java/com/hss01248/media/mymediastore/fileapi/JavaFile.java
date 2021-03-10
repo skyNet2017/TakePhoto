@@ -25,11 +25,13 @@ public class JavaFile extends BaseFileApi<File>{
     public IFile[] listFiles() {
         if(isDirectory()){
             File[] files = file.listFiles();
+            IFile[] iFiles = new IFile[files.length];
             if(files != null){
                 for (int i = 0; i < files.length; i++) {
-
+                    iFiles[i] = new JavaFile(files[i]);
                 }
             }
+            return iFiles;
         }
         return null;
     }
@@ -81,7 +83,10 @@ public class JavaFile extends BaseFileApi<File>{
 
     @Override
     public IFile getParentFile() {
-        return null;
+        if(file.getParentFile() ==  null){
+            return null;
+        }
+        return new JavaFile(file.getParentFile());
     }
 
 

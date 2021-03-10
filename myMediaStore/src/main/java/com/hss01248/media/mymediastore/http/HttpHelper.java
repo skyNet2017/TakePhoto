@@ -2,13 +2,17 @@ package com.hss01248.media.mymediastore.http;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.blankj.utilcode.util.EncodeUtils;
 import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.SafFileFinder22;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.ScanFolderCallback;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
+
+import org.bouncycastle.util.encoders.Base64Encoder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +30,8 @@ public class HttpHelper {
     static OkHttpClient client;
     public static OkHttpClient getClient(){
         if(client == null){
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-                    //.addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
             client = builder.build();
         }
         return client;
@@ -88,6 +92,27 @@ public class HttpHelper {
             }
         }
         return null;
+    }
+
+    public static boolean checkAvailable(String url,String uname,String pw){
+        Request.Builder builder = new Request.Builder();
+        if(!TextUtils.isEmpty(uname)){
+            //Authorization: Basic base64encode(username+":"+password)
+            builder.header("Authorization","Basic "+ EncodeUtils.base64Encode2String((uname+":"+pw).getBytes()));
+        }
+        Request request =   builder .url(url)
+                .get().build();
+        try {
+            Response response =   HttpHelper.getClient().newCall(request).execute();
+            if(!response.isSuccessful()){
+                return false;
+            }
+            return true;
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 

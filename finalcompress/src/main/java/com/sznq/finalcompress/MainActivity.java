@@ -29,6 +29,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.hss01248.media.mymediastore.usb.UsbUtil;
 import com.noober.menu.FloatMenu;
+import com.sznq.finalcompress.filemanager.StorageListActivity;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -110,7 +111,9 @@ public class MainActivity extends AppCompatActivity {
         //MyImageWatcher.init();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},78);
+           if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+               requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},78);
+           }
         }
 
         //smb();
@@ -300,4 +303,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void listStorages(View view) {
+        startActivity(new Intent(this, StorageListActivity.class));
+    }
 }

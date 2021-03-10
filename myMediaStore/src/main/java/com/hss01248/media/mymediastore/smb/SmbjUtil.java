@@ -1,7 +1,5 @@
 package com.hss01248.media.mymediastore.smb;
 
-import android.content.Context;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -9,11 +7,9 @@ import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
-import com.hierynomus.smbj.common.SmbPath;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
-import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.SafFileFinder22;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.ScanFolderCallback;
@@ -22,7 +18,6 @@ import com.hss01248.media.mymediastore.bean.StorageBean;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +55,7 @@ public class SmbjUtil {
         if(TextUtils.isEmpty(myIp)){
             myIp = IPUtils.getIpAddress(SafUtil.context);
         }
-        String netGate0 = bean.smbHost.substring(0,bean.smbHost.lastIndexOf("."));
+        String netGate0 = bean.ip.substring(0,bean.ip.lastIndexOf("."));
         String netGate1 = myIp.substring(0,myIp.lastIndexOf("."));
         if(!netGate0.equals(netGate1)){
             Log.w("smb","不在同一个局域网");
@@ -73,9 +68,9 @@ public class SmbjUtil {
                 .build();
 
 
-        String ip = bean.smbHost;
-        String username = bean.smbUName;
-        String password = bean.smbPw;
+        String ip = bean.ip;
+        String username = bean.uname;
+        String password = bean.pw;
         // 如果不设置超时时间	SMBClient client = new SMBClient();
         SMBClient client = new SMBClient(config);
 
@@ -86,10 +81,10 @@ public class SmbjUtil {
 
             //todo 扫描整个目录
 
-            String dirStr = bean.smbRootDirs;
+            String dirStr = bean.rootDirs;
             if(!TextUtils.isEmpty(dirStr)){
-                if(!map.containsKey(bean.smbHost)){
-                    map.put(bean.smbHost,new HashMap<>());
+                if(!map.containsKey(bean.ip)){
+                    map.put(bean.ip,new HashMap<>());
                 }
                 if(dirStr.contains("-")){
                     String[] dirs = dirStr.split("-");
@@ -97,7 +92,7 @@ public class SmbjUtil {
                         if(!TextUtils.isEmpty(dir)){
                             try {
                                 DiskShare  share = (DiskShare) session.connectShare(dir);
-                                map.get(bean.smbHost).put(dir, share);
+                                map.get(bean.ip).put(dir, share);
                             }catch (Throwable throwable){
                                 //该dir共享目录没有挂载
                                 throwable.printStackTrace();
@@ -111,7 +106,7 @@ public class SmbjUtil {
                     if(!TextUtils.isEmpty(dir)){
                         try {
                             DiskShare  share = (DiskShare) session.connectShare(dir);
-                            map.get(bean.smbHost).put(dir, share);
+                            map.get(bean.ip).put(dir, share);
                         }catch (Throwable throwable){
                             //该dir共享目录没有挂载
                             throwable.printStackTrace();

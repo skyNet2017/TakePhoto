@@ -27,6 +27,9 @@ public class EverythingParser {
 
     //http://59.46.68.148:9999/
     public static HttpFile[]  start(String url){
+        if(!url.startsWith("http")){
+            url = "http://"+url;
+        }
         Request request = new Request.Builder()
                 .url(url)
                 .get().build();

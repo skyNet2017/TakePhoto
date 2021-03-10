@@ -38,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class SafUtil {
@@ -64,10 +65,25 @@ public class SafUtil {
         return null;
     }
 
+    public static List<TfCardBean> storages;
+
     public static void getRootDir(FragmentActivity activity, ISdRoot callback){
         context = activity.getApplicationContext();
 
-        ArrayList<TfCardBean> storageData = getStorageData(activity.getApplicationContext());
+        List<TfCardBean> storageData = getStorageData(activity.getApplicationContext());
+        storages = storageData;
+        /*
+        File[] files;
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    files = getExternalFilesDirs(Environment.MEDIA_MOUNTED);
+    for(File file:files){
+        Log.e("main",file);
+    }
+}
+————————————————
+版权声明：本文为CSDN博主「雨季莫忧离」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/u010937230/article/details/73303034
+        * */
         if(storageData ==null || storageData.size() <=1){
             Log.w(SafUtil.TAG,"没有额外sd卡");
             return;

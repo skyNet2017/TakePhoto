@@ -139,6 +139,10 @@ public class SafFileFinder22<T extends IFile>{
      AtomicInteger countGetSaf = new AtomicInteger(0);
 
 
+    public void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
+        getAlbums(dir,false,executorService,observer);
+    }
+
     /**
      * 5条线程同时跑,cpu消耗整体为70%左右.
      * 1条线程,cpu22%  选用此方案
@@ -148,7 +152,7 @@ public class SafFileFinder22<T extends IFile>{
      * @param dir
      * @param observer
      */
-      public void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
+      public void getAlbums(final T dir,boolean justScanCurrentDir, ExecutorService executorService, final ScanFolderCallback observer) {
           //todo 6500个文件夹. 最后将其归并显示
 
           if(folderToSkip.contains(dir.getName())){
@@ -179,6 +183,9 @@ public class SafFileFinder22<T extends IFile>{
                 for (IFile file : files) {
                     file.printInfo();
                     if (file.isDirectory()) {
+                        if(justScanCurrentDir){
+                            continue;
+                        }
                        if( folderToSkip.contains(file.getName())){
                            Log.e("smb","跳过文件夹:"+file.getPath());
                             continue;
@@ -286,17 +293,21 @@ public class SafFileFinder22<T extends IFile>{
         long start = System.currentTimeMillis();
         //文件夹:
         if (folderInfos.size() > 0) {
+            DbUtil.insertOrUpdate(folderInfos);
             //其实是同一个文件夹,同时有图片,音视频,怎么处理? 用type-path作为id:
-            DbUtil.getDaoSession().getBaseMediaFolderInfoDao().insertOrReplaceInTx(folderInfos);
+           // DbUtil.getDaoSession().getBaseMediaFolderInfoDao().insertOrReplaceInTx(folderInfos);
             //DbUtil.getDaoSession().getBaseMediaFolderInfoDao().upda
             // 如何不更新里面的hidden值?
             // 已删除文件的处理:DbUtil.delete(dir.getUri().toString(),BaseMediaInfo.TYPE_AUDIO);
         }
 
+
+
          Iterator<Map.Entry<Integer, List<BaseMediaInfo>>> iterator = filesMap.entrySet().iterator();
          while (iterator.hasNext()){
              Map.Entry<Integer, List<BaseMediaInfo>> next = iterator.next();
-             DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(next.getValue());
+             //DbUtil.getDaoSession().getBaseMediaInfoDao().insertOrReplaceInTx(next.getValue());
+             DbUtil.insertOrUpdate2(next.getValue());
 
          }
         if (folderInfos.size() > 0) {

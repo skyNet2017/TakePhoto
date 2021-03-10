@@ -74,7 +74,13 @@ public class HttpFile extends BaseFileApi<HttpResponseBean> {
 
     @Override
     public IFile getParentFile() {
-        return null;
+        HttpResponseBean bean = new HttpResponseBean();
+        if(!file.url.contains("/")){
+            return null;
+        }
+        bean.url = file.url.substring(0,file.url.lastIndexOf("/"));
+        bean.isDir = true;
+        return new HttpFile(bean);
     }
 
     @Override

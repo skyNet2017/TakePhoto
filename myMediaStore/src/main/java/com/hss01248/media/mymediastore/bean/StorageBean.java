@@ -14,47 +14,47 @@ public class StorageBean {
     public static final int TYPE_SAF = 2;
     public static final int TYPE_SMB = 3;
     public static final int TYPE_USB = 4;
+    public static final int TYPE_HTTP_Everything = 5;
 
     @Id
-    public int id;
+    public long id;
     public int usable;
     public int type;
     public String diskId;
 
-    public String smbHost;
-    public String smbUName;
-    public String smbPw;
-    public String smbRootDirs;//不带/, String数组,逗号相连,比如D,F
+    public String ip;
+    public String uname;
+    public String pw;
+    public String rootDirs;//不带/, String数组,逗号相连,比如D,F
 
     public String safRoot;
 
-    public String usbName;
+    public String name;
 
-    @Generated(hash = 1915755558)
-    public StorageBean(int id, int usable, int type, String diskId, String smbHost,
-            String smbUName, String smbPw, String smbRootDirs, String safRoot,
-            String usbName) {
+    @Generated(hash = 1965211341)
+    public StorageBean(long id, int usable, int type, String diskId, String ip,
+            String uname, String pw, String rootDirs, String safRoot, String name) {
         this.id = id;
         this.usable = usable;
         this.type = type;
         this.diskId = diskId;
-        this.smbHost = smbHost;
-        this.smbUName = smbUName;
-        this.smbPw = smbPw;
-        this.smbRootDirs = smbRootDirs;
+        this.ip = ip;
+        this.uname = uname;
+        this.pw = pw;
+        this.rootDirs = rootDirs;
         this.safRoot = safRoot;
-        this.usbName = usbName;
+        this.name = name;
     }
 
     @Generated(hash = 806242961)
     public StorageBean() {
     }
 
-    public int getId() {
+    public long getId() {
         return this.id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -82,36 +82,36 @@ public class StorageBean {
         this.diskId = diskId;
     }
 
-    public String getSmbHost() {
-        return this.smbHost;
+    public String getIp() {
+        return this.ip;
     }
 
-    public void setSmbHost(String smbHost) {
-        this.smbHost = smbHost;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
-    public String getSmbUName() {
-        return this.smbUName;
+    public String getUname() {
+        return this.uname;
     }
 
-    public void setSmbUName(String smbUName) {
-        this.smbUName = smbUName;
+    public void setUname(String uname) {
+        this.uname = uname;
     }
 
-    public String getSmbPw() {
-        return this.smbPw;
+    public String getPw() {
+        return this.pw;
     }
 
-    public void setSmbPw(String smbPw) {
-        this.smbPw = smbPw;
+    public void setPw(String pw) {
+        this.pw = pw;
     }
 
-    public String getSmbRootDirs() {
-        return this.smbRootDirs;
+    public String getRootDirs() {
+        return this.rootDirs;
     }
 
-    public void setSmbRootDirs(String smbRootDirs) {
-        this.smbRootDirs = smbRootDirs;
+    public void setRootDirs(String rootDirs) {
+        this.rootDirs = rootDirs;
     }
 
     public String getSafRoot() {
@@ -122,13 +122,19 @@ public class StorageBean {
         this.safRoot = safRoot;
     }
 
-    public String getUsbName() {
-        return this.usbName;
+    public String getName() {
+        return this.name;
     }
 
-    public void setUsbName(String usbName) {
-        this.usbName = usbName;
+    public void setName(String name) {
+        this.name = name;
     }
+
+
+
+    
+
+
 
 
 

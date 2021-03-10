@@ -65,6 +65,19 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
                 "\"PATH\" TEXT," + // 10: path
                 "\"TYPE\" INTEGER NOT NULL ," + // 11: type
                 "\"PRAISE_COUNT\" INTEGER);"); // 12: praiseCount
+        // Add Indexes
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_FOLDER_PATH_OR_URI ON \"BASE_MEDIA_INFO\"" +
+                " (\"FOLDER_PATH_OR_URI\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_NAME ON \"BASE_MEDIA_INFO\"" +
+                " (\"NAME\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_FILE_SIZE ON \"BASE_MEDIA_INFO\"" +
+                " (\"FILE_SIZE\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_UPDATED_TIME ON \"BASE_MEDIA_INFO\"" +
+                " (\"UPDATED_TIME\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_MAX_SIDE ON \"BASE_MEDIA_INFO\"" +
+                " (\"MAX_SIDE\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_DURATION ON \"BASE_MEDIA_INFO\"" +
+                " (\"DURATION\" ASC);");
     }
 
     /** Drops the underlying database table. */

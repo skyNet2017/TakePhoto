@@ -5,17 +5,20 @@ apply plugin: 'io.fabric'
 
 com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
-
+    viewBinding {
+        enabled = true
+    }
 
     defaultConfig {
         applicationId "com.hss01248.finalcompress"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 8
         versionName "1.1.4"
         multiDexEnabled true
+
         // testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             ndk {
@@ -95,6 +98,7 @@ dependencies {
     compile 'com.github.hss01248:SuperAdapter:3.0.1'
     compile project(':lubanturbo')
     compile project(':analytics')
+    compile project(':viewholder')
     implementation 'com.jakewharton:butterknife:10.2.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
     compile 'com.github.clans:fab:1.6.4'
@@ -120,6 +124,9 @@ dependencies {
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0' //注解处理器
     api 'com.blankj:utilcodex:1.30.6'
+
+    // 权限请求框架：https://github.com/getActivity/XXPermissions
+    //implementation 'com.hjq:xxpermissions:10.2'
 
 }
 configurations {

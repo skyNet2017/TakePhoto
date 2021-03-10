@@ -24,6 +24,7 @@ import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Index;
 
 import java.util.EnumSet;
 import java.util.Objects;
@@ -42,12 +43,12 @@ public class BaseMediaInfo {
     public static final int TYPE_DOC_TXT = 8;  //文件名.txt
 
     public static final int TYPE_UNKNOWN = -1;
-
+    @Index
     public String folderPathOrUri;
 
     public String smbHost;
     public String smbRootDir;//不带/
-
+    @Index
     public String name;
 
     public int  isHiden = 0;
@@ -110,11 +111,13 @@ public class BaseMediaInfo {
      */
     @Id
     public String pathOrUri;
-
+    @Index
     public long fileSize;
+    @Index
     public long updatedTime;
-
+    @Index
     public int maxSide;
+    @Index
     public int duration;
 
     public String path;
