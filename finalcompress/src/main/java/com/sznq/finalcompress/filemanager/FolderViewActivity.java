@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -35,6 +36,7 @@ import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivityFolderBinding;
 import com.sznq.finalcompress.filemanager.adapter.FileItemAdapter;
+import com.sznq.finalcompress.filemanager.adapter.FileItemImgAdapter;
 import com.sznq.finalcompress.filemanager.folder.BaseFolderSort;
 import com.sznq.finalcompress.filemanager.folder.sort.FileNameSortAes;
 import com.sznq.finalcompress.filemanager.folder.sort.FileNameSortDes;
@@ -70,10 +72,11 @@ public class FolderViewActivity extends AppCompatActivity {
         activity.startActivity(intent);
     }
 
-    FileItemAdapter adapter;
+    BaseQuickAdapter adapter;
     ActivityFolderBinding binding;
     String ipOrPath, uName, pw;
     int type;
+    int displayType;
     PageStateManager stateManager;
     private void parseIntent() {
         ipOrPath = getIntent().getStringExtra("ipOrPath");
@@ -99,22 +102,8 @@ public class FolderViewActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-        adapter = new FileItemAdapter(R.layout.item_file);
-        binding.recycler.setAdapter(adapter);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-               IFile file =  files.get(position);
-               if(file.isDirectory()){
-                   listFiles(file);
-               }else {
-                   ToastUtils.showLong("打开文件:"+file.getPath());
-                   openFile(file,files);
+        initRecycleviewByType(0);
 
-               }
-            }
-        });
 
         binding.titlebar.getRightTextView().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +118,35 @@ public class FolderViewActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    private void initRecycleviewByType(int displayType) {
+        this.displayType = displayType%2;
+        if(displayType == 0){
+            binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+            adapter = new FileItemAdapter(R.layout.item_file);
+        }else if(displayType ==1){
+            binding.recycler.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
+            adapter = new FileItemImgAdapter(R.layout.item_file_img);
+        }else {
+            binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+            adapter = new FileItemAdapter(R.layout.item_file);
+        }
+        binding.recycler.setAdapter(adapter);
+        adapter.setNewData(files);
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                IFile file =  files.get(position);
+                if(file.isDirectory()){
+                    listFiles(file);
+                }else {
+                    ToastUtils.showLong("打开文件:"+file.getPath());
+                    openFile(file,files);
+
+                }
+            }
+        });
     }
 
     private void openFile(IFile file, List<IFile> files) {
@@ -163,7 +181,7 @@ public class FolderViewActivity extends AppCompatActivity {
         String[] desc = new String[3];
         desc[0] = "排序"  ;
         desc[1] ="刷新当前文件夹和子文件夹";
-        desc[2] ="收藏当前文件夹";
+        desc[2] ="切换表格和列表显示";
 
         floatMenu.items(desc);
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
@@ -177,12 +195,17 @@ public class FolderViewActivity extends AppCompatActivity {
 
 
                 }else if(position == 2){
-
+                    changeGridOrList();
                 }
             }
         });
 
         floatMenu.showAsDropDown(binding.titlebar.getRightTextView());
+    }
+
+    private void changeGridOrList() {
+        initRecycleviewByType(displayType+1);
+
     }
 
     private void scanAll() {

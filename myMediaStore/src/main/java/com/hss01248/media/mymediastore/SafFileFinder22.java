@@ -209,18 +209,21 @@ public class SafFileFinder22<T extends IFile>{
                             continue;
                         }
 
-                        int type = guessTypeByName(file.getName());
+                        int type = guessTypeByName(name);
+                        if(type == BaseMediaInfo.TYPE_UNKNOWN){
+                            continue;
+                        }
 
                         if(!folderMap.containsKey(type)){
                             BaseMediaFolderInfo folder = new BaseMediaFolderInfo();
                             folder.name = dir.getName();
-                            folder.cover = file.getUri().toString();
+                            folder.cover = file.getPath();
                             folder.type = type;
                             folder.updatedTime = file.lastModified();
                             folder.path = file.getPath();
-                            folder.pathOrUri = dir.getUri().toString();
+                            folder.pathOrUri = dir.getPath();
                             folder.generateTheId();
-                            Log.w("扫描", "添加文件夹:" + dir.getUri().toString());
+                            Log.w("扫描", "添加文件夹:" + dir.getPath());
                             folderMap.put(type,folder);
                         }
                         BaseMediaFolderInfo folderInfo =   folderMap.get(type);
@@ -234,8 +237,8 @@ public class SafFileFinder22<T extends IFile>{
                         List<BaseMediaInfo> fileInfos = filesMap.get(type);
 
                         BaseMediaInfo image = new BaseMediaInfo();
-                        image.folderPathOrUri = dir.getUri().toString();
-                        image.pathOrUri = file.getUri().toString();
+                        image.folderPathOrUri = dir.getPath();
+                        image.pathOrUri = file.getPath();
                         image.updatedTime = file.lastModified();
                         image.name = file.getName();
                         image.path = file.getPath();
