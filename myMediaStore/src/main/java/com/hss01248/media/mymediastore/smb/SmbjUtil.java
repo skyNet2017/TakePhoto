@@ -139,7 +139,7 @@ If i open the directory and call getSecurityInfo it works fine. The difference b
 
         String ip = "192.168.3.8";
          username = "Administrator";
-         password = "614511qc";
+         password = "";
         // 如果不设置超时时间	SMBClient client = new SMBClient();
         SMBClient client = new SMBClient(config);
 

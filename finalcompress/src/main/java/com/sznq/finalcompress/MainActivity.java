@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                         String text = "来来来，我们来试一试";//要写入的文本内容
                         String host = "192.168.3.8";//远程服务器的地址
                         String username = "Administrator";//远程服务器的用户名
-                        String password = "614511qc";//远程服务器的密码
+                        String password = "";//远程服务器的密码
                         String path = "/D/";//远程服务器共享文件夹名称
                         String remoteUrl = "smb://" + username + ":" + password + "@" + host + path + (path.endsWith("/") ? "" : "/");//带密码的url
                        // String remoteUrl = "smb://"+ host + path + (path.endsWith("/") ? "" : "/");//不需要输入用户名密码的url

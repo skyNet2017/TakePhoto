@@ -31,7 +31,7 @@ public class SmbUtil {
         try {
             String ip = "192.168.3.8";
             String username = "Administrator";
-            String password = "614511qc";
+            String password = "";
 
             UniAddress mDomain = UniAddress.getByName(ip);
             NtlmPasswordAuthentication mAuthentication = new NtlmPasswordAuthentication(ip, username, password);
