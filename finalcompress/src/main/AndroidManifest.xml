@@ -34,6 +34,7 @@ com.orhanobut.logger,es.dmoral.toasty,pl.droidsonroids.gif,pl.droidsonroids.reli
         </activity>
         <activity android:name=".filemanager.StorageListActivity" />
         <activity android:name=".filemanager.FolderViewActivity" />
+        <activity android:name=".filemanager.search.SearchActivity" />
 
         <service android:name=".MyJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

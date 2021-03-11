@@ -44,6 +44,7 @@ import com.sznq.finalcompress.filemanager.folder.sort.FileSizeSortAES;
 import com.sznq.finalcompress.filemanager.folder.sort.FileSizeSortDes;
 import com.sznq.finalcompress.filemanager.folder.sort.ModifyTimeSortAes;
 import com.sznq.finalcompress.filemanager.folder.sort.ModifyTimeSortDes;
+import com.sznq.finalcompress.filemanager.search.SearchActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -116,6 +117,13 @@ public class FolderViewActivity extends AppCompatActivity {
             stateManager = PageStateManager.initWhenUse(binding.recycler,null);
             stateManager.showContent();
         }
+
+        binding.titlebar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchActivity.doSearch(FolderViewActivity.this,"");
+            }
+        });
 
 
     }
