@@ -2,7 +2,6 @@ package com.hss01248.media.mymediastore;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,10 +16,7 @@ import com.hss01248.media.mymediastore.sort.SortByFolderName;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class DbUtil {
@@ -60,7 +56,7 @@ public class DbUtil {
     public static List<BaseMediaFolderInfo> getAllFolders(int type) {
         long start = System.currentTimeMillis();
         List<BaseMediaFolderInfo> infos = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
-                .where(BaseMediaFolderInfoDao.Properties.Type.eq(type))
+                .where(BaseMediaFolderInfoDao.Properties.MediaType.eq(type))
                 .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
         Log.w(SafUtil.TAG, " getAllFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
@@ -71,7 +67,7 @@ public class DbUtil {
     public static List<BaseMediaFolderInfo> getAllImageAndVideoFolders() {
         long start = System.currentTimeMillis();
         List<BaseMediaFolderInfo> infos = getDaoSession().getBaseMediaFolderInfoDao().queryBuilder()
-                .whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1), BaseMediaFolderInfoDao.Properties.Type.eq(2))
+                .whereOr(BaseMediaFolderInfoDao.Properties.MediaType.eq(1), BaseMediaFolderInfoDao.Properties.MediaType.eq(2))
                 .orderDesc(BaseMediaFolderInfoDao.Properties.FileSize)
                 .list();
         Log.w(SafUtil.TAG, " getAllImageAndVideoFolders 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
@@ -135,14 +131,14 @@ public class DbUtil {
                     BaseMediaFolderInfoDao.Properties.Type.eq(2)
                     , BaseMediaFolderInfoDao.Properties.Type.eq(3));*/
         }else if(folderFilterType == 1){
-            builder.whereOr(BaseMediaFolderInfoDao.Properties.Type.eq(1),
-                    BaseMediaFolderInfoDao.Properties.Type.eq(2));
+            builder.whereOr(BaseMediaFolderInfoDao.Properties.MediaType.eq(1),
+                    BaseMediaFolderInfoDao.Properties.MediaType.eq(2));
         }else if(folderFilterType == 2){
-            builder.where(BaseMediaFolderInfoDao.Properties.Type.eq(1));
+            builder.where(BaseMediaFolderInfoDao.Properties.MediaType.eq(1));
         }else if(folderFilterType == 3){
-            builder.where(BaseMediaFolderInfoDao.Properties.Type.eq(2));
+            builder.where(BaseMediaFolderInfoDao.Properties.MediaType.eq(2));
         }else if(folderFilterType == 4){
-            builder.where(BaseMediaFolderInfoDao.Properties.Type.eq(3));
+            builder.where(BaseMediaFolderInfoDao.Properties.MediaType.eq(3));
         }
 
     }
@@ -212,7 +208,7 @@ public class DbUtil {
 
         BaseMediaInfoDao dao = DbUtil.getDaoSession().getBaseMediaInfoDao();
         for (BaseMediaInfo info : infos) {
-            List<BaseMediaInfo> list=    dao.queryBuilder().where(BaseMediaInfoDao.Properties.PathOrUri.eq(info.pathOrUri)).list();
+            List<BaseMediaInfo> list=    dao.queryBuilder().where(BaseMediaInfoDao.Properties.Path.eq(info.path)).list();
             if(list != null && list.size()>0){
                 info.praiseCount = list.get(0).praiseCount;
                 update.add(info);
@@ -234,7 +230,7 @@ public class DbUtil {
 
         BaseMediaFolderInfoDao dao = DbUtil.getDaoSession().getBaseMediaFolderInfoDao();
         for (BaseMediaFolderInfo info : infos) {
-          List<BaseMediaFolderInfo> list=   dao.queryBuilder().where(BaseMediaFolderInfoDao.Properties.PathAndType.eq(info.pathAndType)).list();
+          List<BaseMediaFolderInfo> list=   dao.queryBuilder().where(BaseMediaFolderInfoDao.Properties.Id.eq(info.id)).list();
             if(list != null && list.size()>0){
                 update.add(info);
             }else {
@@ -269,7 +265,7 @@ public class DbUtil {
             }
 
         }else {
-            builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FolderPathOrUri.eq(dir));
+            builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.Dir.eq(dir));
         }
 
 
@@ -356,9 +352,9 @@ public class DbUtil {
             }
 
         }else if(fileSortType == 8){
-            builder.orderAsc(BaseMediaInfoDao.Properties.PathOrUri);
+            builder.orderAsc(BaseMediaInfoDao.Properties.Path);
         }else if(fileSortType == 9){
-            builder.orderDesc(BaseMediaInfoDao.Properties.PathOrUri);
+            builder.orderDesc(BaseMediaInfoDao.Properties.Path);
         }else if(fileSortType == 10){
             builder.orderDesc(BaseMediaInfoDao.Properties.Duration);
         }else if(fileSortType == 11){

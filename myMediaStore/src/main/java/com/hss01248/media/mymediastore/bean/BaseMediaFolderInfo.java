@@ -1,18 +1,13 @@
 package com.hss01248.media.mymediastore.bean;
 
-import android.os.Build;
-
 import androidx.annotation.Keep;
+
+import com.blankj.utilcode.util.EncryptUtils;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
-import java.util.Objects;
-
-import static com.hss01248.media.mymediastore.bean.BaseMediaInfo.TYPE_AUDIO;
-import static com.hss01248.media.mymediastore.bean.BaseMediaInfo.TYPE_IMAGE;
-import static com.hss01248.media.mymediastore.bean.BaseMediaInfo.TYPE_VIDEO;
 @Keep
 @Entity
 public class BaseMediaFolderInfo {
@@ -23,25 +18,7 @@ public class BaseMediaFolderInfo {
      * 可能是纯文件路径,或者saf拿到的content://xxxx
      */
     public String cover;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BaseMediaFolderInfo)) return false;
-        BaseMediaFolderInfo that = (BaseMediaFolderInfo) o;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return Objects.equals(pathAndType, that.pathAndType);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return Objects.hash(pathAndType);
-        }
-        return 9090;
-    }
+    
 
     /**
      * 可能是纯文件路径,或者saf拿到的content://xxxx
@@ -52,13 +29,13 @@ public class BaseMediaFolderInfo {
     public String smbRootDir;//不带/
 
     @Id
-    public String pathAndType;
+    public String id;
 
-    public String path;
 
+    public int diskType;
 
     public void generateTheId(){
-        pathAndType = type+"-"+pathOrUri;
+        id = EncryptUtils.encryptMD5ToString(mediaType +"-"+pathOrUri);
     }
 
     public String getName() {
@@ -101,20 +78,20 @@ public class BaseMediaFolderInfo {
         this.smbRootDir = smbRootDir;
     }
 
-    public String getPathAndType() {
-        return this.pathAndType;
+    public String getId() {
+        return this.id;
     }
 
-    public void setPathAndType(String pathAndType) {
-        this.pathAndType = pathAndType;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getPath() {
-        return this.path;
+    public int getDiskType() {
+        return this.diskType;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setDiskType(int diskType) {
+        this.diskType = diskType;
     }
 
     public int getCount() {
@@ -165,12 +142,12 @@ public class BaseMediaFolderInfo {
         this.order = order;
     }
 
-    public int getType() {
-        return this.type;
+    public int getMediaType() {
+        return this.mediaType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setMediaType(int mediaType) {
+        this.mediaType = mediaType;
     }
 
 
@@ -193,32 +170,33 @@ public class BaseMediaFolderInfo {
      */
     public int order;
 
-    public int type;
+    public int mediaType;
 
-    @Generated(hash = 1788600874)
+    @Generated(hash = 480953982)
     public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
-            String smbHost, String smbRootDir, String pathAndType, String path,
-            int count, long fileSize, int hidden, long updatedTime, long duration,
-            int order, int type) {
+            String smbHost, String smbRootDir, String id, int diskType, int count,
+            long fileSize, int hidden, long updatedTime, long duration, int order,
+            int mediaType) {
         this.name = name;
         this.cover = cover;
         this.pathOrUri = pathOrUri;
         this.smbHost = smbHost;
         this.smbRootDir = smbRootDir;
-        this.pathAndType = pathAndType;
-        this.path = path;
+        this.id = id;
+        this.diskType = diskType;
         this.count = count;
         this.fileSize = fileSize;
         this.hidden = hidden;
         this.updatedTime = updatedTime;
         this.duration = duration;
         this.order = order;
-        this.type = type;
+        this.mediaType = mediaType;
     }
 
     @Generated(hash = 1055136609)
     public BaseMediaFolderInfo() {
     }
+
 
 
 

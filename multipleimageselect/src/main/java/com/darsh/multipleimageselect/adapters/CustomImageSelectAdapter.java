@@ -1,8 +1,6 @@
 package com.darsh.multipleimageselect.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
@@ -14,32 +12,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.darsh.multipleimageselect.R;
-import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.LoggingListener;
-import com.darsh.multipleimageselect.models.Image;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
-import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -85,26 +71,26 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
 
         BaseMediaInfo image = arrayList.get(position);
         viewHolder.image = image;
-        Log.w(SafUtil.TAG,"dir22: images show:   "+image.pathOrUri);
-        if(image.pathOrUri.startsWith("content:/") && !image.pathOrUri.startsWith("content://")){
-            image.pathOrUri = image.pathOrUri.replace("content:/","content://");
+        Log.w(SafUtil.TAG,"dir22: images show:   "+image.path);
+        if(image.path.startsWith("content:/") && !image.path.startsWith("content://")){
+            image.path = image.path.replace("content:/","content://");
         }
         //.FileNotFoundException: content:/com.android.externalstorage.documents/tree/0123-4567
         Uri uri = null;
-        if(image.pathOrUri.startsWith("content")){
-            uri = Uri.parse(image.pathOrUri);
-        }else if(image.pathOrUri.startsWith("/storage/")){
-            uri = Uri.fromFile(new File(image.pathOrUri));
-        }else if(image.pathOrUri.startsWith("smb")){
-            String url = SmbToHttp.getHttpUrlFromSmb(image.pathOrUri);
+        if(image.path.startsWith("content")){
+            uri = Uri.parse(image.path);
+        }else if(image.path.startsWith("/storage/")){
+            uri = Uri.fromFile(new File(image.path));
+        }else if(image.path.startsWith("smb")){
+            String url = SmbToHttp.getHttpUrlFromSmb(image.path);
             uri = Uri.parse(url);
         }else {
-            uri = Uri.parse(image.pathOrUri);
+            uri = Uri.parse(image.path);
         }
-        if(image.pathOrUri.startsWith("http") || image.pathOrUri.startsWith("smb")){
+        if(image.path.startsWith("http") || image.path.startsWith("smb")){
             if(image.type != BaseMediaInfo.TYPE_IMAGE){
                 viewHolder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.c_text_bg));
-                viewHolder.tvInfo.setText(image.pathOrUri+"\n"+ ImageInfoFormater.formatFileSize(image.fileSize)+" 点赞:"+image.praiseCount);
+                viewHolder.tvInfo.setText(image.path +"\n"+ ImageInfoFormater.formatFileSize(image.fileSize)+" 点赞:"+image.praiseCount);
                 return convertView;
             }
         }
@@ -117,7 +103,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                 .placeholder(R.drawable.image_placeholder).into(viewHolder.imageView);
         ViewHolder viewHolder1 = viewHolder;
         //viewHolder.tvInfo.setText("");
-        if(viewHolder.image.pathOrUri.startsWith("smb") || viewHolder.image.pathOrUri.startsWith("http") ){
+        if(viewHolder.image.path.startsWith("smb") || viewHolder.image.path.startsWith("http") ){
             viewHolder.tvInfo.setText(uri.getPath().substring(uri.getPath().lastIndexOf("/")+1)+"\n"
                     + ImageInfoFormater.formatFileSize(image.fileSize)
                     +" "+ImageInfoFormater.formatTime(image.updatedTime)+" 点赞:"+image.praiseCount);
@@ -132,16 +118,16 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                         //viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
                         //viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
                         if(viewHolder.image.type == 1){
-                            viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
+                            viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.path,false);
                         }else {
                             boolean getInfoFail = false;
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
-                                if(viewHolder.image.pathOrUri.startsWith("content")){
-                                    retriever.setDataSource(context,Uri.parse(viewHolder.image.pathOrUri));
-                                }else if(viewHolder.image.pathOrUri.startsWith("/storage/")){
-                                    retriever.setDataSource(viewHolder.image.pathOrUri);
-                                }else if(viewHolder.image.pathOrUri.contains("smb")){
+                                if(viewHolder.image.path.startsWith("content")){
+                                    retriever.setDataSource(context,Uri.parse(viewHolder.image.path));
+                                }else if(viewHolder.image.path.startsWith("/storage/")){
+                                    retriever.setDataSource(viewHolder.image.path);
+                                }else if(viewHolder.image.path.contains("smb")){
                                     /*retriever.setDataSource(SmbToHttp.getHttpUrlFromSmb(image.pathOrUri),new HashMap<>());
                                    Bitmap bitmap = retriever.getFrameAtTime();
                                    if(bitmap!=null){
@@ -174,19 +160,19 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                                         ro = " "+rotation+"°";
                                     }
                                 }
-                                desc = width+"x"+height+ro+"\n"+ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+"   "+formatTime(duration);
+                                desc = width+"x"+height+ro+"\n"+ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.path))+"   "+formatTime(duration);
                             }else {
-                                String path2 = URLDecoder.decode(viewHolder.image.pathOrUri);
+                                String path2 = URLDecoder.decode(viewHolder.image.path);
                                 if (path2.contains(":")) {
                                     path2 = path2.substring(path2.lastIndexOf(":") + 1);
                                 }
                                 if(path2.contains("/")){
                                     path2 = path2.substring(path2.lastIndexOf("/")+1);
                                 }
-                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.pathOrUri))+"   "+formatTime(duration)+"\n"+path2;
+                                desc = ImageInfoFormater.formatFileSize(ImageInfoFormater.getFileLen(viewHolder.image.path))+"   "+formatTime(duration)+"\n"+path2;
                             }
                             if(getInfoFail){
-                                viewHolder.desc = URLDecoder.decode(viewHolder.image.pathOrUri);
+                                viewHolder.desc = URLDecoder.decode(viewHolder.image.path);
                                 viewHolder.desc = viewHolder.desc.substring(viewHolder.desc.lastIndexOf("/")+1);
                             }else {
                                 viewHolder.desc = desc;

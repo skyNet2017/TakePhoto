@@ -15,10 +15,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -113,7 +110,7 @@ public class FileScanner {
                                 imageFolder = new BaseMediaFolderInfo();
                                 imageFolder.name = dir.getName();
                                 imageFolder.cover = file.getAbsolutePath();
-                                imageFolder.type = BaseMediaInfo.TYPE_IMAGE;
+                                imageFolder.mediaType = BaseMediaInfo.TYPE_IMAGE;
                                 imageFolder.updatedTime = file.lastModified();
                                 imageFolder.pathOrUri = dir.getAbsolutePath();
                                 Log.d("扫描", "添加有图文件夹:" + dir.getAbsolutePath());
@@ -124,8 +121,8 @@ public class FileScanner {
                                 images = new ArrayList<>(files.length / 2);
                             }
                             BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getAbsolutePath();
-                            image.pathOrUri = file.getAbsolutePath();
+                            image.dir = dir.getAbsolutePath();
+                            image.path = file.getAbsolutePath();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
@@ -146,7 +143,7 @@ public class FileScanner {
                                 videoFolder.name = dir.getName();
                                 videoFolder.cover = file.getAbsolutePath();
                                 videoFolder.updatedTime = file.lastModified();
-                                videoFolder.type = BaseMediaInfo.TYPE_VIDEO;
+                                videoFolder.mediaType = BaseMediaInfo.TYPE_VIDEO;
                                 videoFolder.pathOrUri = dir.getAbsolutePath();
                                 Log.d("扫描", "添加有视频文件夹:" + dir.getAbsolutePath());
                             }
@@ -157,8 +154,8 @@ public class FileScanner {
                                 videos = new ArrayList<>(files.length / 2);
                             }
                             BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getAbsolutePath();
-                            image.pathOrUri = file.getAbsolutePath();
+                            image.dir = dir.getAbsolutePath();
+                            image.path = file.getAbsolutePath();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
@@ -169,14 +166,14 @@ public class FileScanner {
                             try {
 
                                 //FileInputStream inputStream = new FileInputStream(new File(image.pathOrUri).getAbsolutePath());
-                                retriever.setDataSource(image.pathOrUri);
+                                retriever.setDataSource(image.path);
                                 image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
                                 videoDuration = videoDuration + image.duration;
                                 int width = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
                                 int height = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
                                 image.maxSide = Math.max(width,height);
                             }catch (Throwable throwable){
-                                Log.w("errorv",image.pathOrUri);
+                                Log.w("errorv",image.path);
                                 throwable.printStackTrace();
                             }finally {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -191,7 +188,7 @@ public class FileScanner {
                                 audioFolder.name = dir.getName();
                                 audioFolder.cover = file.getAbsolutePath();
                                 audioFolder.updatedTime = file.lastModified();
-                                audioFolder.type = BaseMediaInfo.TYPE_AUDIO;
+                                audioFolder.mediaType = BaseMediaInfo.TYPE_AUDIO;
                                 audioFolder.pathOrUri = dir.getAbsolutePath();
                                 Log.d("扫描", "添加有音频文件夹:" + dir.getAbsolutePath());
                             }
@@ -201,8 +198,8 @@ public class FileScanner {
                                 audios = new ArrayList<>(files.length / 2);
                             }
                             BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getAbsolutePath();
-                            image.pathOrUri = file.getAbsolutePath();
+                            image.dir = dir.getAbsolutePath();
+                            image.path = file.getAbsolutePath();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
@@ -213,15 +210,15 @@ public class FileScanner {
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
                                 try {
-                                    if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.pathOrUri));
+                                    if(image.path.startsWith("content")){
+                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.path));
                                     }else {
-                                        FileInputStream inputStream = new FileInputStream(new File(image.pathOrUri).getAbsolutePath());
+                                        FileInputStream inputStream = new FileInputStream(new File(image.path).getAbsolutePath());
                                         retriever.setDataSource(inputStream.getFD());
                                     }
 
                                 }catch (Throwable throwable){
-                                    Log.w("error",image.pathOrUri);
+                                    Log.w("error",image.path);
                                     throwable.printStackTrace();
                                 }
                                 audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;

@@ -2,9 +2,6 @@ package com.hss01248.media.mymediastore;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.MediaMetadataRetriever;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,7 +12,6 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
-import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -218,9 +214,8 @@ public class SafFileFinder22<T extends IFile>{
                             BaseMediaFolderInfo folder = new BaseMediaFolderInfo();
                             folder.name = dir.getName();
                             folder.cover = file.getPath();
-                            folder.type = type;
+                            folder.mediaType = type;
                             folder.updatedTime = file.lastModified();
-                            folder.path = file.getPath();
                             folder.pathOrUri = dir.getPath();
                             folder.generateTheId();
                             Log.w("扫描", "添加文件夹:" + dir.getPath());
@@ -237,11 +232,10 @@ public class SafFileFinder22<T extends IFile>{
                         List<BaseMediaInfo> fileInfos = filesMap.get(type);
 
                         BaseMediaInfo image = new BaseMediaInfo();
-                        image.folderPathOrUri = dir.getPath();
-                        image.pathOrUri = file.getPath();
+                        image.dir = dir.getPath();
+                        image.path = file.getPath();
                         image.updatedTime = file.lastModified();
                         image.name = file.getName();
-                        image.path = file.getPath();
                         image.fileSize = file.length();
                         image.type = type;
                         image.fillMediaInfo();
@@ -324,7 +318,7 @@ public class SafFileFinder22<T extends IFile>{
 
      static void print(List<BaseMediaFolderInfo> folderInfos, boolean isSaf) {
         for (BaseMediaFolderInfo folderInfo : folderInfos) {
-            Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.type + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
+            Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.mediaType + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
         }
     }
 

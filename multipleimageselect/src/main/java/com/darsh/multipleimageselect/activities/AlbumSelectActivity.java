@@ -4,20 +4,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.ContentObserver;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Process;
 import android.provider.MediaStore;
-import androidx.appcompat.app.ActionBar;
+
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.documentfile.provider.DocumentFile;
 
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,14 +20,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
 import com.darsh.multipleimageselect.R;
 import com.darsh.multipleimageselect.adapters.CustomAlbumSelectAdapter;
-import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
-import com.darsh.multipleimageselect.models.Album;
-import com.darsh.multipleimageselect.saf.TfAlbumFinder;
 import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.DefaultScanFolderCallback;
 import com.hss01248.media.mymediastore.SafFileFinder;
@@ -46,20 +34,7 @@ import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Darshan on 4/14/2015.
@@ -155,7 +130,7 @@ public class AlbumSelectActivity extends HelperActivity {
         //删除的确认弹窗:
         new AlertDialog.Builder(this)
                 .setTitle("删除确认")
-                .setMessage("真的要删除这个文件夹里的"+CustomAlbumSelectAdapter.typeDes(folderInfo.type)+"吗?")
+                .setMessage("真的要删除这个文件夹里的"+CustomAlbumSelectAdapter.typeDes(folderInfo.mediaType)+"吗?")
                 .setPositiveButton("确定删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -191,7 +166,7 @@ public class AlbumSelectActivity extends HelperActivity {
                     }
                     for (DocumentFile file : files) {
                         int type = SafFileFinder.guessTypeByName(file.getName());
-                        if(type == folderInfo.type){
+                        if(type == folderInfo.mediaType){
                             file.delete();
                         }
                     }
@@ -204,7 +179,7 @@ public class AlbumSelectActivity extends HelperActivity {
                     }
                     for (File file : files) {
                         int type = SafFileFinder.guessTypeByName(file.getName());
-                        if(type == folderInfo.type){
+                        if(type == folderInfo.mediaType){
                             file.delete();
                         }
                     }
@@ -220,7 +195,7 @@ public class AlbumSelectActivity extends HelperActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                String text = "文件夹内("+CustomAlbumSelectAdapter.typeDes(folderInfo.type)+")删除完成\n"+folderInfo.pathOrUri;
+                String text = "文件夹内("+CustomAlbumSelectAdapter.typeDes(folderInfo.mediaType)+")删除完成\n"+folderInfo.pathOrUri;
                 Toast.makeText(AlbumSelectActivity.this.getApplicationContext(),text,Toast.LENGTH_LONG).show();
             }
         });

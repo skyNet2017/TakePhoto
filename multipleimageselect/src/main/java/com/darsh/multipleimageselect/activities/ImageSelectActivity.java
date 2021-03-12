@@ -8,23 +8,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.os.Process;
 import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 
 import android.text.TextUtils;
@@ -32,7 +26,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -54,49 +47,25 @@ import com.darsh.multipleimageselect.adapters.CustomImageSelectAdapter;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.darsh.multipleimageselect.helpers.Constants;
-import com.darsh.multipleimageselect.models.Album;
-import com.darsh.multipleimageselect.models.Image;
-import com.darsh.multipleimageselect.saf.TfAlbumFinder;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.localvideoplayer.VideoPlayUtil;
 import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
-import com.hss01248.media.mymediastore.SafFileFinder;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
-import com.hss01248.media.mymediastore.http.EverythingSearchParser;
 import com.hss01248.media.mymediastore.http.HttpHelper;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.noober.menu.FloatMenu;
-import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 import com.wuhenzhizao.titlebar.widget.CommonTitleBar;
 
-import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
-import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by Darshan on 4/18/2015.
@@ -126,7 +95,7 @@ public class ImageSelectActivity extends HelperActivity {
     public static void list(Activity activity,BaseMediaFolderInfo info){
         Intent intent = new Intent(activity, ImageSelectActivity.class);
         intent.putExtra(Constants.INTENT_EXTRA_ALBUM, info.name);
-        intent.putExtra(Constants.INTENT_EXTRA_TYPE, info.type);
+        intent.putExtra(Constants.INTENT_EXTRA_TYPE, info.mediaType);
 
         intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, info.pathOrUri);
 
@@ -232,24 +201,24 @@ public class ImageSelectActivity extends HelperActivity {
                 } else {
                     ArrayList<String> files = new ArrayList<>();
                     for (BaseMediaInfo image : images) {
-                        files.add(image.pathOrUri);
+                        files.add(image.path);
                     }
                     if(type == BaseMediaInfo.TYPE_IMAGE){
                         //点击去预览
                         CompressResultCompareActivity.lauchForPreview(ImageSelectActivity.this, files, position);
                     }else if(type == BaseMediaInfo.TYPE_VIDEO || type == BaseMediaInfo.TYPE_AUDIO){
                         if(files.get(position).startsWith("smb:")){
-                            playByOther(images.get(position).pathOrUri);
+                            playByOther(images.get(position).path);
                         }else {
                             if(files.get(position).endsWith(".mp4")|| type == BaseMediaInfo.TYPE_AUDIO){
                                 VideoPlayUtil.startPreviewInList(ImageSelectActivity.this,files,position);
                             }else {
-                                viewVideo(images.get(position).pathOrUri);
+                                viewVideo(images.get(position).path);
                             }
 
                         }
                     }else {
-                        viewVideo(images.get(position).pathOrUri);
+                        viewVideo(images.get(position).path);
                     }
 
                 }
@@ -377,13 +346,13 @@ public class ImageSelectActivity extends HelperActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if(folderInfo.pathOrUri.startsWith("content")){
-                    DocumentFile file = com.hss01248.media.mymediastore.SafUtil.findFile(SafUtil.sdRoot,folderInfo.pathOrUri);
+                if(folderInfo.path.startsWith("content")){
+                    DocumentFile file = com.hss01248.media.mymediastore.SafUtil.findFile(SafUtil.sdRoot,folderInfo.path);
                     if(file.exists()){
                         file.delete();
                     }
                 }else {
-                    File file = new File(folderInfo.pathOrUri);
+                    File file = new File(folderInfo.path);
                     file.delete();
 
                 }
@@ -841,10 +810,10 @@ public class ImageSelectActivity extends HelperActivity {
             Toast.makeText(this, R.string.c_mot_selected, Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!PhotoCompressHelper.isACompressedDr(new File(images.get(0).pathOrUri))) {
+        if (!PhotoCompressHelper.isACompressedDr(new File(images.get(0).path))) {
             List<File> files = new ArrayList<>();
             for (BaseMediaInfo image : images) {
-                files.add(new File(image.pathOrUri));
+                files.add(new File(image.path));
             }
             PhotoCompressHelper.compressAllFiles(files, this, new Subscriber<String>() {
                 @Override
@@ -856,7 +825,7 @@ public class ImageSelectActivity extends HelperActivity {
                 public void onNext(String s) {
                     ArrayList<String> paths = new ArrayList<>();
                     for (BaseMediaInfo image : images) {
-                        paths.add(image.pathOrUri);
+                        paths.add(image.path);
                     }
                     CompressResultCompareActivity.lauch(ImageSelectActivity.this, paths, countSelected == images.size());
                 }
@@ -868,7 +837,7 @@ public class ImageSelectActivity extends HelperActivity {
                         menu.findItem(R.id.menu_item_add_image).setTitle(R.string.c_preview);
                         ArrayList<String> paths = new ArrayList<>();
                         for (BaseMediaInfo image : images) {
-                            paths.add(image.pathOrUri);
+                            paths.add(image.path);
                         }
                         CompressResultCompareActivity.lauch(ImageSelectActivity.this, paths, countSelected == images.size());
                     }
@@ -885,7 +854,7 @@ public class ImageSelectActivity extends HelperActivity {
 
         ArrayList<String> paths = new ArrayList<>();
         for (BaseMediaInfo image : images) {
-            paths.add(image.pathOrUri);
+            paths.add(image.path);
         }
         CompressResultCompareActivity.lauch(this, paths, countSelected == images.size());
 

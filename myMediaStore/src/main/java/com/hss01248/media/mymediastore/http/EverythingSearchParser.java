@@ -8,9 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
-import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
-import com.hss01248.media.mymediastore.db.BaseMediaInfoDao;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -81,9 +78,9 @@ public class EverythingSearchParser {
                                 // files[i] = new HttpFile(beans.get(i));
                                 HttpResponseBean bean = beans.get(i);
                                 BaseMediaInfo info = new BaseMediaInfo();
-                                info.pathOrUri = bean.url;
+                                info.path = bean.url;
                                 info.type = type;
-                                info.folderPathOrUri = bean.url.substring(0,bean.url.lastIndexOf("/"));
+                                info.dir = bean.url.substring(0,bean.url.lastIndexOf("/"));
                                 info.fileSize = bean.fileSize;
                                 info.isHiden = 0;
                                 info.updatedTime = bean.lastModified;

@@ -1,37 +1,25 @@
 package com.hss01248.media.mymediastore.bean;
 
-import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.annotation.Keep;
 
-import com.hierynomus.msdtyp.AccessMask;
-import com.hierynomus.msfscc.fileinformation.FileAllInformation;
-import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
-import com.hierynomus.msfscc.fileinformation.InformationTrans;
-import com.hierynomus.mssmb2.SMB2CreateDisposition;
-import com.hierynomus.mssmb2.SMB2ShareAccess;
-import com.hierynomus.smbj.share.File;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.fileapi.JavaFile;
-import com.hss01248.media.mymediastore.smb.FileApiForSmb;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
-import com.hss01248.media.mymediastore.smb.SmbjUtil;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Index;
 
-import java.util.EnumSet;
 import java.util.Objects;
 
 @Keep
 @Entity
-public class BaseMediaInfo {
+public class BaseMediaInfo extends BaseInfo{
 
     public static final int TYPE_IMAGE = 1;
     public static final int TYPE_VIDEO = 2;
@@ -44,10 +32,9 @@ public class BaseMediaInfo {
 
     public static final int TYPE_UNKNOWN = -1;
     @Index
-    public String folderPathOrUri;
+    public String dir;
 
-    public String smbHost;
-    public String smbRootDir;//不带/
+
     @Index
     public String name;
 
@@ -63,12 +50,12 @@ public class BaseMediaInfo {
     public transient IFile file;
 
     public void genFile(){
-        if(pathOrUri.startsWith("smb://")){
-            this.file = SmbToHttp.getFile(pathOrUri);
-        }else if(pathOrUri.startsWith("content://")){
-            file = new IDocumentFile(SafUtil.findFile(SafUtil.sdRoot,pathOrUri));
-        }else if(pathOrUri.startsWith("/storage/")){
-            file = new JavaFile(new java.io.File(pathOrUri));
+        if(path.startsWith("smb://")){
+            this.file = SmbToHttp.getFile(path);
+        }else if(path.startsWith("content://")){
+            file = new IDocumentFile(SafUtil.findFile(SafUtil.sdRoot, path));
+        }else if(path.startsWith("/storage/")){
+            file = new JavaFile(new java.io.File(path));
         }
 
     }
@@ -79,7 +66,7 @@ public class BaseMediaInfo {
         if (!(o instanceof BaseMediaInfo)) return false;
         BaseMediaInfo that = (BaseMediaInfo) o;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return Objects.equals(pathOrUri, that.pathOrUri);
+            return Objects.equals(path, that.path);
         }
         return false;
     }
@@ -87,7 +74,7 @@ public class BaseMediaInfo {
     @Override
     public int hashCode() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return Objects.hash(pathOrUri);
+            return Objects.hash(path);
         }
         return 908;
     }
@@ -104,91 +91,12 @@ public class BaseMediaInfo {
         return type >3 ;
     }
 
-
-
-    /**
-     * 可能是纯文件路径,或者saf拿到的content://xxxx
-     */
-    @Id
-    public String pathOrUri;
-    @Index
-    public long fileSize;
-    @Index
-    public long updatedTime;
-    @Index
-    public int maxSide;
-    @Index
-    public int duration;
-
-    public String path;
-
-    public int type;
-    public Integer praiseCount;
-
-    @Generated(hash = 1817727138)
-    public BaseMediaInfo(String folderPathOrUri, String smbHost, String smbRootDir,
-            String name, int isHiden, String pathOrUri, long fileSize,
-            long updatedTime, int maxSide, int duration, String path, int type,
-            Integer praiseCount) {
-        this.folderPathOrUri = folderPathOrUri;
-        this.smbHost = smbHost;
-        this.smbRootDir = smbRootDir;
-        this.name = name;
-        this.isHiden = isHiden;
-        this.pathOrUri = pathOrUri;
-        this.fileSize = fileSize;
-        this.updatedTime = updatedTime;
-        this.maxSide = maxSide;
-        this.duration = duration;
-        this.path = path;
-        this.type = type;
-        this.praiseCount = praiseCount;
+    public String getDir() {
+        return this.dir;
     }
 
-    @Generated(hash = 1446686172)
-    public BaseMediaInfo() {
-    }
-
-
-
-
-
-
-
-    public boolean isImage(){
-        return type == TYPE_IMAGE;
-    }
-
-    public boolean isVideo(){
-        return type == TYPE_VIDEO;
-    }
-
-    public boolean isAudio(){
-        return type == TYPE_AUDIO;
-    }
-
-    public String getFolderPathOrUri() {
-        return this.folderPathOrUri;
-    }
-
-    public void setFolderPathOrUri(String folderPathOrUri) {
-        this.folderPathOrUri = folderPathOrUri;
-    }
-
-    public String getSmbHost() {
-        return this.smbHost;
-    }
-
-    public void setSmbHost(String smbHost) {
-        this.smbHost = smbHost;
-    }
-
-    public String getSmbRootDir() {
-        return this.smbRootDir;
-    }
-
-    public void setSmbRootDir(String smbRootDir) {
-        this.smbRootDir = smbRootDir;
+    public void setDir(String dir) {
+        this.dir = dir;
     }
 
     public String getName() {
@@ -207,12 +115,12 @@ public class BaseMediaInfo {
         this.isHiden = isHiden;
     }
 
-    public String getPathOrUri() {
-        return this.pathOrUri;
+    public String getPath() {
+        return this.path;
     }
 
-    public void setPathOrUri(String pathOrUri) {
-        this.pathOrUri = pathOrUri;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public long getFileSize() {
@@ -247,14 +155,6 @@ public class BaseMediaInfo {
         this.duration = duration;
     }
 
-    public String getPath() {
-        return this.path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public int getType() {
         return this.type;
     }
@@ -270,6 +170,66 @@ public class BaseMediaInfo {
     public void setPraiseCount(Integer praiseCount) {
         this.praiseCount = praiseCount;
     }
+
+    public int getDiskType() {
+        return this.diskType;
+    }
+
+    public void setDiskType(int diskType) {
+        this.diskType = diskType;
+    }
+
+
+
+
+
+
+
+    /**
+     * 可能是纯文件路径,或者saf拿到的content://xxxx
+     */
+    @Id
+    public String path;
+    @Index
+    public long fileSize;
+    @Index
+    public long updatedTime;
+    @Index
+    public int maxSide;
+    @Index
+    public int duration;
+    
+
+    public int type;
+    public Integer praiseCount;
+    public int diskType;
+
+    @Generated(hash = 93660614)
+    public BaseMediaInfo(String dir, String name, int isHiden, String path,
+            long fileSize, long updatedTime, int maxSide, int duration, int type,
+            Integer praiseCount, int diskType) {
+        this.dir = dir;
+        this.name = name;
+        this.isHiden = isHiden;
+        this.path = path;
+        this.fileSize = fileSize;
+        this.updatedTime = updatedTime;
+        this.maxSide = maxSide;
+        this.duration = duration;
+        this.type = type;
+        this.praiseCount = praiseCount;
+        this.diskType = diskType;
+    }
+
+    @Generated(hash = 1446686172)
+    public BaseMediaInfo() {
+    }
+
+
+
+
+
+
 
 
 

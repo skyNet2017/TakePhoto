@@ -2,7 +2,6 @@ package com.hss01248.media.mymediastore;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.ImageFormat;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
@@ -202,7 +201,7 @@ public class SafFileFinder {
                                 imageFolder = new BaseMediaFolderInfo();
                                 imageFolder.name = dir.getName();
                                 imageFolder.cover = file.getUri().toString();
-                                imageFolder.type = BaseMediaInfo.TYPE_IMAGE;
+                                imageFolder.mediaType = BaseMediaInfo.TYPE_IMAGE;
                                 imageFolder.updatedTime = file.lastModified();
                                 imageFolder.pathOrUri = dir.getUri().toString();
                                 Log.d("扫描", "添加有图文件夹:" + dir.getUri().toString());
@@ -213,8 +212,8 @@ public class SafFileFinder {
                                 images = new ArrayList<>(files.length / 2);
                             }
                             BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getUri().toString();
-                            image.pathOrUri = file.getUri().toString();
+                            image.dir = dir.getUri().toString();
+                            image.path = file.getUri().toString();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
@@ -237,7 +236,7 @@ public class SafFileFinder {
                                 videoFolder.name = dir.getName();
                                 videoFolder.cover = file.getUri().toString();
                                 videoFolder.updatedTime = file.lastModified();
-                                videoFolder.type = BaseMediaInfo.TYPE_VIDEO;
+                                videoFolder.mediaType = BaseMediaInfo.TYPE_VIDEO;
                                 videoFolder.pathOrUri = dir.getUri().toString();
                                 Log.d("扫描", "添加有视频文件夹:" + dir.getUri().toString());
                             }
@@ -248,8 +247,8 @@ public class SafFileFinder {
                                 videos = new ArrayList<>(files.length / 2);
                             }
                             BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getUri().toString();
-                            image.pathOrUri = file.getUri().toString();
+                            image.dir = dir.getUri().toString();
+                            image.path = file.getUri().toString();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
@@ -259,14 +258,14 @@ public class SafFileFinder {
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
                                 try {
-                                    if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.pathOrUri));
+                                    if(image.path.startsWith("content")){
+                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.path));
                                     }else {
-                                        retriever.setDataSource(image.pathOrUri);
+                                        retriever.setDataSource(image.path);
                                     }
 
                                 }catch (Throwable throwable){
-                                    Log.w("errorv",image.pathOrUri);
+                                    Log.w("errorv",image.path);
                                     throwable.printStackTrace();
                                 }
                                 image.duration = SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
@@ -289,7 +288,7 @@ public class SafFileFinder {
                                 audioFolder.name = dir.getName();
                                 audioFolder.cover = file.getUri().toString();
                                 audioFolder.updatedTime = file.lastModified();
-                                audioFolder.type = BaseMediaInfo.TYPE_AUDIO;
+                                audioFolder.mediaType = BaseMediaInfo.TYPE_AUDIO;
                                 audioFolder.pathOrUri = dir.getUri().toString();
                                 Log.d("扫描", "添加有音频文件夹:" + dir.getUri().toString());
                             }
@@ -299,8 +298,8 @@ public class SafFileFinder {
                                 audios = new ArrayList<>(files.length / 2);
                             }
                             BaseMediaInfo image = new BaseMediaInfo();
-                            image.folderPathOrUri = dir.getUri().toString();
-                            image.pathOrUri = file.getUri().toString();
+                            image.dir = dir.getUri().toString();
+                            image.path = file.getUri().toString();
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
@@ -310,14 +309,14 @@ public class SafFileFinder {
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             try {
                                 try {
-                                    if(image.pathOrUri.startsWith("content")){
-                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.pathOrUri));
+                                    if(image.path.startsWith("content")){
+                                        retriever.setDataSource(SafUtil.context,Uri.parse(image.path));
                                     }else {
-                                        retriever.setDataSource(image.pathOrUri);
+                                        retriever.setDataSource(image.path);
                                     }
 
                                 }catch (Throwable throwable){
-                                    Log.w("error",image.pathOrUri);
+                                    Log.w("error",image.path);
                                     throwable.printStackTrace();
                                 }
                                 audioDuration = audioDuration + SafUtil.toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
@@ -406,7 +405,7 @@ public class SafFileFinder {
 
      static void print(List<BaseMediaFolderInfo> folderInfos, boolean isSaf) {
         for (BaseMediaFolderInfo folderInfo : folderInfos) {
-            Log.v(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.type + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
+            Log.v(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.mediaType + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
         }
     }
 

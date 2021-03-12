@@ -24,19 +24,17 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property FolderPathOrUri = new Property(0, String.class, "folderPathOrUri", false, "FOLDER_PATH_OR_URI");
-        public final static Property SmbHost = new Property(1, String.class, "smbHost", false, "SMB_HOST");
-        public final static Property SmbRootDir = new Property(2, String.class, "smbRootDir", false, "SMB_ROOT_DIR");
-        public final static Property Name = new Property(3, String.class, "name", false, "NAME");
-        public final static Property IsHiden = new Property(4, int.class, "isHiden", false, "IS_HIDEN");
-        public final static Property PathOrUri = new Property(5, String.class, "pathOrUri", true, "PATH_OR_URI");
-        public final static Property FileSize = new Property(6, long.class, "fileSize", false, "FILE_SIZE");
-        public final static Property UpdatedTime = new Property(7, long.class, "updatedTime", false, "UPDATED_TIME");
-        public final static Property MaxSide = new Property(8, int.class, "maxSide", false, "MAX_SIDE");
-        public final static Property Duration = new Property(9, int.class, "duration", false, "DURATION");
-        public final static Property Path = new Property(10, String.class, "path", false, "PATH");
-        public final static Property Type = new Property(11, int.class, "type", false, "TYPE");
-        public final static Property PraiseCount = new Property(12, Integer.class, "praiseCount", false, "PRAISE_COUNT");
+        public final static Property Dir = new Property(0, String.class, "dir", false, "DIR");
+        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
+        public final static Property IsHiden = new Property(2, int.class, "isHiden", false, "IS_HIDEN");
+        public final static Property Path = new Property(3, String.class, "path", true, "PATH");
+        public final static Property FileSize = new Property(4, long.class, "fileSize", false, "FILE_SIZE");
+        public final static Property UpdatedTime = new Property(5, long.class, "updatedTime", false, "UPDATED_TIME");
+        public final static Property MaxSide = new Property(6, int.class, "maxSide", false, "MAX_SIDE");
+        public final static Property Duration = new Property(7, int.class, "duration", false, "DURATION");
+        public final static Property Type = new Property(8, int.class, "type", false, "TYPE");
+        public final static Property PraiseCount = new Property(9, Integer.class, "praiseCount", false, "PRAISE_COUNT");
+        public final static Property DiskType = new Property(10, int.class, "diskType", false, "DISK_TYPE");
     }
 
 
@@ -52,22 +50,20 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"BASE_MEDIA_INFO\" (" + //
-                "\"FOLDER_PATH_OR_URI\" TEXT," + // 0: folderPathOrUri
-                "\"SMB_HOST\" TEXT," + // 1: smbHost
-                "\"SMB_ROOT_DIR\" TEXT," + // 2: smbRootDir
-                "\"NAME\" TEXT," + // 3: name
-                "\"IS_HIDEN\" INTEGER NOT NULL ," + // 4: isHiden
-                "\"PATH_OR_URI\" TEXT PRIMARY KEY NOT NULL ," + // 5: pathOrUri
-                "\"FILE_SIZE\" INTEGER NOT NULL ," + // 6: fileSize
-                "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 7: updatedTime
-                "\"MAX_SIDE\" INTEGER NOT NULL ," + // 8: maxSide
-                "\"DURATION\" INTEGER NOT NULL ," + // 9: duration
-                "\"PATH\" TEXT," + // 10: path
-                "\"TYPE\" INTEGER NOT NULL ," + // 11: type
-                "\"PRAISE_COUNT\" INTEGER);"); // 12: praiseCount
+                "\"DIR\" TEXT," + // 0: dir
+                "\"NAME\" TEXT," + // 1: name
+                "\"IS_HIDEN\" INTEGER NOT NULL ," + // 2: isHiden
+                "\"PATH\" TEXT PRIMARY KEY NOT NULL ," + // 3: path
+                "\"FILE_SIZE\" INTEGER NOT NULL ," + // 4: fileSize
+                "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 5: updatedTime
+                "\"MAX_SIDE\" INTEGER NOT NULL ," + // 6: maxSide
+                "\"DURATION\" INTEGER NOT NULL ," + // 7: duration
+                "\"TYPE\" INTEGER NOT NULL ," + // 8: type
+                "\"PRAISE_COUNT\" INTEGER," + // 9: praiseCount
+                "\"DISK_TYPE\" INTEGER NOT NULL );"); // 10: diskType
         // Add Indexes
-        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_FOLDER_PATH_OR_URI ON \"BASE_MEDIA_INFO\"" +
-                " (\"FOLDER_PATH_OR_URI\" ASC);");
+        db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_DIR ON \"BASE_MEDIA_INFO\"" +
+                " (\"DIR\" ASC);");
         db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_NAME ON \"BASE_MEDIA_INFO\"" +
                 " (\"NAME\" ASC);");
         db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_FILE_SIZE ON \"BASE_MEDIA_INFO\"" +
@@ -90,145 +86,113 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
     protected final void bindValues(DatabaseStatement stmt, BaseMediaInfo entity) {
         stmt.clearBindings();
  
-        String folderPathOrUri = entity.getFolderPathOrUri();
-        if (folderPathOrUri != null) {
-            stmt.bindString(1, folderPathOrUri);
-        }
- 
-        String smbHost = entity.getSmbHost();
-        if (smbHost != null) {
-            stmt.bindString(2, smbHost);
-        }
- 
-        String smbRootDir = entity.getSmbRootDir();
-        if (smbRootDir != null) {
-            stmt.bindString(3, smbRootDir);
+        String dir = entity.getDir();
+        if (dir != null) {
+            stmt.bindString(1, dir);
         }
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(4, name);
+            stmt.bindString(2, name);
         }
-        stmt.bindLong(5, entity.getIsHiden());
- 
-        String pathOrUri = entity.getPathOrUri();
-        if (pathOrUri != null) {
-            stmt.bindString(6, pathOrUri);
-        }
-        stmt.bindLong(7, entity.getFileSize());
-        stmt.bindLong(8, entity.getUpdatedTime());
-        stmt.bindLong(9, entity.getMaxSide());
-        stmt.bindLong(10, entity.getDuration());
+        stmt.bindLong(3, entity.getIsHiden());
  
         String path = entity.getPath();
         if (path != null) {
-            stmt.bindString(11, path);
+            stmt.bindString(4, path);
         }
-        stmt.bindLong(12, entity.getType());
+        stmt.bindLong(5, entity.getFileSize());
+        stmt.bindLong(6, entity.getUpdatedTime());
+        stmt.bindLong(7, entity.getMaxSide());
+        stmt.bindLong(8, entity.getDuration());
+        stmt.bindLong(9, entity.getType());
  
         Integer praiseCount = entity.getPraiseCount();
         if (praiseCount != null) {
-            stmt.bindLong(13, praiseCount);
+            stmt.bindLong(10, praiseCount);
         }
+        stmt.bindLong(11, entity.getDiskType());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, BaseMediaInfo entity) {
         stmt.clearBindings();
  
-        String folderPathOrUri = entity.getFolderPathOrUri();
-        if (folderPathOrUri != null) {
-            stmt.bindString(1, folderPathOrUri);
-        }
- 
-        String smbHost = entity.getSmbHost();
-        if (smbHost != null) {
-            stmt.bindString(2, smbHost);
-        }
- 
-        String smbRootDir = entity.getSmbRootDir();
-        if (smbRootDir != null) {
-            stmt.bindString(3, smbRootDir);
+        String dir = entity.getDir();
+        if (dir != null) {
+            stmt.bindString(1, dir);
         }
  
         String name = entity.getName();
         if (name != null) {
-            stmt.bindString(4, name);
+            stmt.bindString(2, name);
         }
-        stmt.bindLong(5, entity.getIsHiden());
- 
-        String pathOrUri = entity.getPathOrUri();
-        if (pathOrUri != null) {
-            stmt.bindString(6, pathOrUri);
-        }
-        stmt.bindLong(7, entity.getFileSize());
-        stmt.bindLong(8, entity.getUpdatedTime());
-        stmt.bindLong(9, entity.getMaxSide());
-        stmt.bindLong(10, entity.getDuration());
+        stmt.bindLong(3, entity.getIsHiden());
  
         String path = entity.getPath();
         if (path != null) {
-            stmt.bindString(11, path);
+            stmt.bindString(4, path);
         }
-        stmt.bindLong(12, entity.getType());
+        stmt.bindLong(5, entity.getFileSize());
+        stmt.bindLong(6, entity.getUpdatedTime());
+        stmt.bindLong(7, entity.getMaxSide());
+        stmt.bindLong(8, entity.getDuration());
+        stmt.bindLong(9, entity.getType());
  
         Integer praiseCount = entity.getPraiseCount();
         if (praiseCount != null) {
-            stmt.bindLong(13, praiseCount);
+            stmt.bindLong(10, praiseCount);
         }
+        stmt.bindLong(11, entity.getDiskType());
     }
 
     @Override
     public String readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5);
+        return cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3);
     }    
 
     @Override
     public BaseMediaInfo readEntity(Cursor cursor, int offset) {
         BaseMediaInfo entity = new BaseMediaInfo( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // folderPathOrUri
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // smbHost
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // smbRootDir
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // name
-            cursor.getInt(offset + 4), // isHiden
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // pathOrUri
-            cursor.getLong(offset + 6), // fileSize
-            cursor.getLong(offset + 7), // updatedTime
-            cursor.getInt(offset + 8), // maxSide
-            cursor.getInt(offset + 9), // duration
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // path
-            cursor.getInt(offset + 11), // type
-            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12) // praiseCount
+            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // dir
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
+            cursor.getInt(offset + 2), // isHiden
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // path
+            cursor.getLong(offset + 4), // fileSize
+            cursor.getLong(offset + 5), // updatedTime
+            cursor.getInt(offset + 6), // maxSide
+            cursor.getInt(offset + 7), // duration
+            cursor.getInt(offset + 8), // type
+            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // praiseCount
+            cursor.getInt(offset + 10) // diskType
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, BaseMediaInfo entity, int offset) {
-        entity.setFolderPathOrUri(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setSmbHost(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setSmbRootDir(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setIsHiden(cursor.getInt(offset + 4));
-        entity.setPathOrUri(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setFileSize(cursor.getLong(offset + 6));
-        entity.setUpdatedTime(cursor.getLong(offset + 7));
-        entity.setMaxSide(cursor.getInt(offset + 8));
-        entity.setDuration(cursor.getInt(offset + 9));
-        entity.setPath(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setType(cursor.getInt(offset + 11));
-        entity.setPraiseCount(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
+        entity.setDir(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setIsHiden(cursor.getInt(offset + 2));
+        entity.setPath(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setFileSize(cursor.getLong(offset + 4));
+        entity.setUpdatedTime(cursor.getLong(offset + 5));
+        entity.setMaxSide(cursor.getInt(offset + 6));
+        entity.setDuration(cursor.getInt(offset + 7));
+        entity.setType(cursor.getInt(offset + 8));
+        entity.setPraiseCount(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
+        entity.setDiskType(cursor.getInt(offset + 10));
      }
     
     @Override
     protected final String updateKeyAfterInsert(BaseMediaInfo entity, long rowId) {
-        return entity.getPathOrUri();
+        return entity.getPath();
     }
     
     @Override
     public String getKey(BaseMediaInfo entity) {
         if(entity != null) {
-            return entity.getPathOrUri();
+            return entity.getPath();
         } else {
             return null;
         }
@@ -236,7 +200,7 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
 
     @Override
     public boolean hasKey(BaseMediaInfo entity) {
-        return entity.getPathOrUri() != null;
+        return entity.getPath() != null;
     }
 
     @Override
