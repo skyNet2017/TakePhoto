@@ -30,6 +30,7 @@ import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.hss01248.media.mymediastore.usb.UsbUtil;
 import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.filemanager.StorageListActivity;
+import com.sznq.finalcompress.filemanager.search.SearchActivity;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -266,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void smbj(View view) {
+        SearchActivity.doSearch(this,"");
 
     }
 

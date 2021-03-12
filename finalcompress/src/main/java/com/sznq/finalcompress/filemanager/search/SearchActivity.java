@@ -2,9 +2,12 @@ package com.sznq.finalcompress.filemanager.search;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +16,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.darsh.multipleimageselect.FileOpenUtil;
+import com.hss01248.media.mymediastore.FileTypeUtil;
+import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
@@ -20,6 +26,7 @@ import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.pagestate.PageStateManager;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivitySearchBinding;
+import com.sznq.finalcompress.filemanager.FolderViewActivity;
 import com.sznq.finalcompress.filemanager.adapter.FileItemAdapter;
 import com.sznq.finalcompress.filemanager.adapter.FileItemImgAdapter;
 
@@ -55,7 +62,6 @@ public class SearchActivity extends AppCompatActivity {
         filterViewHolder.initDataAndEventInternal(this,"");
         stateManager = PageStateManager.initWhenUse(binding.recycler,null);
         filterViewHolder.setActivity(this);
-        stateManager.showContent();
 
 
         initRecycleview();
@@ -64,6 +70,65 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 doSearch();
+            }
+        });
+        doSearch();
+
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                BaseInfo info = mediaInfos.get(position);
+                //IFile file =  files.get(position);
+                if(info instanceof BaseMediaFolderInfo){
+                    BaseMediaFolderInfo folderInfo = (BaseMediaFolderInfo) info;
+                    //listFiles(file);
+                    FolderViewActivity.goTo(SearchActivity.this,info.getPath(),folderInfo.getMediaType(),"","");
+                }else {
+                    openFile((BaseMediaInfo) info,mediaInfos);
+                }
+            }
+        });
+        binding.tvNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int idx = pageInfo[0]+1;
+                if(idx <= pageInfo[1]){
+                    pageInfo[0]++;
+                    doSearch(true);
+                }else {
+                    ToastUtils.showLong("已经是最后一页");
+                }
+
+            }
+        });
+
+        binding.tvPre.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                int idx = pageInfo[0] - 1;
+                if (idx >=0){
+                    pageInfo[0] = idx;
+                    doSearch(true);
+                }
+            }
+        });
+        binding.sbPager.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                pageInfo[0] = seekBar.getProgress();
+                doSearch(true);
             }
         });
     }
@@ -85,27 +150,48 @@ public class SearchActivity extends AppCompatActivity {
         }
         binding.recycler.setAdapter(adapter);
         adapter.setNewData(mediaInfos);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                /*IFile file =  files.get(position);
-                if(file.isDirectory()){
-                    listFiles(file);
-                }else {
-                    ToastUtils.showLong("打开文件:"+file.getPath());
-                    openFile(file,files);
 
-                }*/
+    }
+
+    private void openFile(BaseMediaInfo file, List<BaseInfo> files) {
+        String path = file.getPath();
+        int type = FileTypeUtil.getTypeByFileName(path);
+        List<String> paths = new ArrayList<>();
+        int position = 0;
+        int realP = 0;
+        if(type == BaseMediaInfo.TYPE_IMAGE || type == BaseMediaInfo.TYPE_VIDEO){
+            for (BaseInfo iFile : files) {
+                if(iFile instanceof BaseMediaFolderInfo){
+                    continue;
+                }
+                if(FileTypeUtil.getTypeByFileName(iFile.getPath()) == type){
+                    if(iFile.equals(file)){
+                        realP = position;
+                    }
+                    paths.add(iFile.getPath());
+                    position++;
+                }
             }
-        });
+            FileOpenUtil.open(SearchActivity.this,file.getPath(),paths,realP);
+        }else {
+            FileOpenUtil.open(SearchActivity.this,file.getPath());
+        }
+
     }
 
     String currentSearchKey;
-    void doSearch(){
+    void doSearch(boolean isChangePage){
+        if(!isChangePage){
+            pageInfo = new int[]{0,0};
+        }
         String word = binding.titlebar.getSearchKey();
 
         searchDB(word,filterViewHolder.isSearchDir,filterViewHolder.diskType,filterViewHolder.mediaType,
                 filterViewHolder.sortType,filterViewHolder.hiddenType);
+    }
+
+    void doSearch(){
+        doSearch(false);
     }
     int[] pageInfo = new int[]{0,0};
     private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType,int hiddenType) {
@@ -134,6 +220,25 @@ public class SearchActivity extends AppCompatActivity {
                         mediaInfos.clear();
                         mediaInfos.addAll(infos);
                         adapter.setNewData(mediaInfos);
+
+
+                        if(pageInfo[1] > 0){
+                            Log.w(SafUtil.TAG, " 需要分页:" );
+                            binding.llPager.setVisibility(View.VISIBLE);
+                            binding.tvPbInfo.setVisibility(View.VISIBLE);
+                            binding.sbPager.setProgress(pageInfo[0]);
+                            binding.sbPager.setMax(pageInfo[1]);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                String text = pageInfo[0]+"/"+pageInfo[1];
+                                binding.sbPager.setTooltipText(text);
+                            }
+                           binding.tvPbInfo.setText("page:"+(pageInfo[0]+1)+"/"+pageInfo[1]+",count:"+mediaInfos.size());
+                        }else {
+                            binding.llPager.setVisibility(View.GONE);
+                            binding.tvPbInfo.setVisibility(View.GONE);
+                            //titleBar.getLeftTextView().setText("count:"+images.size());
+                        }
+
 
                     }
 
