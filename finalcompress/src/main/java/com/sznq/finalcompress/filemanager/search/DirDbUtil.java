@@ -10,6 +10,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.bean.StorageBean;
 import com.hss01248.media.mymediastore.db.BaseMediaFolderInfoDao;
 import com.hss01248.media.mymediastore.db.BaseMediaFolderInfoDao;
+import com.hss01248.media.mymediastore.db.BaseMediaFolderInfoDao;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -19,11 +20,12 @@ public class DirDbUtil {
 
     public static int pagesize = 50;
 
-     static List<BaseMediaFolderInfo> searchDir(String word, int diskType, int mediaType, int sortType,int hiddenType, int[] pageInfo) {
+     static List<BaseMediaFolderInfo> searchDir(String word, int diskType, int mediaType, int sortType,
+                                                int hiddenType, int[] pageInfo, int sizeType) {
          long start = System.currentTimeMillis();
          //
          QueryBuilder<BaseMediaFolderInfo> builder = DbUtil.getDaoSession().getBaseMediaFolderInfoDao().queryBuilder();
-         doFilter(builder,word,diskType,mediaType,hiddenType);
+         doFilter(builder,word,diskType,mediaType,hiddenType,sizeType);
          doSort(builder,sortType,mediaType);
          List<BaseMediaFolderInfo> infos = pager(builder,pageInfo);
 
@@ -34,14 +36,67 @@ public class DirDbUtil {
 
 
 
-    private static void doFilter(QueryBuilder<BaseMediaFolderInfo> builder, String word, int diskType, int mediaType, int hiddenType) {
+    private static void doFilter(QueryBuilder<BaseMediaFolderInfo> builder, String word, int diskType, int mediaType, int hiddenType, int sizeType) {
         if(!TextUtils.isEmpty(word)){
             builder.where(BaseMediaFolderInfoDao.Properties.Name.like(word));
         }
         filterMediaType(builder,mediaType);
         filterDiskType(builder,diskType);
         filterHiddenType(builder,hiddenType);
+        filterSizetype(builder,sizeType);
+    }
 
+    /**
+     *   desc[0] = ">50kB";
+     *         desc[1] ="全部";
+     *         desc[2] =">1KB";
+     *         desc[3] =">500KB";
+     *         desc[4] =">1MB";
+     *         desc[5] =">10MB";
+     *         desc[6] =">100MB";
+     *         desc[7] =">1GB";
+     *         desc[8] ="50kB-10M";
+     *         desc[9] ="50kB-100M";
+     *         desc[10] ="50kB-1GB";
+     * @param builder
+     * @param sizeType
+     */
+    private static void filterSizetype(QueryBuilder<BaseMediaFolderInfo> builder, int sizeType) {
+        switch (sizeType){
+            case 0:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(50*1024));
+                break;
+            case 2:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(1024));
+                break;
+            case 3:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(500*1024));
+                break;
+            case 4:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(1024*1024));
+                break;
+            case 5:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(10*1024*1024));
+                break;
+            case 6:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(100*1024*1024));
+                break;
+            case 7:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(1024*1024*1024));
+                break;
+            case 8:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(50*1024))
+                        .where(BaseMediaFolderInfoDao.Properties.FileSize.lt(10*1024*1024));
+                break;
+            case 9:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(50*1024))
+                        .where(BaseMediaFolderInfoDao.Properties.FileSize.lt(100*1024*1024));
+                break;
+            case 10:
+                builder.where(BaseMediaFolderInfoDao.Properties.FileSize.gt(50*1024))
+                        .where(BaseMediaFolderInfoDao.Properties.FileSize.lt(1024*1024*1024));
+                break;
+        }
     }
 
     /**

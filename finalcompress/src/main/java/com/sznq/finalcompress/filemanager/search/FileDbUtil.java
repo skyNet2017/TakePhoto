@@ -19,11 +19,11 @@ public class FileDbUtil {
 
     public static int pagesize = 2000;
 
-    static List<BaseMediaInfo> searc(String word, int diskType, int mediaType, int sortType,int hiddenType, int[] pageInfo) {
+    static List<BaseMediaInfo> searc(String word, int diskType, int mediaType, int sortType,int hiddenType, int[] pageInfo, int sizeType) {
         long start = System.currentTimeMillis();
         //
         QueryBuilder<BaseMediaInfo> builder = DbUtil.getDaoSession().getBaseMediaInfoDao().queryBuilder();
-        doFilter(builder,word,diskType,mediaType,hiddenType);
+        doFilter(builder,word,diskType,mediaType,hiddenType,sizeType);
         doSort(builder,sortType,mediaType);
         List<BaseMediaInfo> infos = pager(builder,pageInfo);
 
@@ -34,14 +34,68 @@ public class FileDbUtil {
 
 
 
-    private static void doFilter(QueryBuilder<BaseMediaInfo> builder, String word, int diskType, int mediaType, int hiddenType) {
+    private static void doFilter(QueryBuilder<BaseMediaInfo> builder, String word, int diskType, int mediaType, int hiddenType, int sizeType) {
         if(!TextUtils.isEmpty(word)){
             builder.where(BaseMediaInfoDao.Properties.Name.like(word));
         }
         filterMediaType(builder,mediaType);
         filterDiskType(builder,diskType);
         filterHiddenType(builder,hiddenType);
+        filterSizetype(builder,sizeType);
 
+    }
+
+    /**
+     *   desc[0] = ">50kB";
+     *         desc[1] ="全部";
+     *         desc[2] =">1KB";
+     *         desc[3] =">500KB";
+     *         desc[4] =">1MB";
+     *         desc[5] =">10MB";
+     *         desc[6] =">100MB";
+     *         desc[7] =">1GB";
+     *         desc[8] ="50kB-10M";
+     *         desc[9] ="50kB-100M";
+     *         desc[10] ="50kB-1GB";
+     * @param builder
+     * @param sizeType
+     */
+    private static void filterSizetype(QueryBuilder<BaseMediaInfo> builder, int sizeType) {
+        switch (sizeType){
+            case 0:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(50*1024));
+                break;
+            case 2:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(1024));
+                break;
+            case 3:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(500*1024));
+                break;
+            case 4:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(1024*1024));
+                break;
+            case 5:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(10*1024*1024));
+                break;
+            case 6:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(100*1024*1024));
+                break;
+            case 7:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(1024*1024*1024));
+                break;
+            case 8:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(50*1024))
+                .where(BaseMediaInfoDao.Properties.FileSize.lt(10*1024*1024));
+                break;
+            case 9:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(50*1024))
+                        .where(BaseMediaInfoDao.Properties.FileSize.lt(100*1024*1024));
+                break;
+            case 10:
+                builder.where(BaseMediaInfoDao.Properties.FileSize.gt(50*1024))
+                        .where(BaseMediaInfoDao.Properties.FileSize.lt(1024*1024*1024));
+                break;
+        }
     }
 
     /**

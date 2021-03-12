@@ -187,21 +187,21 @@ public class SearchActivity extends AppCompatActivity {
         String word = binding.titlebar.getSearchKey();
 
         searchDB(word,filterViewHolder.isSearchDir,filterViewHolder.diskType,filterViewHolder.mediaType,
-                filterViewHolder.sortType,filterViewHolder.hiddenType);
+                filterViewHolder.sortType,filterViewHolder.hiddenType,filterViewHolder.sizeType);
     }
 
     void doSearch(){
         doSearch(false);
     }
     int[] pageInfo = new int[]{0,0};
-    private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType,int hiddenType) {
+    private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType,int hiddenType,int sizeType) {
         stateManager.showLoading();
         Observable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(new Function<Integer, List<? extends BaseInfo>>() {
                     @Override
                     public List<? extends BaseInfo> apply(@NonNull Integer integer) throws Exception {
-                        return SearchDbUtil.searchItem(word,diskType,mediaType,sortType,isSearchDir,hiddenType,pageInfo);
+                        return SearchDbUtil.searchItem(word,diskType,mediaType,sortType,isSearchDir,hiddenType,pageInfo,sizeType);
                     }
                 }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<? extends BaseInfo>>() {

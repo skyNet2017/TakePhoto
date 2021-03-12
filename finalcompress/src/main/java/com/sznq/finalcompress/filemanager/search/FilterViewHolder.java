@@ -3,6 +3,7 @@ package com.sznq.finalcompress.filemanager.search;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,7 +61,43 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
                 showHiddenMenu(v);
             }
         });
+        binding.tvSize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSizeFilterMenu(v);
+            }
+        });
 
+    }
+
+    int sizeType;
+    private void showSizeFilterMenu(View v) {
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+
+        String[] desc = new String[11];
+        desc[0] = ">50kB";
+        desc[1] ="全部";
+        desc[2] =">1KB";
+        desc[3] =">500KB";
+        desc[4] =">1MB";
+        desc[5] =">10MB";
+        desc[6] =">100MB";
+        desc[7] =">1GB";
+        desc[8] ="50kB-10M";
+        desc[9] ="50kB-100M";
+        desc[10] ="50kB-1GB";
+        desc[sizeType] =  desc[sizeType] +"(now)";
+        floatMenu.items(desc);
+
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                sizeType = position;
+                doSearch();
+            }
+        });
+        floatMenu.showAsDropDown(v);
     }
 
     private void showHiddenMenu(View v) {
@@ -153,8 +190,31 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
     int mediaType = 0;
     int hiddenType = 0;
     private void showDirFilterMenu(View v) {
-        isSearchDir = !isSearchDir;
-        doSearch();
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[2];
+        desc[0] = "文件夹";
+        desc[1] ="文件";
+        if(isSearchDir){
+            desc[0] =  desc[0] +"(now)";
+        }else {
+            desc[1] =  desc[1] +"(now)";
+        }
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                if(position ==0){
+                    isSearchDir = true;
+                }else {
+                    isSearchDir = false;
+                }
+                doSearch();
+            }
+        });
+        floatMenu.showAsDropDown(v);
+
     }
 
     SearchActivity activity;
