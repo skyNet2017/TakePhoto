@@ -2,6 +2,7 @@ package com.sznq.finalcompress.filemanager.search;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.FileOpenUtil;
+import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
+import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseInfo;
@@ -24,6 +27,7 @@ import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.pagestate.PageStateManager;
+import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivitySearchBinding;
 import com.sznq.finalcompress.filemanager.FolderViewActivity;
@@ -60,12 +64,15 @@ public class SearchActivity extends AppCompatActivity {
         filterViewHolder = new FilterViewHolder(getLayoutInflater(),this, binding.llRoot,false);
         filterViewHolder.addToParentView(1);
         filterViewHolder.initDataAndEventInternal(this,"");
-        stateManager = PageStateManager.initWhenUse(binding.recycler,null);
+        stateManager = PageStateManager.initWhenUse(binding.fastContainer,null);
         filterViewHolder.setActivity(this);
 
 
         initRecycleview();
-
+        binding.fastscroll.setRecyclerView(binding.recycler);
+        binding.fastscroll.setVisibility(View.VISIBLE);
+       // fastScroller.setRecyclerView(binding.recycler);
+      //  fastScroller.setVisibility(VISIBLE);
         binding.titlebar.getRightTextView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,6 +93,13 @@ public class SearchActivity extends AppCompatActivity {
                 }else {
                     openFile((BaseMediaInfo) info,mediaInfos);
                 }
+            }
+        });
+        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                showMenu(view,position);
+                return true;
             }
         });
         binding.tvNext.setOnClickListener(new View.OnClickListener() {
@@ -133,8 +147,34 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    private void showMenu(View v, int position0) {
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[1];
+        desc[0] = "显示exif/metadata信息";
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                if(position ==0){
+                    CompressResultCompareActivity.showExif(SearchActivity.this,mediaInfos.get(position0).getPath());
+                }else {
+
+                }
+
+            }
+        });
+        int[] location = new int[2];
+        v.getLocationOnScreen(location);
+        Point point = new Point();
+        point.x = location[0];
+        point.y =location[1];
+        floatMenu.show(point);
+    }
+
     List<BaseInfo> mediaInfos = new ArrayList<>();
     BaseQuickAdapter adapter;
+
     int displayType = 1;
     private void initRecycleview() {
         this.displayType = displayType%2;

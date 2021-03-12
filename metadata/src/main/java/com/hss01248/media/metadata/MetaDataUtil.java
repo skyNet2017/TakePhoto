@@ -1,6 +1,7 @@
 package com.hss01248.media.metadata;
 
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -23,7 +24,12 @@ public class MetaDataUtil {
         String key = "METADATA_KEY_";
         try {
             //没有权限时,crash
-            retriever.setDataSource(path);
+            if(path.startsWith("content")){
+                retriever.setDataSource(ExifUtil.context, Uri.parse(path));
+            }else {
+                retriever.setDataSource(path);
+            }
+
             for (Field field : fields) {
                 if(  Modifier.isFinal(field.getModifiers())  && Modifier.isStatic(field.getModifiers())){
                     String name = field.getName();

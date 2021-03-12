@@ -31,12 +31,25 @@
             android:background="#666666"
             android:id="@+id/v"
             android:layout_height="1dp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:id="@+id/recycler"
+        <RelativeLayout
             android:layout_below="@id/v"
-            android:layout_height="match_parent"/>
+            android:id="@+id/fast_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:id="@+id/recycler"
+                android:layout_height="match_parent"/>
+            <com.futuremind.recyclerviewfastscroll.FastScroller
+                android:id="@+id/fastscroll"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
+
+
     </LinearLayout>
 
     <LinearLayout

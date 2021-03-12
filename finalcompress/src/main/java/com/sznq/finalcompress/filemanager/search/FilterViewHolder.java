@@ -70,7 +70,7 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
 
     }
 
-    int sizeType;
+   static int sizeType;
     private void showSizeFilterMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
@@ -184,11 +184,11 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
         floatMenu.showAsDropDown(v);
     }
 
-    boolean isSearchDir;
-    int diskType = 0;
-    int sortType = 0;
-    int mediaType = 0;
-    int hiddenType = 0;
+    static  boolean isSearchDir;
+    static  int diskType = 0;
+    static int sortType = 0;
+    static int mediaType = 0;
+    static int hiddenType = 0;
     private void showDirFilterMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";

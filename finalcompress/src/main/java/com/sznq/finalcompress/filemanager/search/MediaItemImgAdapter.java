@@ -2,6 +2,7 @@ package com.sznq.finalcompress.filemanager.search;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -25,7 +26,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
     public MediaItemImgAdapter(int layoutResId) {
         super(layoutResId);
     }
-    ColorDrawable drawable = new ColorDrawable(Color.GRAY);
+    Drawable drawable = new ColorDrawable(Color.GRAY);
     @Override
     protected void convert(@NonNull BaseViewHolder helper, BaseInfo item) {
 
@@ -43,7 +44,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
             }
         }
         if(!showImg){
-            helper.setImageDrawable(R.id.iv_img,drawable);
+            helper.setImageDrawable(R.id.iv_img,helper.itemView.getResources().getDrawable(R.drawable.image_placeholder));
         }
 
 
@@ -53,6 +54,8 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
         Glide.with(helper.itemView)
                 .load(item.getPath())
                 .thumbnail(0.2f)
+                .placeholder(R.drawable.image_placeholder)
+                .fitCenter()
                 .into((ImageView) helper.getView(R.id.iv_img));
     }
 }

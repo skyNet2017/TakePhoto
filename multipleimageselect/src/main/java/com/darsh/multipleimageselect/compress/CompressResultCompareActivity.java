@@ -2,9 +2,11 @@ package com.darsh.multipleimageselect.compress;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
@@ -18,18 +20,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.darsh.multipleimageselect.PathToStream;
 import com.darsh.multipleimageselect.R;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
+import com.hss01248.media.metadata.ExifUtil;
+import com.hss01248.media.metadata.MediaInfoUtil;
+import com.hss01248.media.metadata.MetaDataUtil;
+import com.hss01248.media.mymediastore.FileTypeUtil;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -130,7 +146,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         isPreview = getIntent().getBooleanExtra("isPreview",false);
         isAllSelected = getIntent().getBooleanExtra("isAllSelected",false);
         if(isPreview){
-            menu.setVisibility(View.GONE);
+           // menu.setVisibility(View.GONE);
         }
 
 
@@ -253,6 +269,17 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                 });
             }
         });
+        //if(isPreview){
+            fbOverrideSingle.setVisibility(View.GONE);
+            fbOverrideAll.setVisibility(View.GONE);
+            fbChangeQuality.setLabelText("查看exif/metadata");
+            fbChangeQuality.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showExif(CompressResultCompareActivity.this,paths.get(position));
+                }
+            });
+       // }
 
 
         /*rlRoot.setOnClickListener(new View.OnClickListener() {
@@ -264,6 +291,70 @@ public class CompressResultCompareActivity extends AppCompatActivity {
         });
         isDescShow = isPreview;
         switchDescUI();*/
+    }
+
+    public static void showExif(Activity activity,String path) {
+        int type = FileTypeUtil.getTypeByFileName(path);
+
+        Observable.just(path)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<String, String>() {
+                    @Override
+                    public String apply(@NonNull String path) throws Exception {
+                        String str = "";
+                        if(type== BaseMediaInfo.TYPE_IMAGE){
+                            Map<String, String> exif = ExifUtil.readExif(PathToStream.getInput(path));
+                            str = exif.toString().replace(",","\n");
+                        }else if(type == BaseMediaInfo.TYPE_VIDEO){
+                            if(!path.startsWith("http")){
+                                Map<String, String> allInfo = MetaDataUtil.getAllInfo(path);
+                                str = allInfo.toString().replace(",","\n");
+                            }
+                        }
+                        return str;
+                    }
+                }).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull String s) {
+                       new  AlertDialog.Builder(activity)
+                               .setTitle("detail")
+                               .setMessage(s)
+                               .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialog, int which) {
+
+                                   }
+                               }).show();
+
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        e.printStackTrace();
+                        new  AlertDialog.Builder(activity)
+                                .setTitle("detail")
+                                .setMessage(e.getMessage())
+                                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                }).show();
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 
     private void changeQuality(int quality) {

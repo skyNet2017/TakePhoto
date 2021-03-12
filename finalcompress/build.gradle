@@ -130,6 +130,8 @@ dependencies {
 
     compile 'com.github.dongjunkun:DropDownMenu:1.0.4'
 
+    implementation 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
+
 }
 configurations {
     all*.exclude group: 'com.android.support', module:'support-compat'

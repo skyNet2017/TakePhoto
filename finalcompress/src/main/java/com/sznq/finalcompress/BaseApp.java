@@ -25,6 +25,7 @@ import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
 import com.fanjun.keeplive.config.KeepLiveService;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.ScanFolderCallback;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
@@ -73,6 +74,7 @@ public class BaseApp extends Application {
         isDebugable = BuildConfig.DEBUG;
         SpiderMan.init(this);
         keepAlive();
+        ExifUtil.init(this);
         //registerFileReceiver(this);
         StorageUtils.context = this;
         ImageInfoFormater.init(this);
