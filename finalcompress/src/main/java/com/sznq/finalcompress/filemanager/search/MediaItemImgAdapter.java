@@ -11,6 +11,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.FileTypeUtil;
+import com.hss01248.media.mymediastore.bean.BaseInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
@@ -20,16 +21,16 @@ import com.sznq.finalcompress.R;
 
 import java.util.Collections;
 
-public class MediaItemImgAdapter extends BaseQuickAdapter<BaseMediaInfo, BaseViewHolder> {
+public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHolder> {
     public MediaItemImgAdapter(int layoutResId) {
         super(layoutResId);
     }
     ColorDrawable drawable = new ColorDrawable(Color.GRAY);
     @Override
-    protected void convert(@NonNull BaseViewHolder helper, BaseMediaInfo item) {
+    protected void convert(@NonNull BaseViewHolder helper, BaseInfo item) {
 
-        helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.updatedTime)+"-"+ ImageInfoFormater.formatFileSize(item.fileSize)+"\n"+item.getName());
-        int type = FileTypeUtil.getTypeByFileName(item.getName());
+        helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.getUpdatedTime())+"-"+ ImageInfoFormater.formatFileSize(item.getFileSize())+"\n"+item.getName());
+        int type = FileTypeUtil.getTypeByFileName(item.getPath());
         boolean showImg = false;
         if(type == BaseMediaInfo.TYPE_IMAGE){
             showImg = true;
@@ -48,7 +49,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseMediaInfo, BaseVie
 
     }
 
-    private void showImg(BaseViewHolder helper, BaseMediaInfo item) {
+    private void showImg(BaseViewHolder helper, BaseInfo item) {
         Glide.with(helper.itemView)
                 .load(item.getPath())
                 .thumbnail(0.2f)

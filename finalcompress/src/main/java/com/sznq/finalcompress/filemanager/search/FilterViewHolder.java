@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.view.viewholder.CommonViewHolder;
 import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
@@ -53,23 +54,50 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
                 showTypeFilterMenu(v);
             }
         });
+        binding.tvHidden.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showHiddenMenu(v);
+            }
+        });
 
+    }
+
+    private void showHiddenMenu(View v) {
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[3];
+        desc[0] = "全部";
+        desc[1] ="仅搜索公开的内容";
+        desc[2] ="仅搜索隐藏的内容";
+        desc[hiddenType] =  desc[hiddenType] +"(now)";
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                hiddenType = position;
+                doSearch();
+            }
+        });
+        floatMenu.showAsDropDown(v);
     }
 
     private void showTypeFilterMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[10];
-        desc[0] = "全部";
-        desc[1] ="图片和视频";
-        desc[2] ="只有图片";
-        desc[3] ="只有视频";
-        desc[4] ="只有音频";
+        String[] desc = new String[11];
+        desc[0] ="图片和视频";
+        desc[1] ="只有图片";
+        desc[2] ="只有视频";
+        desc[3] ="只有音频";
+        desc[4] ="全部文档";
         desc[5] ="pdf";
         desc[6] ="doc";
         desc[7] ="ppt";
         desc[8] ="excel";
         desc[9] ="txt";
+        desc[10] ="全部office";
+
 
         desc[mediaType] =  desc[mediaType] +"(now)";
 
@@ -87,17 +115,24 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
     private void showSortMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[10];
-        desc[0] = "按文件夹容量从大到小";
-        desc[1] ="按文件个数从大到小";
-        desc[2] ="按更新时间 新在前";
-        desc[3] ="按更新时间顺序 旧在前";
-        desc[4] ="按文件夹名 顺序";
-        desc[5] ="按文件夹名  倒序";
-        desc[6] ="按路径 顺序";
-        desc[7] ="按路径  倒序";
-        desc[8] ="按时长 顺序";
-        desc[9] ="按时长  倒序";
+        String[] desc = new String[13];
+        desc[0] ="按更新时间 新在前";
+        desc[1] ="按更新时间顺序 旧在前";
+        desc[2] = "文件大小从大到小";
+        desc[3] ="文件大小从小到大";
+        desc[4] ="按文件名 顺序";
+        desc[5] ="按文件名  倒序";
+
+        desc[6] ="按画面尺寸 高分辨率在前";
+        desc[7] ="按画面尺寸 低分辨率在前";
+        desc[8] ="按文件路径 顺序";
+        desc[9] ="按文件路径  倒序";
+
+        if(mediaType == BaseMediaInfo.TYPE_VIDEO || mediaType == BaseMediaInfo.TYPE_AUDIO){
+            desc[10] = "按时长 长在前";
+            desc[11] ="按时长 短在前";
+        }
+        desc[12] ="按点赞数 顺序";
 
         desc[sortType] =  desc[sortType] +"(now)";
 
@@ -116,13 +151,20 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
     int diskType = 0;
     int sortType = 0;
     int mediaType = 0;
+    int hiddenType = 0;
     private void showDirFilterMenu(View v) {
         isSearchDir = !isSearchDir;
         doSearch();
     }
 
+    SearchActivity activity;
+    public void setActivity(SearchActivity activity){
+        this.activity = activity;
+    }
+
     private void doSearch() {
         ToastUtils.showLong("搜索:xxxx");
+        activity.doSearch();
 
     }
 

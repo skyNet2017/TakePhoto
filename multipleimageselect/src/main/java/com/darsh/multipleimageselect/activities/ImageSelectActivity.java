@@ -97,7 +97,7 @@ public class ImageSelectActivity extends HelperActivity {
         intent.putExtra(Constants.INTENT_EXTRA_ALBUM, info.name);
         intent.putExtra(Constants.INTENT_EXTRA_TYPE, info.mediaType);
 
-        intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, info.pathOrUri);
+        intent.putExtra(Constants.INTENT_EXTRA_ALBUM_PATH, info.path);
 
 
         activity.startActivityForResult(intent, Constants.REQUEST_CODE);
@@ -323,7 +323,7 @@ public class ImageSelectActivity extends HelperActivity {
         //删除的确认弹窗:
         new AlertDialog.Builder(this)
                 .setTitle("删除确认")
-                .setMessage("真的要删除这个"+ CustomAlbumSelectAdapter.typeDes(folderInfo.type)+"文件吗?")
+                .setMessage("真的要删除这个"+ CustomAlbumSelectAdapter.typeDes(folderInfo.mediaType)+"文件吗?")
                 .setPositiveButton("确定删除", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -79,7 +79,7 @@ public class EverythingSearchParser {
                                 HttpResponseBean bean = beans.get(i);
                                 BaseMediaInfo info = new BaseMediaInfo();
                                 info.path = bean.url;
-                                info.type = type;
+                                info.mediaType = type;
                                 info.dir = bean.url.substring(0,bean.url.lastIndexOf("/"));
                                 info.fileSize = bean.fileSize;
                                 info.isHiden = 0;

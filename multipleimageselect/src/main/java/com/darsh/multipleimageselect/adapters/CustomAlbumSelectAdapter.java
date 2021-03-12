@@ -51,7 +51,7 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
         viewHolder.imageView.getLayoutParams().height = size;
         String desc = ImageInfoFormater.formatFileSize(album.fileSize)+", "+ album.count+" "+FileTypeUtil.getDesc(album.mediaType);
         if(album.mediaType != BaseMediaInfo.TYPE_IMAGE){
-            desc = album.pathOrUri+"\n"+desc;
+            desc = album.path +"\n"+desc;
         }else {
             desc =  album.name+"\n"+desc;
         }
@@ -59,7 +59,7 @@ public class CustomAlbumSelectAdapter extends CustomGenericAdapter<BaseMediaFold
             desc = desc+"\n"+formatTime(album.duration);
         }
 
-        Uri uri1 = Uri.parse(album.pathOrUri);
+        Uri uri1 = Uri.parse(album.path);
         if(uri1 != null){
             String scheme = uri1.getScheme();
             if(TextUtils.isEmpty(scheme)){

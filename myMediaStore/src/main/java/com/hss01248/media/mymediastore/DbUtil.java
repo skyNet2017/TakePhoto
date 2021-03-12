@@ -189,9 +189,9 @@ public class DbUtil {
         }else if(folderSortType == 5){
             builder.orderDesc(BaseMediaFolderInfoDao.Properties.Name);
         }else if(folderSortType == 6){
-            builder.orderAsc(BaseMediaFolderInfoDao.Properties.PathOrUri);
+            builder.orderAsc(BaseMediaFolderInfoDao.Properties.Path);
         }else if(folderSortType == 7){
-            builder.orderDesc(BaseMediaFolderInfoDao.Properties.PathOrUri);
+            builder.orderDesc(BaseMediaFolderInfoDao.Properties.Path);
         }else if(folderSortType == 8){
             builder.orderAsc(BaseMediaFolderInfoDao.Properties.Duration);
         }else if(folderSortType == 9){
@@ -259,13 +259,13 @@ public class DbUtil {
          getDaoSession().getBaseMediaInfoDao().queryBuilder();
         if(TextUtils.isEmpty(dir)){
             if(type == BaseMediaInfo.TYPE_IMAGE|| type == BaseMediaInfo.TYPE_VIDEO){
-                builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*50));
+                builder.where(BaseMediaInfoDao.Properties.MediaType.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*50));
             }else {
-                builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*10));
+                builder.where(BaseMediaInfoDao.Properties.MediaType.eq(type), BaseMediaInfoDao.Properties.FileSize.gt(1024*10));
             }
 
         }else {
-            builder.where(BaseMediaInfoDao.Properties.Type.eq(type), BaseMediaInfoDao.Properties.Dir.eq(dir));
+            builder.where(BaseMediaInfoDao.Properties.MediaType.eq(type), BaseMediaInfoDao.Properties.Dir.eq(dir));
         }
 
 

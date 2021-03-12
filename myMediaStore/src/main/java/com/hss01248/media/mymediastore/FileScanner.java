@@ -112,7 +112,7 @@ public class FileScanner {
                                 imageFolder.cover = file.getAbsolutePath();
                                 imageFolder.mediaType = BaseMediaInfo.TYPE_IMAGE;
                                 imageFolder.updatedTime = file.lastModified();
-                                imageFolder.pathOrUri = dir.getAbsolutePath();
+                                imageFolder.path = dir.getAbsolutePath();
                                 Log.d("扫描", "添加有图文件夹:" + dir.getAbsolutePath());
                             }
 
@@ -126,7 +126,7 @@ public class FileScanner {
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_IMAGE;
+                            image.mediaType = BaseMediaInfo.TYPE_IMAGE;
                             images.add(image);
 
                             //图片宽高:
@@ -144,7 +144,7 @@ public class FileScanner {
                                 videoFolder.cover = file.getAbsolutePath();
                                 videoFolder.updatedTime = file.lastModified();
                                 videoFolder.mediaType = BaseMediaInfo.TYPE_VIDEO;
-                                videoFolder.pathOrUri = dir.getAbsolutePath();
+                                videoFolder.path = dir.getAbsolutePath();
                                 Log.d("扫描", "添加有视频文件夹:" + dir.getAbsolutePath());
                             }
 
@@ -159,7 +159,7 @@ public class FileScanner {
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_VIDEO;
+                            image.mediaType = BaseMediaInfo.TYPE_VIDEO;
                             videos.add(image);
 
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -189,7 +189,7 @@ public class FileScanner {
                                 audioFolder.cover = file.getAbsolutePath();
                                 audioFolder.updatedTime = file.lastModified();
                                 audioFolder.mediaType = BaseMediaInfo.TYPE_AUDIO;
-                                audioFolder.pathOrUri = dir.getAbsolutePath();
+                                audioFolder.path = dir.getAbsolutePath();
                                 Log.d("扫描", "添加有音频文件夹:" + dir.getAbsolutePath());
                             }
 
@@ -203,7 +203,7 @@ public class FileScanner {
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_AUDIO;
+                            image.mediaType = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
 
 

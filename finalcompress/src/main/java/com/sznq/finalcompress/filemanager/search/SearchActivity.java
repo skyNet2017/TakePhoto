@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.hss01248.media.mymediastore.bean.BaseInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.fileapi.IFile;
@@ -53,7 +54,9 @@ public class SearchActivity extends AppCompatActivity {
         filterViewHolder.addToParentView(1);
         filterViewHolder.initDataAndEventInternal(this,"");
         stateManager = PageStateManager.initWhenUse(binding.recycler,null);
+        filterViewHolder.setActivity(this);
         stateManager.showContent();
+
 
         initRecycleview();
 
@@ -65,10 +68,9 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    List<BaseMediaInfo> mediaInfos = new ArrayList<>();
-    List<BaseMediaFolderInfo> folderInfos = new ArrayList<>();
+    List<BaseInfo> mediaInfos = new ArrayList<>();
     BaseQuickAdapter adapter;
-    int displayType;
+    int displayType = 1;
     private void initRecycleview() {
         this.displayType = displayType%2;
         if(displayType == 0){
@@ -82,7 +84,7 @@ public class SearchActivity extends AppCompatActivity {
             adapter = new MediaItemAdapter(R.layout.item_file);
         }
         binding.recycler.setAdapter(adapter);
-        //adapter.setNewData(files);
+        adapter.setNewData(mediaInfos);
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
@@ -98,89 +100,55 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-
+    String currentSearchKey;
     void doSearch(){
         String word = binding.titlebar.getSearchKey();
-        stateManager.showLoading();
-        searchDB(word,filterViewHolder.isSearchDir,filterViewHolder.diskType,filterViewHolder.mediaType,filterViewHolder.sortType);
 
+        searchDB(word,filterViewHolder.isSearchDir,filterViewHolder.diskType,filterViewHolder.mediaType,
+                filterViewHolder.sortType,filterViewHolder.hiddenType);
     }
+    int[] pageInfo = new int[]{0,0};
+    private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType,int hiddenType) {
+        stateManager.showLoading();
+        Observable.just(1)
+                .subscribeOn(Schedulers.io())
+                .map(new Function<Integer, List<? extends BaseInfo>>() {
+                    @Override
+                    public List<? extends BaseInfo> apply(@NonNull Integer integer) throws Exception {
+                        return SearchDbUtil.searchItem(word,diskType,mediaType,sortType,isSearchDir,hiddenType,pageInfo);
+                    }
+                }).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<List<? extends BaseInfo>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
 
-    private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType) {
-        if(isSearchDir){
-            Observable.just(1)
-                    .subscribeOn(Schedulers.io())
-                    .map(new Function<Integer, List<BaseMediaFolderInfo>>() {
-                        @Override
-                        public List<BaseMediaFolderInfo> apply(@NonNull Integer integer) throws Exception {
-                            return SearchDbUtil.searchFolders(word,diskType,mediaType,sortType);
+                    }
+
+                    @Override
+                    public void onNext(@NonNull List<? extends BaseInfo> infos) {
+                        if(infos.isEmpty()){
+                            stateManager.showEmpty();
+                        }else {
+                            stateManager.showContent();
                         }
-                    }).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<List<BaseMediaFolderInfo>>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
+                        mediaInfos.clear();
+                        mediaInfos.addAll(infos);
+                        adapter.setNewData(mediaInfos);
 
-                        }
+                    }
 
-                        @Override
-                        public void onNext(@NonNull List<BaseMediaFolderInfo> infos) {
-                            if(infos.isEmpty()){
-                                stateManager.showEmpty();
-                            }else {
-                                stateManager.showContent();
-                            }
-                            adapter.setNewData(infos);
-                        }
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        stateManager.showError(e.getMessage());
+                        e.printStackTrace();
 
-                        @Override
-                        public void onError(@NonNull Throwable e) {
+                    }
 
-                        }
+                    @Override
+                    public void onComplete() {
 
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
-        }else {
-            Observable.just(1)
-                    .subscribeOn(Schedulers.io())
-                    .map(new Function<Integer, List<BaseMediaInfo>>() {
-                        @Override
-                        public List<BaseMediaInfo> apply(@NonNull Integer integer) throws Exception {
-                            return SearchDbUtil.searchItem(word,diskType,mediaType,sortType);
-                        }
-                    }).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<List<BaseMediaInfo>>() {
-                        @Override
-                        public void onSubscribe(@NonNull Disposable d) {
-
-                        }
-
-                        @Override
-                        public void onNext(@NonNull List<BaseMediaInfo> infos) {
-                            if(infos.isEmpty()){
-                                stateManager.showEmpty();
-                            }else {
-                                stateManager.showContent();
-                            }
-                            mediaInfos.clear();
-                            mediaInfos.addAll(infos);
-                            adapter.setNewData(mediaInfos);
-
-                        }
-
-                        @Override
-                        public void onError(@NonNull Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
-        }
+                    }
+                });
 
     }
 }

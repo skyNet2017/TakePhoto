@@ -153,6 +153,9 @@ public class FileTypeUtil {
 
 
     public static int getTypeByFileName(String name){
+        if(TextUtils.isEmpty(name)){
+            return BaseMediaInfo.TYPE_UNKNOWN;
+        }
         final int lastDot = name.lastIndexOf('.');
         if (lastDot >= 0) {
             final String extension = name.substring(lastDot + 1).toLowerCase();

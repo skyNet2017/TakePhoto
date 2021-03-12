@@ -216,7 +216,7 @@ public class SafFileFinder22<T extends IFile>{
                             folder.cover = file.getPath();
                             folder.mediaType = type;
                             folder.updatedTime = file.lastModified();
-                            folder.pathOrUri = dir.getPath();
+                            folder.path = dir.getPath();
                             folder.generateTheId();
                             Log.w("扫描", "添加文件夹:" + dir.getPath());
                             folderMap.put(type,folder);
@@ -237,7 +237,7 @@ public class SafFileFinder22<T extends IFile>{
                         image.updatedTime = file.lastModified();
                         image.name = file.getName();
                         image.fileSize = file.length();
-                        image.type = type;
+                        image.mediaType = type;
                         image.fillMediaInfo();
                         fileInfos.add(image);
                     }
@@ -318,7 +318,7 @@ public class SafFileFinder22<T extends IFile>{
 
      static void print(List<BaseMediaFolderInfo> folderInfos, boolean isSaf) {
         for (BaseMediaFolderInfo folderInfo : folderInfos) {
-            Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.mediaType + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
+            Log.w(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.mediaType + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.path);
         }
     }
 

@@ -10,7 +10,7 @@ import org.greenrobot.greendao.annotation.Generated;
 
 @Keep
 @Entity
-public class BaseMediaFolderInfo {
+public class BaseMediaFolderInfo extends BaseInfo{
 
 
     public String name;
@@ -23,7 +23,7 @@ public class BaseMediaFolderInfo {
     /**
      * 可能是纯文件路径,或者saf拿到的content://xxxx
      */
-    public String pathOrUri;
+    public String path;
 
     public String smbHost;
     public String smbRootDir;//不带/
@@ -35,7 +35,7 @@ public class BaseMediaFolderInfo {
     public int diskType;
 
     public void generateTheId(){
-        id = EncryptUtils.encryptMD5ToString(mediaType +"-"+pathOrUri);
+        id = EncryptUtils.encryptMD5ToString(mediaType +"-"+ path);
     }
 
     public String getName() {
@@ -54,12 +54,12 @@ public class BaseMediaFolderInfo {
         this.cover = cover;
     }
 
-    public String getPathOrUri() {
-        return this.pathOrUri;
+    public String getPath() {
+        return this.path;
     }
 
-    public void setPathOrUri(String pathOrUri) {
-        this.pathOrUri = pathOrUri;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getSmbHost() {
@@ -172,14 +172,14 @@ public class BaseMediaFolderInfo {
 
     public int mediaType;
 
-    @Generated(hash = 480953982)
-    public BaseMediaFolderInfo(String name, String cover, String pathOrUri,
+    @Generated(hash = 420904309)
+    public BaseMediaFolderInfo(String name, String cover, String path,
             String smbHost, String smbRootDir, String id, int diskType, int count,
             long fileSize, int hidden, long updatedTime, long duration, int order,
             int mediaType) {
         this.name = name;
         this.cover = cover;
-        this.pathOrUri = pathOrUri;
+        this.path = path;
         this.smbHost = smbHost;
         this.smbRootDir = smbRootDir;
         this.id = id;
@@ -196,6 +196,8 @@ public class BaseMediaFolderInfo {
     @Generated(hash = 1055136609)
     public BaseMediaFolderInfo() {
     }
+
+   
 
 
 

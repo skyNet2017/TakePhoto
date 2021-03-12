@@ -203,7 +203,7 @@ public class SafFileFinder {
                                 imageFolder.cover = file.getUri().toString();
                                 imageFolder.mediaType = BaseMediaInfo.TYPE_IMAGE;
                                 imageFolder.updatedTime = file.lastModified();
-                                imageFolder.pathOrUri = dir.getUri().toString();
+                                imageFolder.path = dir.getUri().toString();
                                 Log.d("扫描", "添加有图文件夹:" + dir.getUri().toString());
                             }
 
@@ -217,7 +217,7 @@ public class SafFileFinder {
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_IMAGE;
+                            image.mediaType = BaseMediaInfo.TYPE_IMAGE;
                             images.add(image);
 
                             //图片宽高:
@@ -237,7 +237,7 @@ public class SafFileFinder {
                                 videoFolder.cover = file.getUri().toString();
                                 videoFolder.updatedTime = file.lastModified();
                                 videoFolder.mediaType = BaseMediaInfo.TYPE_VIDEO;
-                                videoFolder.pathOrUri = dir.getUri().toString();
+                                videoFolder.path = dir.getUri().toString();
                                 Log.d("扫描", "添加有视频文件夹:" + dir.getUri().toString());
                             }
 
@@ -252,7 +252,7 @@ public class SafFileFinder {
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_VIDEO;
+                            image.mediaType = BaseMediaInfo.TYPE_VIDEO;
                             videos.add(image);
 
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -289,7 +289,7 @@ public class SafFileFinder {
                                 audioFolder.cover = file.getUri().toString();
                                 audioFolder.updatedTime = file.lastModified();
                                 audioFolder.mediaType = BaseMediaInfo.TYPE_AUDIO;
-                                audioFolder.pathOrUri = dir.getUri().toString();
+                                audioFolder.path = dir.getUri().toString();
                                 Log.d("扫描", "添加有音频文件夹:" + dir.getUri().toString());
                             }
 
@@ -303,7 +303,7 @@ public class SafFileFinder {
                             image.updatedTime = file.lastModified();
                             image.name = file.getName();
                             image.fileSize = file.length();
-                            image.type = BaseMediaInfo.TYPE_AUDIO;
+                            image.mediaType = BaseMediaInfo.TYPE_AUDIO;
                             audios.add(image);
 
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -405,7 +405,7 @@ public class SafFileFinder {
 
      static void print(List<BaseMediaFolderInfo> folderInfos, boolean isSaf) {
         for (BaseMediaFolderInfo folderInfo : folderInfos) {
-            Log.v(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.mediaType + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.pathOrUri);
+            Log.v(isSaf ? SafUtil.TAG : FileScanner.TAG, folderInfo.mediaType + "-type-count-" + folderInfo.count + "-文件夹---->:" + folderInfo.path);
         }
     }
 

@@ -26,7 +26,7 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
     public static class Properties {
         public final static Property Name = new Property(0, String.class, "name", false, "NAME");
         public final static Property Cover = new Property(1, String.class, "cover", false, "COVER");
-        public final static Property PathOrUri = new Property(2, String.class, "pathOrUri", false, "PATH_OR_URI");
+        public final static Property Path = new Property(2, String.class, "path", false, "PATH");
         public final static Property SmbHost = new Property(3, String.class, "smbHost", false, "SMB_HOST");
         public final static Property SmbRootDir = new Property(4, String.class, "smbRootDir", false, "SMB_ROOT_DIR");
         public final static Property Id = new Property(5, String.class, "id", true, "ID");
@@ -55,7 +55,7 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         db.execSQL("CREATE TABLE " + constraint + "\"BASE_MEDIA_FOLDER_INFO\" (" + //
                 "\"NAME\" TEXT," + // 0: name
                 "\"COVER\" TEXT," + // 1: cover
-                "\"PATH_OR_URI\" TEXT," + // 2: pathOrUri
+                "\"PATH\" TEXT," + // 2: path
                 "\"SMB_HOST\" TEXT," + // 3: smbHost
                 "\"SMB_ROOT_DIR\" TEXT," + // 4: smbRootDir
                 "\"ID\" TEXT PRIMARY KEY NOT NULL ," + // 5: id
@@ -89,9 +89,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
             stmt.bindString(2, cover);
         }
  
-        String pathOrUri = entity.getPathOrUri();
-        if (pathOrUri != null) {
-            stmt.bindString(3, pathOrUri);
+        String path = entity.getPath();
+        if (path != null) {
+            stmt.bindString(3, path);
         }
  
         String smbHost = entity.getSmbHost();
@@ -132,9 +132,9 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
             stmt.bindString(2, cover);
         }
  
-        String pathOrUri = entity.getPathOrUri();
-        if (pathOrUri != null) {
-            stmt.bindString(3, pathOrUri);
+        String path = entity.getPath();
+        if (path != null) {
+            stmt.bindString(3, path);
         }
  
         String smbHost = entity.getSmbHost();
@@ -171,7 +171,7 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
         BaseMediaFolderInfo entity = new BaseMediaFolderInfo( //
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // name
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // cover
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // pathOrUri
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // path
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // smbHost
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // smbRootDir
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // id
@@ -191,7 +191,7 @@ public class BaseMediaFolderInfoDao extends AbstractDao<BaseMediaFolderInfo, Str
     public void readEntity(Cursor cursor, BaseMediaFolderInfo entity, int offset) {
         entity.setName(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
         entity.setCover(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPathOrUri(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setPath(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSmbHost(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setSmbRootDir(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));

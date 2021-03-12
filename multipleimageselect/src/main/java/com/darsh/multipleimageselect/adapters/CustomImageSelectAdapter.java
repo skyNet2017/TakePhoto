@@ -88,7 +88,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
             uri = Uri.parse(image.path);
         }
         if(image.path.startsWith("http") || image.path.startsWith("smb")){
-            if(image.type != BaseMediaInfo.TYPE_IMAGE){
+            if(image.mediaType != BaseMediaInfo.TYPE_IMAGE){
                 viewHolder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.c_text_bg));
                 viewHolder.tvInfo.setText(image.path +"\n"+ ImageInfoFormater.formatFileSize(image.fileSize)+" 点赞:"+image.praiseCount);
                 return convertView;
@@ -117,7 +117,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
                     public void accept(ViewHolder viewHolder) throws Exception {
                         //viewHolder.desc = formatImagInfo(viewHolder.image,false,context);
                         //viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.pathOrUri,false);
-                        if(viewHolder.image.type == 1){
+                        if(viewHolder.image.mediaType == 1){
                             viewHolder.desc = ImageInfoFormater.formatImagInfo(viewHolder.image.path,false);
                         }else {
                             boolean getInfoFail = false;
@@ -150,7 +150,7 @@ public class CustomImageSelectAdapter extends CustomGenericAdapter<BaseMediaInfo
 
                             int duration = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;//视频的长度 s
                             String desc = "";
-                            if(viewHolder.image.type == BaseMediaInfo.TYPE_VIDEO){
+                            if(viewHolder.image.mediaType == BaseMediaInfo.TYPE_VIDEO){
                                 int width = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); //宽
                                 int height = toInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); //高
                                 String ro = "";

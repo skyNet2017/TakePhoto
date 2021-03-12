@@ -154,7 +154,7 @@ public class AlbumSelectActivity extends HelperActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String path = folderInfo.pathOrUri;
+                String path = folderInfo.path;
                 if(path.startsWith("content")){
                     DocumentFile dir = SafUtil.findFile(SafUtil.sdRoot,path);
                     if(dir == null){
@@ -195,7 +195,7 @@ public class AlbumSelectActivity extends HelperActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                String text = "文件夹内("+CustomAlbumSelectAdapter.typeDes(folderInfo.mediaType)+")删除完成\n"+folderInfo.pathOrUri;
+                String text = "文件夹内("+CustomAlbumSelectAdapter.typeDes(folderInfo.mediaType)+")删除完成\n"+folderInfo.path;
                 Toast.makeText(AlbumSelectActivity.this.getApplicationContext(),text,Toast.LENGTH_LONG).show();
             }
         });
@@ -220,7 +220,7 @@ public class AlbumSelectActivity extends HelperActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String path = folderInfo.pathOrUri;
+                String path = folderInfo.path;
                 if(path.startsWith("content")){
                     DocumentFile dir = SafUtil.findFile(SafUtil.sdRoot,path);
                     if(dir == null){

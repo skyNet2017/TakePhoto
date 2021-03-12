@@ -12,10 +12,10 @@ import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Index;
 
 import java.util.Objects;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Keep
 @Entity
@@ -84,11 +84,11 @@ public class BaseMediaInfo extends BaseInfo{
     }
 
     public boolean isMedia(){
-        return type <4 && type !=0;
+        return mediaType <4 && mediaType !=0;
     }
 
     public boolean isDoc(){
-        return type >3 ;
+        return mediaType >3 ;
     }
 
     public String getDir() {
@@ -155,13 +155,7 @@ public class BaseMediaInfo extends BaseInfo{
         this.duration = duration;
     }
 
-    public int getType() {
-        return this.type;
-    }
 
-    public void setType(int type) {
-        this.type = type;
-    }
 
     public Integer getPraiseCount() {
         return this.praiseCount;
@@ -177,6 +171,22 @@ public class BaseMediaInfo extends BaseInfo{
 
     public void setDiskType(int diskType) {
         this.diskType = diskType;
+    }
+
+    public int getHidden() {
+        return this.hidden;
+    }
+
+    public void setHidden(int hidden) {
+        this.hidden = hidden;
+    }
+
+    public int getMediaType() {
+        return this.mediaType;
+    }
+
+    public void setMediaType(int mediaType) {
+        this.mediaType = mediaType;
     }
 
 
@@ -198,16 +208,18 @@ public class BaseMediaInfo extends BaseInfo{
     public int maxSide;
     @Index
     public int duration;
+    public   int hidden;
+
     
 
-    public int type;
+    public int mediaType;
     public Integer praiseCount;
     public int diskType;
 
-    @Generated(hash = 93660614)
+    @Generated(hash = 1470264732)
     public BaseMediaInfo(String dir, String name, int isHiden, String path,
-            long fileSize, long updatedTime, int maxSide, int duration, int type,
-            Integer praiseCount, int diskType) {
+            long fileSize, long updatedTime, int maxSide, int duration, int hidden,
+            int mediaType, Integer praiseCount, int diskType) {
         this.dir = dir;
         this.name = name;
         this.isHiden = isHiden;
@@ -216,7 +228,8 @@ public class BaseMediaInfo extends BaseInfo{
         this.updatedTime = updatedTime;
         this.maxSide = maxSide;
         this.duration = duration;
-        this.type = type;
+        this.hidden = hidden;
+        this.mediaType = mediaType;
         this.praiseCount = praiseCount;
         this.diskType = diskType;
     }
@@ -226,6 +239,7 @@ public class BaseMediaInfo extends BaseInfo{
     }
 
 
+    }
 
 
 
@@ -238,4 +252,6 @@ public class BaseMediaInfo extends BaseInfo{
 
 
 
-}
+
+
+
