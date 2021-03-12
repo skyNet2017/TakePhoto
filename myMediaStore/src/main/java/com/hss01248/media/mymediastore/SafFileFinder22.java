@@ -9,6 +9,7 @@ import android.webkit.MimeTypeMap;
 
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.bean.StorageBean;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
@@ -171,6 +172,15 @@ public class SafFileFinder22<T extends IFile>{
 
                     return;
                 }
+                String p = dir.getPath();
+                int diskType = StorageBean.TYPE_EXTERNAL_STORAGE;
+                if(p.startsWith("content")){
+                    diskType = StorageBean.TYPE_SAF;
+                }else if(p.startsWith("http")){
+                    diskType = StorageBean.TYPE_HTTP_Everything;
+                }else if(p.startsWith("/storage/")){
+                    diskType = StorageBean.TYPE_EXTERNAL_STORAGE;
+                }
 
                 Map<Integer,BaseMediaFolderInfo> folderMap = new HashMap<>();
                 Map<Integer,List<BaseMediaInfo>> filesMap = new HashMap<>();
@@ -215,6 +225,7 @@ public class SafFileFinder22<T extends IFile>{
                             folder.name = dir.getName();
                             folder.cover = file.getPath();
                             folder.mediaType = type;
+                            folder.diskType = diskType;
                             folder.updatedTime = file.lastModified();
                             folder.path = dir.getPath();
                             folder.generateTheId();
@@ -236,6 +247,7 @@ public class SafFileFinder22<T extends IFile>{
                         image.path = file.getPath();
                         image.updatedTime = file.lastModified();
                         image.name = file.getName();
+                        image.diskType = diskType;
                         image.fileSize = file.length();
                         image.mediaType = type;
                         image.fillMediaInfo();
