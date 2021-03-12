@@ -36,8 +36,10 @@ public class FileDbUtil {
 
     private static void doFilter(QueryBuilder<BaseMediaInfo> builder, String word, int diskType, int mediaType, int hiddenType, int sizeType) {
         if(!TextUtils.isEmpty(word)){
+            word = "%"+word+"%";
             builder.where(BaseMediaInfoDao.Properties.Name.like(word));
         }
+        Log.w("filter","word:"+word);
         filterMediaType(builder,mediaType);
         filterDiskType(builder,diskType);
         filterHiddenType(builder,hiddenType);
