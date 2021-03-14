@@ -210,6 +210,10 @@ public class SafFileFinder22<T extends IFile>{
                              isHiden = 1;
                             continue;
                         }
+                        //RECYCLE.BIN
+                        if(dir.getPath().contains("RECYCLE.BIN")){
+                            isHiden = 1;
+                        }
                         if(file.length() <=0){
                             Log.e("smb","file.length() <=0:"+file.getPath());
                             continue;

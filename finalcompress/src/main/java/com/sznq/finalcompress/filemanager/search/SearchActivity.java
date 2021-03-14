@@ -256,6 +256,7 @@ public class SearchActivity extends AppCompatActivity {
                             stateManager.showEmpty();
                         }else {
                             stateManager.showContent();
+                            binding.recycler.scrollToPosition(0);
                         }
                         mediaInfos.clear();
                         mediaInfos.addAll(infos);
