@@ -150,8 +150,9 @@ public class SearchActivity extends AppCompatActivity {
     private void showMenu(View v, int position0) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
-        String[] desc = new String[1];
+        String[] desc = new String[2];
         desc[0] = "显示exif/metadata信息";
+        desc[1] = "隐藏文件夹";
         floatMenu.items(desc);
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
@@ -159,6 +160,7 @@ public class SearchActivity extends AppCompatActivity {
                 if(position ==0){
                     CompressResultCompareActivity.showExif(SearchActivity.this,mediaInfos.get(position0).getPath());
                 }else {
+                    hideFolder(mediaInfos.get(position0).getPath(),mediaInfos.get(position0));
 
                 }
 
@@ -170,6 +172,10 @@ public class SearchActivity extends AppCompatActivity {
         point.x = location[0];
         point.y =location[1];
         floatMenu.show(point);
+    }
+
+    private void hideFolder(String path, BaseInfo baseInfo) {
+
     }
 
     List<BaseInfo> mediaInfos = new ArrayList<>();

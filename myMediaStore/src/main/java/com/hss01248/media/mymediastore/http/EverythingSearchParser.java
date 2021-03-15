@@ -82,7 +82,7 @@ public class EverythingSearchParser {
                                 info.mediaType = type;
                                 info.dir = bean.url.substring(0,bean.url.lastIndexOf("/"));
                                 info.fileSize = bean.fileSize;
-                                info.isHiden = 0;
+                                info.hidden = 0;
                                 info.updatedTime = bean.lastModified;
                                 info.name = URLDecoder.decode(bean.url.substring(bean.url.lastIndexOf("/")+1));
                                 infos.add(info);

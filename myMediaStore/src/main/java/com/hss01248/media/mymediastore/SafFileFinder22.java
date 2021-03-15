@@ -250,7 +250,7 @@ public class SafFileFinder22<T extends IFile>{
                         BaseMediaInfo image = new BaseMediaInfo();
                         image.dir = dir.getPath();
                         image.path = file.getPath();
-                        image.isHiden = isHiden;
+                        image.hidden = isHiden;
                         image.updatedTime = file.lastModified();
                         image.name = file.getName();
                         image.diskType = diskType;
