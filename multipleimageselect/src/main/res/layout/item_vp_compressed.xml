@@ -44,10 +44,8 @@
             android:layout_width="wrap_content"
           android:layout_below="@id/tv_original"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:id="@+id/tv_progress"
-            android:text="progress"
             android:textColor="@color/exo_white"
+            style="@style/c_textview_bg"
             android:layout_height="wrap_content"/>
 
     </RelativeLayout>
