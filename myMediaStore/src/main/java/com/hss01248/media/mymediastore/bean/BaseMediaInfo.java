@@ -107,6 +107,78 @@ public class BaseMediaInfo extends BaseInfo{
         this.name = name;
     }
 
+    public int getHidden() {
+        return this.hidden;
+    }
+
+    public void setHidden(int hidden) {
+        this.hidden = hidden;
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public long getFileSize() {
+        return this.fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public long getUpdatedTime() {
+        return this.updatedTime;
+    }
+
+    public void setUpdatedTime(long updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public int getMaxSide() {
+        return this.maxSide;
+    }
+
+    public void setMaxSide(int maxSide) {
+        this.maxSide = maxSide;
+    }
+
+    public int getDuration() {
+        return this.duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public int getMediaType() {
+        return this.mediaType;
+    }
+
+    public void setMediaType(int mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public Integer getPraiseCount() {
+        return this.praiseCount;
+    }
+
+    public void setPraiseCount(Integer praiseCount) {
+        this.praiseCount = praiseCount;
+    }
+
+    public int getDiskType() {
+        return this.diskType;
+    }
+
+    public void setDiskType(int diskType) {
+        this.diskType = diskType;
+    }
+
 
 
 
@@ -135,6 +207,27 @@ public class BaseMediaInfo extends BaseInfo{
     public int mediaType;
     public Integer praiseCount;
     public int diskType;
+
+    @Generated(hash = 340852875)
+    public BaseMediaInfo(String dir, String name, int hidden, String path,
+            long fileSize, long updatedTime, int maxSide, int duration,
+            int mediaType, Integer praiseCount, int diskType) {
+        this.dir = dir;
+        this.name = name;
+        this.hidden = hidden;
+        this.path = path;
+        this.fileSize = fileSize;
+        this.updatedTime = updatedTime;
+        this.maxSide = maxSide;
+        this.duration = duration;
+        this.mediaType = mediaType;
+        this.praiseCount = praiseCount;
+        this.diskType = diskType;
+    }
+
+    @Generated(hash = 1446686172)
+    public BaseMediaInfo() {
+    }
 
 
 

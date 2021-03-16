@@ -132,6 +132,9 @@ dependencies {
 
     implementation 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
 
+    api 'com.github.bumptech.glide:okhttp3-integration:4.11.0' // 新增
+    implementation 'me.jessyan:progressmanager:1.5.0'
+
 }
 configurations {
     all*.exclude group: 'com.android.support', module:'support-compat'

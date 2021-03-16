@@ -26,16 +26,15 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
     public static class Properties {
         public final static Property Dir = new Property(0, String.class, "dir", false, "DIR");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
-        public final static Property IsHiden = new Property(2, int.class, "isHiden", false, "IS_HIDEN");
+        public final static Property Hidden = new Property(2, int.class, "hidden", false, "HIDDEN");
         public final static Property Path = new Property(3, String.class, "path", true, "PATH");
         public final static Property FileSize = new Property(4, long.class, "fileSize", false, "FILE_SIZE");
         public final static Property UpdatedTime = new Property(5, long.class, "updatedTime", false, "UPDATED_TIME");
         public final static Property MaxSide = new Property(6, int.class, "maxSide", false, "MAX_SIDE");
         public final static Property Duration = new Property(7, int.class, "duration", false, "DURATION");
-        public final static Property Hidden = new Property(8, int.class, "hidden", false, "HIDDEN");
-        public final static Property MediaType = new Property(9, int.class, "mediaType", false, "MEDIA_TYPE");
-        public final static Property PraiseCount = new Property(10, Integer.class, "praiseCount", false, "PRAISE_COUNT");
-        public final static Property DiskType = new Property(11, int.class, "diskType", false, "DISK_TYPE");
+        public final static Property MediaType = new Property(8, int.class, "mediaType", false, "MEDIA_TYPE");
+        public final static Property PraiseCount = new Property(9, Integer.class, "praiseCount", false, "PRAISE_COUNT");
+        public final static Property DiskType = new Property(10, int.class, "diskType", false, "DISK_TYPE");
     }
 
 
@@ -53,16 +52,15 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         db.execSQL("CREATE TABLE " + constraint + "\"BASE_MEDIA_INFO\" (" + //
                 "\"DIR\" TEXT," + // 0: dir
                 "\"NAME\" TEXT," + // 1: name
-                "\"IS_HIDEN\" INTEGER NOT NULL ," + // 2: isHiden
+                "\"HIDDEN\" INTEGER NOT NULL ," + // 2: hidden
                 "\"PATH\" TEXT PRIMARY KEY NOT NULL ," + // 3: path
                 "\"FILE_SIZE\" INTEGER NOT NULL ," + // 4: fileSize
                 "\"UPDATED_TIME\" INTEGER NOT NULL ," + // 5: updatedTime
                 "\"MAX_SIDE\" INTEGER NOT NULL ," + // 6: maxSide
                 "\"DURATION\" INTEGER NOT NULL ," + // 7: duration
-                "\"HIDDEN\" INTEGER NOT NULL ," + // 8: hidden
-                "\"MEDIA_TYPE\" INTEGER NOT NULL ," + // 9: mediaType
-                "\"PRAISE_COUNT\" INTEGER," + // 10: praiseCount
-                "\"DISK_TYPE\" INTEGER NOT NULL );"); // 11: diskType
+                "\"MEDIA_TYPE\" INTEGER NOT NULL ," + // 8: mediaType
+                "\"PRAISE_COUNT\" INTEGER," + // 9: praiseCount
+                "\"DISK_TYPE\" INTEGER NOT NULL );"); // 10: diskType
         // Add Indexes
         db.execSQL("CREATE INDEX " + constraint + "IDX_BASE_MEDIA_INFO_DIR ON \"BASE_MEDIA_INFO\"" +
                 " (\"DIR\" ASC);");
@@ -97,7 +95,7 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         if (name != null) {
             stmt.bindString(2, name);
         }
-        stmt.bindLong(3, entity.getIsHiden());
+        stmt.bindLong(3, entity.getHidden());
  
         String path = entity.getPath();
         if (path != null) {
@@ -107,14 +105,13 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         stmt.bindLong(6, entity.getUpdatedTime());
         stmt.bindLong(7, entity.getMaxSide());
         stmt.bindLong(8, entity.getDuration());
-        stmt.bindLong(9, entity.getHidden());
-        stmt.bindLong(10, entity.getMediaType());
+        stmt.bindLong(9, entity.getMediaType());
  
         Integer praiseCount = entity.getPraiseCount();
         if (praiseCount != null) {
-            stmt.bindLong(11, praiseCount);
+            stmt.bindLong(10, praiseCount);
         }
-        stmt.bindLong(12, entity.getDiskType());
+        stmt.bindLong(11, entity.getDiskType());
     }
 
     @Override
@@ -130,7 +127,7 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         if (name != null) {
             stmt.bindString(2, name);
         }
-        stmt.bindLong(3, entity.getIsHiden());
+        stmt.bindLong(3, entity.getHidden());
  
         String path = entity.getPath();
         if (path != null) {
@@ -140,14 +137,13 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         stmt.bindLong(6, entity.getUpdatedTime());
         stmt.bindLong(7, entity.getMaxSide());
         stmt.bindLong(8, entity.getDuration());
-        stmt.bindLong(9, entity.getHidden());
-        stmt.bindLong(10, entity.getMediaType());
+        stmt.bindLong(9, entity.getMediaType());
  
         Integer praiseCount = entity.getPraiseCount();
         if (praiseCount != null) {
-            stmt.bindLong(11, praiseCount);
+            stmt.bindLong(10, praiseCount);
         }
-        stmt.bindLong(12, entity.getDiskType());
+        stmt.bindLong(11, entity.getDiskType());
     }
 
     @Override
@@ -160,16 +156,15 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
         BaseMediaInfo entity = new BaseMediaInfo( //
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // dir
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.getInt(offset + 2), // isHiden
+            cursor.getInt(offset + 2), // hidden
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // path
             cursor.getLong(offset + 4), // fileSize
             cursor.getLong(offset + 5), // updatedTime
             cursor.getInt(offset + 6), // maxSide
             cursor.getInt(offset + 7), // duration
-            cursor.getInt(offset + 8), // hidden
-            cursor.getInt(offset + 9), // mediaType
-            cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10), // praiseCount
-            cursor.getInt(offset + 11) // diskType
+            cursor.getInt(offset + 8), // mediaType
+            cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9), // praiseCount
+            cursor.getInt(offset + 10) // diskType
         );
         return entity;
     }
@@ -178,16 +173,15 @@ public class BaseMediaInfoDao extends AbstractDao<BaseMediaInfo, String> {
     public void readEntity(Cursor cursor, BaseMediaInfo entity, int offset) {
         entity.setDir(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setIsHiden(cursor.getInt(offset + 2));
+        entity.setHidden(cursor.getInt(offset + 2));
         entity.setPath(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setFileSize(cursor.getLong(offset + 4));
         entity.setUpdatedTime(cursor.getLong(offset + 5));
         entity.setMaxSide(cursor.getInt(offset + 6));
         entity.setDuration(cursor.getInt(offset + 7));
-        entity.setHidden(cursor.getInt(offset + 8));
-        entity.setMediaType(cursor.getInt(offset + 9));
-        entity.setPraiseCount(cursor.isNull(offset + 10) ? null : cursor.getInt(offset + 10));
-        entity.setDiskType(cursor.getInt(offset + 11));
+        entity.setMediaType(cursor.getInt(offset + 8));
+        entity.setPraiseCount(cursor.isNull(offset + 9) ? null : cursor.getInt(offset + 9));
+        entity.setDiskType(cursor.getInt(offset + 10));
      }
     
     @Override

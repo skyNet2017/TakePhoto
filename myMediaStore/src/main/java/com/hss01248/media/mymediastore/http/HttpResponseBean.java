@@ -10,7 +10,7 @@ public class HttpResponseBean {
     public boolean isDir;
     public long fileSize;
     public long lastModified;
-    public String parentUrl;
+    public String path;
 
     @Override
     public String toString() {
@@ -20,7 +20,7 @@ public class HttpResponseBean {
                 ", isDir=" + isDir +
                 ", fileSize=" + fileSize +
                 ", lastModified=" + lastModified +
-                ", parentUrl='" + parentUrl + '\'' +
+                ", parentUrl='" + path + '\'' +
                 '}';
     }
 

@@ -64,6 +64,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -77,6 +78,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import me.jessyan.progressmanager.ProgressListener;
+import me.jessyan.progressmanager.ProgressManager;
+import me.jessyan.progressmanager.body.ProgressInfo;
 import pl.droidsonroids.gif.GifImageView;
 
 
@@ -105,6 +109,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
     LinearLayout llCompress;
     GifImageView gif;
     ImageView ivGlide;
+    TextView tvProgress;
 
     public CpHolder setPreview(boolean preview) {
         isPreview = preview;
@@ -140,6 +145,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
         ivOriginalSaf = rootView.findViewById(R.id.iv_original_saf);
         ivCompressedSaf = rootView.findViewById(R.id.iv_compressed_saf);
         gif = rootView.findViewById(R.id.gif_original);
+
+        tvProgress = rootView.findViewById(R.id.tv_progress);
 
         ivGlide = rootView.findViewById(R.id.iv_glide);
 
@@ -220,7 +227,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
                             try {
                                 gif.setImageURI(Uri.fromFile(resource));
-                                tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                                tvOriginal.setText(URLDecoder.decode(s)+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 tvOriginal.setText(e.getMessage());
@@ -273,7 +280,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
                         try {
                             ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
-                            tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                            tvOriginal.setText(URLDecoder.decode(s)+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                             tvOriginal.setText(e.getMessage());
@@ -334,8 +341,33 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
         }
     }
+    Handler handler = new Handler(Looper.getMainLooper());
 
     private void getByGlide(String http, String s, Activity context) {
+
+        ProgressManager.getInstance().addResponseListener(http, new ProgressListener() {
+            @Override
+            public void onProgress(ProgressInfo progressInfo) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvProgress.setText(progressInfo.getPercent()+"% , speed: "+(progressInfo.getSpeed()/1024/8)+"KB/s");
+                    }
+                });
+
+            }
+
+            @Override
+            public void onError(long id, Exception e) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvProgress.setText(e.getMessage());
+                    }
+                });
+
+            }
+        });
         Glide.with(context)
                 .load(http)
                 .priority(Priority.IMMEDIATE)

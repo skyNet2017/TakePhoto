@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import me.jessyan.progressmanager.ProgressManager;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,10 +32,23 @@ public class HttpHelper {
     public static OkHttpClient getClient(){
         if(client == null){
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY));
+                    .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .addInterceptor(new HttpAuthInterceptor());
             client = builder.build();
         }
         return client;
+    }
+    static OkHttpClient gclient;
+
+    //https://github.com/JessYanCoding/ProgressManager
+    public static OkHttpClient getGlideClient(){
+        if(gclient == null){
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    //.addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                    .addInterceptor(new HttpAuthInterceptor());
+            gclient = ProgressManager.getInstance().with(builder).build();
+        }
+        return gclient;
     }
 
     public static void login(String url,String name,String pwd){
@@ -59,9 +73,7 @@ public class HttpHelper {
         HttpFile[] files = EverythingParser.start(url);
         if(files !=null && files.length > 0){
             for (HttpFile file : files) {
-                if(file.getPath().contains("/G%3A")||file.getPath().contains("/H%3A") ||file.getPath().contains("/I%3A")){
-                    new SafFileFinder22<HttpFile>().getAlbums(file, Executors.newFixedThreadPool(2), observer);
-                }
+                new SafFileFinder22<HttpFile>().getAlbums(file, Executors.newFixedThreadPool(2), observer);
 
             }
         }

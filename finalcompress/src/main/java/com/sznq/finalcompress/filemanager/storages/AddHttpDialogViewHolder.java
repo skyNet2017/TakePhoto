@@ -79,12 +79,6 @@ public class AddHttpDialogViewHolder extends CommonViewHolder<Dialog, DialogAddH
     }
 
     private void checkIpAvaiable(StorageBean bean) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean availe = HttpHelper.checkAvailable(bean.ip, bean.uname, bean.pw);
-            }
-        }).start();
 
         Observable.just(bean)
                 .subscribeOn(Schedulers.io())

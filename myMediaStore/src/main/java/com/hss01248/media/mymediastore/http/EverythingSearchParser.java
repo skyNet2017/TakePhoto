@@ -212,7 +212,7 @@ public class EverythingSearchParser {
                 bean.url = host+href;
                 bean.isDir = isDir;
                 if(parentPath != null){
-                    bean.parentUrl = host+parentPath.attr("href");
+                    bean.path = host+parentPath.attr("href");
                 }else {
                     Log.d("http","parentUrl is null");
                 }

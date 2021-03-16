@@ -1,6 +1,7 @@
 package com.hss01248.media.localvideoplayer;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 
+import com.hss01248.media.mymediastore.http.HttpAuthInterceptor;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
 import com.shuyu.gsyvideoplayer.GSYBaseActivityDetail;
 import com.shuyu.gsyvideoplayer.builder.GSYVideoOptionBuilder;
@@ -28,7 +30,9 @@ import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.shuyu.gsyvideoplayer.video.base.GSYVideoView.CURRENT_STATE_AUTO_COMPLETE;
 
@@ -172,9 +176,15 @@ public class PictureVideoPlayByGSYActivity extends GSYBaseActivityDetail<Standar
         // 播放一个视频结束后，直接调用此方法，切换到下一个
         // ?（问题：全屏播放的时候，播放结束了，自动回来调用在这个方法想播放下一个，只有声音，但画面没改变，黑的）
         //detailPlayer.release();
+        Map<String,String> headers = new HashMap<>();
+        String host = Uri.parse(url).getHost();
+        if(HttpAuthInterceptor.getAuthMap().containsKey(host)){
+            headers.put("Authorization",HttpAuthInterceptor.getAuthMap().get(host));
+        }
         getGSYVideoOptionBuilder().setUrl(uri)
                 .setVideoTitle(getNameFromPath(url))
                 .setPlayPosition(position)
+                .setMapHeadData(headers)
                 .build(detailPlayer.getCurrentPlayer());
         //getGSYVideoOptionBuilder().build(detailPlayer);
         detailPlayer.getCurrentPlayer().startPlayLogic();
