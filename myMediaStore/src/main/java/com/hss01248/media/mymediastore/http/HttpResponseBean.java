@@ -1,5 +1,8 @@
 package com.hss01248.media.mymediastore.http;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class HttpResponseBean {
 
     public String url;

@@ -23,6 +23,20 @@ import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * https://www.voidtools.com/support/everything/http/
+ * http://59.46.68.148:9999/?search=.jpg&c=200&o=3&j=1&path_column=1&size_column=1&date_modified_column=1&date_created_column=1&attributes_column=1
+ *
+ * { "totalResults":231, "results":[
+ * { "type":"file", "name":"0d14b623d1e168cdbe08cd1699819375.jpg",
+ * "path":"C:\\Program Files (x86)\\Thunder Network\\Thunder\\profiles\\AdData\\AdTips\\Market\\Banners",
+ * "size":"100629", "date_modified":"132401088182087225" } ] }
+ *
+ *
+ * http://59.46.68.148:9999/C%3A/Program%20Files%20(x86)/mydrivers/drivergenius/data?j=1
+ *
+ * { "results":[ { "type":"folder", "name":"desktip", "size":"", "date_modified":"132587960061373066" }....
+ */
 public class EverythingParser {
 
     //http://59.46.68.148:9999/
