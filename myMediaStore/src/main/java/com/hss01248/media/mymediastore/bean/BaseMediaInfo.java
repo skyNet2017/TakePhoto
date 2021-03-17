@@ -202,6 +202,9 @@ public class BaseMediaInfo extends BaseInfo{
     public int duration;
 
 
+    public String getAbsolutePath(){
+        return dir+"/"+name;
+    }
     
 
     public int mediaType;
