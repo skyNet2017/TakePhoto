@@ -10,22 +10,22 @@ import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.sznq.finalcompress.R;
 
-public class MediaItemAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHolder> {
+public class MediaItemAdapter extends BaseQuickAdapter<IFile, BaseViewHolder> {
     public MediaItemAdapter(int layoutResId) {
         super(layoutResId);
     }
 
     @Override
-    protected void convert(@NonNull BaseViewHolder helper, BaseInfo item) {
+    protected void convert(@NonNull BaseViewHolder helper, IFile item) {
         try {
 
-            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.getUpdatedTime())+"-"+ ImageInfoFormater.formatFileSize(item.getFileSize()));
-            helper.setGone(R.id.iv_folder,item instanceof BaseMediaInfo);
+            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+ ImageInfoFormater.formatFileSize(item.length()));
+           // helper.setGone(R.id.iv_folder,item instanceof BaseMediaInfo);
             helper.setText(R.id.tv_name,item.getName());
+            MediaItemImgAdapter.checkIfShowImg(helper,item);
         }catch (Throwable throwable){
             throwable.printStackTrace();
         }
-
 
 
     }

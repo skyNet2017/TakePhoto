@@ -76,7 +76,7 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
 
     }
 
-   static int disPlayMode = 0;
+  public static int disPlayMode = 0;
     private void showListModeMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";

@@ -100,28 +100,9 @@ public class SearchActivity extends AppCompatActivity {
 
 
         doSearch();
+        initAdapter();
 
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                BaseInfo info = mediaInfos.get(position);
-                //IFile file =  files.get(position);
-                if(info instanceof BaseMediaFolderInfo){
-                    BaseMediaFolderInfo folderInfo = (BaseMediaFolderInfo) info;
-                    //listFiles(file);
-                    FolderViewActivity.goTo(SearchActivity.this,info.getPath(),folderInfo.getMediaType(),"","");
-                }else {
-                    openFile((BaseMediaInfo) info,mediaInfos);
-                }
-            }
-        });
-        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
-                showMenu(view,position);
-                return true;
-            }
-        });
+
         binding.tvNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,6 +148,30 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
+    private void initAdapter() {
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                BaseInfo info = mediaInfos.get(position);
+                //IFile file =  files.get(position);
+                if(info instanceof BaseMediaFolderInfo){
+                    BaseMediaFolderInfo folderInfo = (BaseMediaFolderInfo) info;
+                    //listFiles(file);
+                    FolderViewActivity.goTo(SearchActivity.this,info.getPath(),folderInfo.getMediaType(),"","");
+                }else {
+                    openFile((BaseMediaInfo) info,mediaInfos);
+                }
+            }
+        });
+        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
+                showMenu(view,position);
+                return true;
+            }
+        });
+    }
+
     private void showMenu(View v, int position0) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         String hide = mediaInfos.get(position0).getHidden() == 0 ? "隐藏此文件夹":"取消此文件夹的隐藏";
@@ -205,6 +210,7 @@ public class SearchActivity extends AppCompatActivity {
     private void initRecycleview() {
         changeAdapter(FilterViewHolder.disPlayMode);
 
+
     }
 
     /**
@@ -225,6 +231,7 @@ public class SearchActivity extends AppCompatActivity {
         }
         binding.recycler.setAdapter(adapter);
         adapter.setNewData(mediaInfos);
+        initAdapter();
     }
 
     private void openFile(BaseMediaInfo file, List<BaseInfo> files) {

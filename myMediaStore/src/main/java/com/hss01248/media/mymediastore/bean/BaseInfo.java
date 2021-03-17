@@ -1,6 +1,15 @@
 package com.hss01248.media.mymediastore.bean;
 
-public class BaseInfo {
+import android.net.Uri;
+
+import androidx.annotation.NonNull;
+
+import com.hss01248.media.mymediastore.fileapi.IFile;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class BaseInfo implements IFile {
 
 
     public String id;
@@ -28,8 +37,23 @@ public class BaseInfo {
         this.id = id;
     }
 
+    @Override
+    public String storageId() {
+        return null;
+    }
+
+    @Override
+    public IFile[] listFiles() {
+        return new IFile[0];
+    }
+
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Uri getUri() {
+        return null;
     }
 
     public void setName(String name) {
@@ -38,6 +62,66 @@ public class BaseInfo {
 
     public String getPath() {
         return path;
+    }
+
+    @Override
+    public boolean isDirectory() {
+        return this instanceof BaseMediaFolderInfo;
+    }
+
+    @Override
+    public long length() {
+        return fileSize;
+    }
+
+    @Override
+    public long lastModified() {
+        return updatedTime;
+    }
+
+    @Override
+    public boolean exists() {
+        return true;
+    }
+
+    @Override
+    public boolean delete() {
+        return false;
+    }
+
+    @Override
+    public boolean canWrite() {
+        return false;
+    }
+
+    @Override
+    public IFile getParentFile() {
+        return null;
+    }
+
+    @Override
+    public IFile createDirectory(@NonNull String displayName) {
+        return null;
+    }
+
+    @Override
+    public IFile createFile(@NonNull String mimeType, @NonNull String displayName) {
+        return null;
+    }
+
+    @Override
+    public boolean renameTo(@NonNull String displayName) {
+        return false;
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return null;
+    }
+
+    @Override
+    public OutputStream getOutPutStream() {
+        return null;
     }
 
     public void setPath(String path) {

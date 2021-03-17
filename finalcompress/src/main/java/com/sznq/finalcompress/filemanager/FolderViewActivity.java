@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -36,8 +37,7 @@ import com.hss01248.pagestate.PageStateManager;
 import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivityFolderBinding;
-import com.sznq.finalcompress.filemanager.adapter.FileItemAdapter;
-import com.sznq.finalcompress.filemanager.adapter.FileItemImgAdapter;
+
 import com.sznq.finalcompress.filemanager.folder.BaseFolderSort;
 import com.sznq.finalcompress.filemanager.folder.sort.FileNameSortAes;
 import com.sznq.finalcompress.filemanager.folder.sort.FileNameSortDes;
@@ -45,6 +45,9 @@ import com.sznq.finalcompress.filemanager.folder.sort.FileSizeSortAES;
 import com.sznq.finalcompress.filemanager.folder.sort.FileSizeSortDes;
 import com.sznq.finalcompress.filemanager.folder.sort.ModifyTimeSortAes;
 import com.sznq.finalcompress.filemanager.folder.sort.ModifyTimeSortDes;
+import com.sznq.finalcompress.filemanager.search.FilterViewHolder;
+import com.sznq.finalcompress.filemanager.search.MediaItemAdapter;
+import com.sznq.finalcompress.filemanager.search.MediaItemImgAdapter;
 import com.sznq.finalcompress.filemanager.search.SearchActivity;
 
 import java.io.File;
@@ -104,7 +107,7 @@ public class FolderViewActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        initRecycleviewByType(0);
+        changeAdapter(2);
 
 
         binding.titlebar.getRightTextView().setOnClickListener(new View.OnClickListener() {
@@ -123,37 +126,6 @@ public class FolderViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SearchActivity.doSearch(FolderViewActivity.this,"");
-            }
-        });
-
-
-    }
-
-    private void initRecycleviewByType(int displayType) {
-        this.displayType = displayType%2;
-        if(displayType == 0){
-            binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-            adapter = new FileItemAdapter(R.layout.item_file);
-        }else if(displayType ==1){
-            binding.recycler.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
-            adapter = new FileItemImgAdapter(R.layout.item_file_img);
-        }else {
-            binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-            adapter = new FileItemAdapter(R.layout.item_file);
-        }
-        binding.recycler.setAdapter(adapter);
-        adapter.setNewData(files);
-        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                IFile file =  files.get(position);
-                if(file.isDirectory()){
-                    listFiles(file);
-                }else {
-                    ToastUtils.showLong("打开文件:"+file.getPath());
-                    openFile(file,files);
-
-                }
             }
         });
     }
@@ -204,7 +176,7 @@ public class FolderViewActivity extends AppCompatActivity {
 
 
                 }else if(position == 2){
-                    changeGridOrList();
+                    showListModeMenu(v);
                 }
             }
         });
@@ -212,14 +184,63 @@ public class FolderViewActivity extends AppCompatActivity {
         floatMenu.showAsDropDown(binding.titlebar.getRightTextView());
     }
 
-    private void changeGridOrList() {
-        initRecycleviewByType(displayType+1);
+    private void showListModeMenu(View v) {
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[3];
+        desc[0] ="表格";
+        desc[1] ="瀑布流";
+        desc[2] ="列表";
 
+
+        desc[FilterViewHolder.disPlayMode] =  desc[FilterViewHolder.disPlayMode] +"(now)";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                FilterViewHolder.disPlayMode = position;
+                changeAdapter(FilterViewHolder.disPlayMode);
+            }
+        });
+        floatMenu.showAsDropDown(binding.titlebar.getRightTextView());
+    }
+
+    private void changeAdapter(int displayType) {
+        if(displayType == 0){
+            binding.recycler.setLayoutManager(new GridLayoutManager(this,3));
+            adapter = new MediaItemImgAdapter(R.layout.item_file_img);
+        }else if(displayType ==1){
+            binding.recycler.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
+            adapter = new MediaItemImgAdapter(R.layout.item_file_img);
+        }else {
+            binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+            adapter = new MediaItemAdapter(R.layout.item_file);
+        }
+        binding.recycler.setAdapter(adapter);
+        adapter.setNewData(files);
+        initAdapter();
+    }
+
+    private void initAdapter() {
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                IFile file =  files.get(position);
+                if(file.isDirectory()){
+                    listFiles(file);
+                }else {
+                    ToastUtils.showLong("打开文件:"+file.getPath());
+                    openFile(file,files);
+
+                }
+            }
+        });
     }
 
     private void scanAll() {
-        new EverythingSearchParser().startSearch(folder.getPath(),BaseMediaInfo.TYPE_IMAGE,0);
-        /*new SafFileFinder22<IFile>().getAlbums(folder, Executors.newFixedThreadPool(3), new ScanFolderCallback() {
+        //new EverythingSearchParser().startSearch(folder.getPath(),BaseMediaInfo.TYPE_IMAGE,0);
+        new SafFileFinder22<IFile>().getAlbums(folder, Executors.newFixedThreadPool(3), new ScanFolderCallback() {
             @Override
             public void onComplete() {
 
@@ -239,7 +260,7 @@ public class FolderViewActivity extends AppCompatActivity {
             public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
 
             }
-        });*/
+        });
     }
 
     private void sortMenu() {
