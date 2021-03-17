@@ -6,8 +6,12 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,6 +78,25 @@ public class SearchActivity extends AppCompatActivity {
                 doSearch();
             }
         });
+
+        binding.titlebar.getCenterSearchEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_UNSPECIFIED) {
+                    doSearch();
+                    return true;
+                }
+                return false;
+
+            }
+        });
+        binding.titlebar.getCenterSearchRightImageView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.titlebar.getCenterSearchEditText().setText("");
+            }
+        });
+
 
         doSearch();
 
@@ -223,6 +246,7 @@ public class SearchActivity extends AppCompatActivity {
 
     String currentSearchKey;
     void doSearch(boolean isChangePage){
+        KeyboardUtils.hideSoftInput(SearchActivity.this);
         if(!isChangePage){
             pageInfo = new int[]{0,0};
         }
@@ -294,7 +318,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
-                        KeyboardUtils.hideSoftInput(SearchActivity.this);
+
 
                     }
                 });

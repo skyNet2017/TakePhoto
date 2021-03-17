@@ -192,6 +192,11 @@ public class StorageListActivity extends AppCompatActivity {
         adapter.replaceData(list1);
     }
 
+    public void addBean(StorageBean bean){
+        list1.add(bean);
+        adapter.notifyDataSetChanged();
+    }
+
 
 
     @Override

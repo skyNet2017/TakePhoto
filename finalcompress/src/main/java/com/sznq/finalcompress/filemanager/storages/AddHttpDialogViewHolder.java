@@ -20,6 +20,7 @@ import com.hss01248.media.mymediastore.http.HttpHelper;
 import com.hss01248.view.viewholder.CommonViewHolder;
 import com.sznq.finalcompress.databinding.DialogAddHttpBinding;
 import com.sznq.finalcompress.databinding.ItemStorageBinding;
+import com.sznq.finalcompress.filemanager.StorageListActivity;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -49,6 +50,10 @@ public class AddHttpDialogViewHolder extends CommonViewHolder<Dialog, DialogAddH
                 bean.dismiss();
             }
         });
+    }
+    StorageListActivity activity;
+    public void setActivity(StorageListActivity activity){
+        this.activity = activity;
     }
 
     private void checkAdd() {
@@ -108,6 +113,7 @@ public class AddHttpDialogViewHolder extends CommonViewHolder<Dialog, DialogAddH
                         if(aBoolean){
                             ToastUtils.showLong("http数据源添加成功,可在列表里点击进入扫描");
                             initInfo.dismiss();
+                            activity.addBean(bean);
                         }else {
                             ToastUtils.showLong("该ip无法连接成功");
 
