@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -200,12 +201,21 @@ public class SearchActivity extends AppCompatActivity {
     List<BaseInfo> mediaInfos = new ArrayList<>();
     BaseQuickAdapter adapter;
 
-    int displayType = 1;
+
     private void initRecycleview() {
-        this.displayType = displayType%2;
+        changeAdapter(FilterViewHolder.disPlayMode);
+
+    }
+
+    /**
+     desc[0] ="表格";
+     desc[1] ="瀑布流";
+     desc[2] ="列表";
+     */
+    public void changeAdapter(int displayType) {
         if(displayType == 0){
-            binding.recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-            adapter = new MediaItemAdapter(R.layout.item_file);
+            binding.recycler.setLayoutManager(new GridLayoutManager(this,3));
+            adapter = new MediaItemImgAdapter(R.layout.item_file_img);
         }else if(displayType ==1){
             binding.recycler.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
             adapter = new MediaItemImgAdapter(R.layout.item_file_img);
@@ -215,7 +225,6 @@ public class SearchActivity extends AppCompatActivity {
         }
         binding.recycler.setAdapter(adapter);
         adapter.setNewData(mediaInfos);
-
     }
 
     private void openFile(BaseMediaInfo file, List<BaseInfo> files) {
@@ -324,4 +333,6 @@ public class SearchActivity extends AppCompatActivity {
                 });
 
     }
+
+
 }

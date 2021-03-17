@@ -17,9 +17,15 @@ public class MediaItemAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHolder>
 
     @Override
     protected void convert(@NonNull BaseViewHolder helper, BaseInfo item) {
-        helper.setText(R.id.tv_name,item.getName());
-        helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.getUpdatedTime())+"-"+ ImageInfoFormater.formatFileSize(item.getFileSize()));
-        helper.setGone(R.id.iv_folder,true);
+        try {
+
+            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.getUpdatedTime())+"-"+ ImageInfoFormater.formatFileSize(item.getFileSize()));
+            helper.setGone(R.id.iv_folder,item instanceof BaseMediaInfo);
+            helper.setText(R.id.tv_name,item.getName());
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+
 
 
     }

@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
 
-            android:text="媒体类型v"
+            android:text="媒体类型"
             android:textSize="12dp" />
 
         <TextView
@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"
-            android:text="文件/文件夹v"
+            android:text="文件/文件夹"
             android:textSize="12dp" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"
-            android:text="排序v"
+            android:text="排序"
             android:textSize="12dp" />
 
         <TextView
@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"
-            android:text="磁盘v"
+            android:text="磁盘"
             android:textSize="12dp" />
         <TextView
             android:id="@+id/tv_hidden"
@@ -56,6 +56,13 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:text="文件大小过滤"
+            android:textSize="12dp" />
+        <TextView
+            android:id="@+id/tv_adapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="显示模式"
             android:textSize="12dp" />
 
     </LinearLayout>

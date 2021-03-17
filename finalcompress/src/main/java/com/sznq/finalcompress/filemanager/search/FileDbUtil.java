@@ -147,8 +147,8 @@ public class FileDbUtil {
     }
 
     /**
-     desc[0] ="图片和视频";
-     desc[1] ="只有图片";
+     desc[1] ="图片和视频";
+     desc[0] ="只有图片";
      desc[2] ="只有视频";
      desc[3] ="只有音频";
      desc[4] ="全部文档";
@@ -163,10 +163,10 @@ public class FileDbUtil {
      */
     private static void filterMediaType(QueryBuilder<BaseMediaInfo> builder, int mediaType) {
         switch (mediaType){
-            case 0: builder.whereOr(BaseMediaInfoDao.Properties.MediaType.eq(BaseMediaInfo.TYPE_IMAGE),
+            case 1: builder.whereOr(BaseMediaInfoDao.Properties.MediaType.eq(BaseMediaInfo.TYPE_IMAGE),
                     BaseMediaInfoDao.Properties.MediaType.eq(BaseMediaInfo.TYPE_VIDEO));
                 break;
-            case 1: builder.where(BaseMediaInfoDao.Properties.MediaType.eq(BaseMediaInfo.TYPE_IMAGE));
+            case 0: builder.where(BaseMediaInfoDao.Properties.MediaType.eq(BaseMediaInfo.TYPE_IMAGE));
                 break;
             case 2: builder.where(BaseMediaInfoDao.Properties.MediaType.eq(BaseMediaInfo.TYPE_VIDEO));
                 break;

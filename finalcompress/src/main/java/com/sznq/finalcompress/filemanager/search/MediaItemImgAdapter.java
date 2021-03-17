@@ -36,7 +36,14 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
     @Override
     protected void convert(@NonNull BaseViewHolder helper, BaseInfo item) {
 
-        helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.getUpdatedTime())+"-"+ ImageInfoFormater.formatFileSize(item.getFileSize())+"\n"+item.getName());
+        if(FilterViewHolder.disPlayMode == 0){
+            //去掉adjustviewbonds
+            ImageView imageView =  helper.getView(R.id.iv_img);
+            imageView.setAdjustViewBounds(false);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+        helper.setGone(R.id.tv_info,true);
+        //helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.getUpdatedTime())+"-"+ ImageInfoFormater.formatFileSize(item.getFileSize())+"\n"+item.getName());
         int type = FileTypeUtil.getTypeByFileName(item.getPath());
         boolean showImg = false;
         if(type == BaseMediaInfo.TYPE_IMAGE){
@@ -54,6 +61,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
         }
 
 
+
     }
 
     private void showImg(BaseViewHolder helper, BaseInfo item) {
@@ -63,7 +71,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
                         .load(((BaseMediaFolderInfo) item).getCover())
                         .thumbnail(0.2f)
                         .placeholder(R.drawable.image_placeholder)
-                        .fitCenter()
+                        //.fitCenter()
                         .into((ImageView) helper.getView(R.id.iv_img));
             }else {
                 helper.setImageDrawable(R.id.iv_img,helper.itemView.getResources().getDrawable(R.drawable.image_placeholder));
@@ -74,7 +82,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
                     .load(item.getPath())
                     .thumbnail(0.2f)
                     .placeholder(R.drawable.image_placeholder)
-                    .fitCenter()
+                    //.fitCenter()
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -83,10 +91,11 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<BaseInfo, BaseViewHold
 
                         @Override
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            if(model != null && model.equals(item.getPath())){
+                            /*if(model != null && model.equals(item.getPath())){
                                 return false;
                             }
-                            return true;
+                            return true;*/
+                            return false;
 
                         }
                     })

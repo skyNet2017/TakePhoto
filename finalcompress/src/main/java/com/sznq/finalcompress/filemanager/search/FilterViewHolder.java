@@ -67,10 +67,39 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
                 showSizeFilterMenu(v);
             }
         });
+        binding.tvAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showListModeMenu(v);
+            }
+        });
 
     }
 
-   static int sizeType;
+   static int disPlayMode = 0;
+    private void showListModeMenu(View v) {
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String[] desc = new String[3];
+        desc[0] ="表格";
+        desc[1] ="瀑布流";
+        desc[2] ="列表";
+
+
+        desc[disPlayMode] =  desc[disPlayMode] +"(now)";
+
+        floatMenu.items(desc);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                disPlayMode = position;
+                activity.changeAdapter(disPlayMode);
+            }
+        });
+        floatMenu.showAsDropDown(v);
+    }
+
+    static int sizeType;
     private void showSizeFilterMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
@@ -143,8 +172,8 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
         String[] desc = new String[11];
-        desc[0] ="图片和视频";
-        desc[1] ="只有图片";
+        desc[1] ="图片和视频";
+        desc[0] ="只有图片";
         desc[2] ="只有视频";
         desc[3] ="只有音频";
         desc[4] ="全部文档";
