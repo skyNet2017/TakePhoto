@@ -101,15 +101,15 @@ public class FileDbUtil {
     }
 
     /**
-     *  desc[0] = "全部";
-     *         desc[1] ="仅搜索公开的内容";
+     *  desc[1] = "全部";
+     *         desc[0] ="仅搜索公开的内容";
      *         desc[2] ="仅搜索隐藏的内容";
      * @param builder
      * @param hiddenType
      */
     private static void filterHiddenType(QueryBuilder<BaseMediaInfo> builder, int hiddenType) {
         switch (hiddenType){
-            case 1:
+            case 0:
                 builder.where(BaseMediaInfoDao.Properties.Hidden.eq(0));
                 break;
             case 2:
@@ -120,20 +120,22 @@ public class FileDbUtil {
     }
 
     /**
-     *  desc[0] = "全部";
-     *         desc[1] ="仅手机存储卡";
+     *  desc[1] = "全部";
+     *         desc[0] ="仅手机存储卡";
      *         desc[2] ="手机存储卡和http服务器";
      *         desc[3] ="仅http服务器";
      *         desc[4] ="具体某台http服务器//todo";
      */
     private static void filterDiskType(QueryBuilder<BaseMediaInfo> builder, int diskType) {
         switch (diskType){
-            case 1:
-                builder.where(BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_EXTERNAL_STORAGE));
+            case 0:
+                builder.whereOr(BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_EXTERNAL_STORAGE),
+                        BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_SAF));
                 break;
             case 2:
                 builder.whereOr(BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_EXTERNAL_STORAGE),
-                        BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_HTTP_Everything));
+                        BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_HTTP_Everything)
+                        ,BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_SAF));
                 break;
             case 3:
                 builder.where(BaseMediaInfoDao.Properties.DiskType.eq(StorageBean.TYPE_HTTP_Everything));

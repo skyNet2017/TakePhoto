@@ -34,6 +34,7 @@ import com.hss01248.media.mymediastore.http.EverythingSearchParser;
 import com.hss01248.media.mymediastore.http.HttpHelper;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.hss01248.pagestate.PageStateManager;
+import com.kongzue.dialog.util.DialogSettings;
 import com.shizhefei.view.largeimage.BlockImageLoader;
 import com.simple.spiderman.SpiderMan;
 
@@ -93,7 +94,6 @@ public class BaseApp extends Application {
           Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
           Utils.init(this);
-
 
           //EverythingSearchParser.searchMediaType("http://122.226.210.62:121/");
           //EverythingSearchParser.searchDocType("http://122.226.210.62:121/");

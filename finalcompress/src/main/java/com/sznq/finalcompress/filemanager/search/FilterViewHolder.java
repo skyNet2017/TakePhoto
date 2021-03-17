@@ -104,16 +104,36 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
         String[] desc = new String[3];
-        desc[0] = "全部";
-        desc[1] ="仅搜索公开的内容";
+        desc[1] = "全部";
+        desc[0] ="仅搜索公开的内容";
         desc[2] ="仅搜索隐藏的内容";
+        desc[3] ="关闭隐藏的显示";
         desc[hiddenType] =  desc[hiddenType] +"(now)";
         floatMenu.items(desc);
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
             public void onClick(View v, int position) {
-                hiddenType = position;
-                doSearch();
+                if(position == 3){
+                    HiddenUtil.setShowHidden(false);
+                    hiddenType = 0;
+                    doSearch();
+                    return;
+                }
+                if(position != 0){
+                    //输入密码
+                    HiddenUtil.checkPw(activity, new Runnable() {
+                        @Override
+                        public void run() {
+                            hiddenType = position;
+                            doSearch();
+                        }
+                    });
+
+                }else {
+                    hiddenType = position;
+                    doSearch();
+                }
+
             }
         });
         floatMenu.showAsDropDown(v);
@@ -233,8 +253,8 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
         String[] desc = new String[5];
-        desc[0] = "全部";
-        desc[1] ="仅手机存储卡";
+        desc[1] = "全部";
+        desc[0] ="仅手机存储卡";
         desc[2] ="手机存储卡和http服务器";
         desc[3] ="仅http服务器";
         desc[4] ="具体某台http服务器//todo";

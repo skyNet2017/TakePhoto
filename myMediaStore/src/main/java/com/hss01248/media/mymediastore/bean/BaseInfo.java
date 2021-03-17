@@ -11,6 +11,14 @@ public class BaseInfo {
     public int mediaType;
     public long fileSize;
     public long updatedTime;
+    public int  hidden = 0;
+    public int getHidden() {
+        return this.hidden;
+    }
+
+    public void setHidden(int hidden) {
+        this.hidden = hidden;
+    }
 
     public String getId() {
         return id;

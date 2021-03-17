@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
@@ -19,20 +18,16 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.FileOpenUtil;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
-import com.futuremind.recyclerviewfastscroll.FastScroller;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
-import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.pagestate.PageStateManager;
 import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivitySearchBinding;
 import com.sznq.finalcompress.filemanager.FolderViewActivity;
-import com.sznq.finalcompress.filemanager.adapter.FileItemAdapter;
-import com.sznq.finalcompress.filemanager.adapter.FileItemImgAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +37,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -149,10 +143,10 @@ public class SearchActivity extends AppCompatActivity {
 
     private void showMenu(View v, int position0) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
-        //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+        String hide = mediaInfos.get(position0).getHidden() == 0 ? "隐藏此文件夹":"取消此文件夹的隐藏";
         String[] desc = new String[2];
         desc[0] = "显示exif/metadata信息";
-        desc[1] = "隐藏文件夹";
+        desc[1] = hide;
         floatMenu.items(desc);
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
@@ -175,7 +169,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void hideFolder(String path, BaseInfo baseInfo) {
-
+        HiddenUtil.switchHidePath(path,baseInfo);
     }
 
     List<BaseInfo> mediaInfos = new ArrayList<>();
