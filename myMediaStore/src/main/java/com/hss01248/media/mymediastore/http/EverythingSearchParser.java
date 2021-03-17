@@ -23,6 +23,7 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -82,15 +83,17 @@ public class EverythingSearchParser {
                             String results = object.optString("results");
                             List<HttpResponseBean> beans = GsonUtils.getGson().fromJson(results,new TypeToken<List<HttpResponseBean>>(){}.getType());
                             //List<HttpResponseBean> beans =   parseHtml(url,html,totalPageCount);
-
-                            List<BaseMediaInfo> infos = new ArrayList<>();
-
-                            // HttpFile[] files = new HttpFile[beans.size()];
-                            for (int i = 0; i < beans.size(); i++) {
-                                // files[i] = new HttpFile(beans.get(i));
-                                HttpResponseBean bean = beans.get(i);
+                            Iterator<HttpResponseBean> iterator = beans.iterator();
+                            List<BaseMediaInfo> infos = new ArrayList<>(beans.size());
+                            while (iterator.hasNext()){
+                                HttpResponseBean bean = iterator.next();
                                 bean.setHost(prefix);
-
+                                if(!TextUtils.isEmpty(bean.path)){
+                                    if(URLDecoder.decode(bean.path).contains("Winmend~Folder~Hidden")){
+                                        // iterator.remove();
+                                        continue;
+                                    }
+                                }
 
                                 BaseMediaInfo info = new BaseMediaInfo();
                                 info.path = bean.getUrl();
@@ -101,8 +104,13 @@ public class EverythingSearchParser {
                                 info.hidden = 0;
                                 info.updatedTime = bean.lastModified();
                                 info.name = bean.name;
+                                //K:\$RECYCLE.BIN\S-1-5-21-803563098-3857705006-1357952975-500\$RKP0DIU\钟芳.jpg
+                                if(URLDecoder.decode(bean.path).contains("$RECYCLE.BIN")){
+                                    info.hidden = 1;
+                                }
                                 infos.add(info);
                             }
+
                             writeDb(infos);
 
 

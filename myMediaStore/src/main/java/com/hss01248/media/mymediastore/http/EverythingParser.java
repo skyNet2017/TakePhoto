@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import okhttp3.Call;
@@ -58,6 +59,9 @@ public class EverythingParser {
         }
         if(path.endsWith("/")){
             path = path.substring(0,path.length()-1);
+        }
+        if(path.contains("Winmend~Folder~Hidden")){
+            return null;
         }
         try {
             Response response =   HttpHelper.getClient().newCall(request).execute();

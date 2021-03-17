@@ -127,7 +127,7 @@ public class StorageListActivity extends AppCompatActivity {
 
     private void addHost(int position) {
         AddHttpDialogViewHolder viewHolder = new AddHttpDialogViewHolder(null,this,null,false);
-
+        viewHolder.setActivity(this);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("")
                 .setView(viewHolder.rootView).create();

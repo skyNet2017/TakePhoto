@@ -46,8 +46,8 @@
             android:layout_centerHorizontal="true"
             android:textColor="@color/exo_white"
             style="@style/c_textview_bg"
+            android:id="@+id/tv_progress"
             android:layout_height="wrap_content"/>
-
     </RelativeLayout>
 
     <RelativeLayout

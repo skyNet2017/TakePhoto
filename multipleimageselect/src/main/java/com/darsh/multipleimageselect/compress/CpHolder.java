@@ -351,7 +351,12 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        tvProgress.setText(progressInfo.getPercent()+"% , speed: "+(progressInfo.getSpeed()/1024/8)+"KB/s");
+                        try {
+                            tvProgress.setText(progressInfo.getPercent()+"% , speed: "+(progressInfo.getSpeed()/1024/8)+"KB/s");
+                        }catch (Throwable throwable){
+                            throwable.printStackTrace();
+                        }
+
                     }
                 });
 
