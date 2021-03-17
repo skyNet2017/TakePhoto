@@ -7,6 +7,8 @@
         android:layout_width="match_parent"
         android:gravity="center"
         android:id="@+id/tv_info"
-        android:padding="8dp"
+        android:padding="15dp"
+        android:background="#ff00ff"
+        android:textColor="@color/white"
         android:layout_height="wrap_content"/>
 </RelativeLayout>

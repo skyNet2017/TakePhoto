@@ -56,7 +56,7 @@ dependencies {
     api group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '3.12.13'
     api 'com.blankj:utilcodex:1.30.6'
     api 'me.jessyan:progressmanager:1.5.0'
-
+    api 'com.google.code.gson:gson:2.8.5'
 
 
 

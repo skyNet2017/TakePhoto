@@ -6,10 +6,14 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.blankj.utilcode.util.GsonUtils;
+import com.google.gson.reflect.TypeToken;
 import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.bean.StorageBean;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,11 +34,12 @@ import okhttp3.Response;
 
 public class EverythingSearchParser {
 
-  private   static int pageSize = 32;
+  private   static int pageSize = 2000;
 
     public static ExecutorService service = new ThreadPoolExecutor(0, 10,
             45, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
+
 
 
 
@@ -60,16 +65,23 @@ public class EverythingSearchParser {
         service.execute(new Runnable() {
             @Override
             public void run() {
-                String url = rootUrl+"?search="+getTypeSearchStr(type)+"&offset="+pageNum*pageSize;
+                String url = rootUrl+"?search="+getTypeSearchStr(type)+"&o="+pageNum*pageSize+
+                        "&c="+pageSize+"&j=1&path_column=1&size_column=1&date_modified_column=1&date_created_column=1&attributes_column=1";
                 Request request = new Request.Builder()
                         .url(url)
                         .get().build();
+                String prefix = "http://"+request.url().host()+":"+request.url().port();
                 try {
                     Response response =   HttpHelper.getClient().newCall(request).execute();
                     if(response.isSuccessful()){
-                        String html = response.body().string();
                         try {
-                            List<HttpResponseBean> beans =   parseHtml(url,html,totalPageCount);
+                            String json = response.body().string();
+                            JSONObject object = new JSONObject(json);
+                            int totalResults = object.optInt("totalResults");
+                            totalPageCount[0] = (int) Math.ceil(totalResults*1.0f/pageSize);
+                            String results = object.optString("results");
+                            List<HttpResponseBean> beans = GsonUtils.getGson().fromJson(results,new TypeToken<List<HttpResponseBean>>(){}.getType());
+                            //List<HttpResponseBean> beans =   parseHtml(url,html,totalPageCount);
 
                             List<BaseMediaInfo> infos = new ArrayList<>();
 
@@ -77,14 +89,18 @@ public class EverythingSearchParser {
                             for (int i = 0; i < beans.size(); i++) {
                                 // files[i] = new HttpFile(beans.get(i));
                                 HttpResponseBean bean = beans.get(i);
+                                bean.setHost(prefix);
+
+
                                 BaseMediaInfo info = new BaseMediaInfo();
-                                info.path = bean.url;
+                                info.path = bean.getUrl();
                                 info.mediaType = type;
-                                info.dir = bean.url.substring(0,bean.url.lastIndexOf("/"));
-                                info.fileSize = bean.fileSize;
+                                info.diskType = StorageBean.TYPE_HTTP_Everything;
+                                info.dir = bean.getParentPath();
+                                info.fileSize = bean.length();
                                 info.hidden = 0;
-                                info.updatedTime = bean.lastModified;
-                                info.name = URLDecoder.decode(bean.url.substring(bean.url.lastIndexOf("/")+1));
+                                info.updatedTime = bean.lastModified();
+                                info.name = bean.name;
                                 infos.add(info);
                             }
                             writeDb(infos);
@@ -186,8 +202,8 @@ public class EverythingSearchParser {
             String clazzName = element.selectFirst("td").className();
 
             String sizeData = element.selectFirst("td.sizedata > span > nobr").text();
-            bean.lastModified = parseDate(modifieddata);
-            bean.fileSize = paseSize(sizeData);
+            //bean.lastModified = parseDate(modifieddata);
+           // bean.fileSize = paseSize(sizeData);
             String name = "";
             String href = "";
             boolean isDir = false;
@@ -209,8 +225,8 @@ public class EverythingSearchParser {
                 name = element1.text();
                 href = element1.attr("href");
                 bean.name = name;
-                bean.url = host+href;
-                bean.isDir = isDir;
+               // bean.url = host+href;
+               // bean.isDir = isDir;
                 if(parentPath != null){
                     bean.path = host+parentPath.attr("href");
                 }else {

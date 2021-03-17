@@ -132,7 +132,6 @@ public class FileTypeUtil {
                 ext.add( "vob");
                 ext.add("flv");
                 ext.add("ts");
-                ext.add("dat");
                 break;
             case BaseMediaInfo.TYPE_DOC_WORD:
                 ext.add( "doc");

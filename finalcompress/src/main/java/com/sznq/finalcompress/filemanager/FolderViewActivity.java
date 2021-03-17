@@ -27,6 +27,7 @@ import com.hss01248.media.mymediastore.bean.StorageBean;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.fileapi.JavaFile;
+import com.hss01248.media.mymediastore.http.EverythingSearchParser;
 import com.hss01248.media.mymediastore.http.HttpFile;
 import com.hss01248.media.mymediastore.http.HttpResponseBean;
 import com.hss01248.media.mymediastore.smb.FileApiForSmb;
@@ -217,7 +218,8 @@ public class FolderViewActivity extends AppCompatActivity {
     }
 
     private void scanAll() {
-        new SafFileFinder22<IFile>().getAlbums(folder, Executors.newFixedThreadPool(3), new ScanFolderCallback() {
+        new EverythingSearchParser().startSearch(folder.getPath(),BaseMediaInfo.TYPE_IMAGE,0);
+        /*new SafFileFinder22<IFile>().getAlbums(folder, Executors.newFixedThreadPool(3), new ScanFolderCallback() {
             @Override
             public void onComplete() {
 
@@ -237,7 +239,7 @@ public class FolderViewActivity extends AppCompatActivity {
             public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
 
             }
-        });
+        });*/
     }
 
     private void sortMenu() {
@@ -399,8 +401,9 @@ public class FolderViewActivity extends AppCompatActivity {
         }
         if(type == StorageBean.TYPE_HTTP_Everything){
             HttpResponseBean bean = new HttpResponseBean();
-            bean.url = ipOrPath;
-            bean.isDir = true;
+            bean.name = "";
+            bean.path = ipOrPath;
+            bean.type = "folder";
             return new HttpFile(bean);
         }
         return null;

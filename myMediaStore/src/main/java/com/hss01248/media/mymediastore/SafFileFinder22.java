@@ -137,6 +137,7 @@ public class SafFileFinder22<T extends IFile>{
 
 
     public void getAlbums(final T dir, ExecutorService executorService, final ScanFolderCallback observer) {
+        safStart = System.currentTimeMillis();
         getAlbums(dir,false,executorService,observer);
     }
 

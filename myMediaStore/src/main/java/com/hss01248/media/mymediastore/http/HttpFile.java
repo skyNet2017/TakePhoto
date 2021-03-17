@@ -34,27 +34,27 @@ public class HttpFile extends BaseFileApi<HttpResponseBean> {
 
     @Override
     public Uri getUri() {
-        return Uri.parse(file.url);
+        return Uri.parse(file.getUrl());
     }
 
     @Override
     public String getPath() {
-        return file.url;
+        return file.getUrl();
     }
 
     @Override
     public boolean isDirectory() {
-        return file.isDir;
+        return file.isDir();
     }
 
     @Override
     public long length() {
-        return file.fileSize;
+        return file.length();
     }
 
     @Override
     public long lastModified() {
-        return file.lastModified;
+        return file.lastModified();
     }
 
     @Override
@@ -75,11 +75,10 @@ public class HttpFile extends BaseFileApi<HttpResponseBean> {
     @Override
     public IFile getParentFile() {
         HttpResponseBean bean = new HttpResponseBean();
-        if(!file.url.contains("/")){
-            return null;
-        }
-        bean.url = file.url.substring(0,file.url.lastIndexOf("/"));
-        bean.isDir = true;
+
+        bean.name = file.path.substring(file.path.lastIndexOf("/")+1);
+        bean.path = file.path.substring(0,file.path.lastIndexOf("/"));
+        bean.type = "folder";
         return new HttpFile(bean);
     }
 
@@ -103,7 +102,7 @@ public class HttpFile extends BaseFileApi<HttpResponseBean> {
         if(isDirectory()){
             return null;
         }
-        return HttpHelper.getInputStream(file.url,null);
+        return HttpHelper.getInputStream(file.getUrl(),null);
     }
 
     @Override

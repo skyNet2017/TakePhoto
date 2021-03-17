@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
@@ -19,15 +20,23 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.SafFileFinder22;
+import com.hss01248.media.mymediastore.ScanFolderCallback;
 import com.hss01248.media.mymediastore.TfCardBean;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.StorageBean;
 import com.hss01248.media.mymediastore.db.StorageBeanDao;
+import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
+import com.hss01248.media.mymediastore.fileapi.JavaFile;
+import com.hss01248.media.mymediastore.http.EverythingSearchParser;
+import com.noober.menu.FloatMenu;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.filemanager.adapter.StorageAdapter;
 import com.sznq.finalcompress.filemanager.storages.AddHttpDialogViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class StorageListActivity extends AppCompatActivity {
 
@@ -60,6 +69,58 @@ public class StorageListActivity extends AppCompatActivity {
                     StorageBean bean = list1.get(position);
                     FolderViewActivity.goTo(StorageListActivity.this,bean.ip,bean.type,bean.uname,bean.pw);
                 }
+            }
+        });
+
+        adapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(BaseQuickAdapter adapter, View v, int position) {
+                final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+                //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
+                StorageBean bean = list1.get(position);
+                ScanFolderCallback folderCallback = new ScanFolderCallback() {
+                    @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
+                    public void onFromDB(List<BaseMediaFolderInfo> folderInfos) {
+
+                    }
+
+                    @Override
+                    public void onScanEachFolder(List<BaseMediaFolderInfo> folderInfos) {
+
+                    }
+
+                    @Override
+                    public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
+
+                    }
+                };
+
+                String[] desc = new String[1];
+                desc[0] = "扫描此磁盘所有内容";
+                floatMenu.items(desc);
+                floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+                    @Override
+                    public void onClick(View v, int position) {
+                        if(bean.type == StorageBean.TYPE_HTTP_Everything){
+                            EverythingSearchParser.searchDocType(bean.ip);
+                            EverythingSearchParser.searchMediaType(bean.ip);
+                        }else if(bean.type == StorageBean.TYPE_EXTERNAL_STORAGE){
+                            JavaFile file = new JavaFile(Environment.getExternalStorageDirectory());
+                            new SafFileFinder22<JavaFile>().getAlbums(file, Executors.newFixedThreadPool(3),folderCallback);
+                        }else if(bean.type == StorageBean.TYPE_SAF){
+                            IDocumentFile file = new IDocumentFile(com.hss01248.media.mymediastore.SafUtil.sdRoot);
+                            new SafFileFinder22<IDocumentFile>().getAlbums(file, Executors.newFixedThreadPool(3),folderCallback);
+
+                        }
+                    }
+                });
+                floatMenu.showAsDropDown(v);
+                return false;
             }
         });
     }

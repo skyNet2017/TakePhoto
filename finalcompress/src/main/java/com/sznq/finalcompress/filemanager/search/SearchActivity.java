@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.FileOpenUtil;
@@ -73,6 +74,7 @@ public class SearchActivity extends AppCompatActivity {
                 doSearch();
             }
         });
+
         doSearch();
 
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
@@ -226,8 +228,8 @@ public class SearchActivity extends AppCompatActivity {
         }
         String word = binding.titlebar.getSearchKey();
 
-        searchDB(word,filterViewHolder.isSearchDir,filterViewHolder.diskType,filterViewHolder.mediaType,
-                filterViewHolder.sortType,filterViewHolder.hiddenType,filterViewHolder.sizeType);
+        searchDB(word,FilterViewHolder.isSearchDir,FilterViewHolder.diskType,FilterViewHolder.mediaType,
+                FilterViewHolder.sortType,FilterViewHolder.hiddenType,FilterViewHolder.sizeType);
     }
 
     void doSearch(){
@@ -292,6 +294,7 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onComplete() {
+                        KeyboardUtils.hideSoftInput(SearchActivity.this);
 
                     }
                 });

@@ -4,8 +4,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blankj.utilcode.util.GsonUtils;
+import com.google.gson.reflect.TypeToken;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -44,17 +47,33 @@ public class EverythingParser {
         if(!url.startsWith("http")){
             url = "http://"+url;
         }
+        url = url+"?j=1&path_column=1&date_modified_column=1&date_created_column=1&attributes_column=1";
         Request request = new Request.Builder()
                 .url(url)
                 .get().build();
+        String prefix = "http://"+request.url().host()+":"+request.url().port();
+        String path = url;
+        if(path.contains("?")){
+            path = path.substring(0,path.indexOf("?"));
+        }
+        if(path.endsWith("/")){
+            path = path.substring(0,path.length()-1);
+        }
         try {
             Response response =   HttpHelper.getClient().newCall(request).execute();
             if(response.isSuccessful()){
-                String html = response.body().string();
+                String json = response.body().string();
                 try {
-                    List<HttpResponseBean> beans =   parseHtml(url,html);
+                    //json = json.replaceAll("\"size\":\"\",","");
+                    JSONObject object = new JSONObject(json);
+                   // int totalResults = object.optInt("totalResults");
+                    String results = object.optString("results");
+                    List<HttpResponseBean> beans = GsonUtils.getGson().fromJson(results,new TypeToken<List<HttpResponseBean>>(){}.getType());
                     HttpFile[] files = new HttpFile[beans.size()];
                     for (int i = 0; i < beans.size(); i++) {
+                        HttpResponseBean bean = beans.get(i);
+                        bean.path = path;
+                        //bean.setHost(prefix);
                         files[i] = new HttpFile(beans.get(i));
                     }
                     return files;
@@ -77,7 +96,7 @@ public class EverythingParser {
 
 
 
-    private static List<HttpResponseBean> parseHtml(String url, String html) {
+   /* private static List<HttpResponseBean> parseHtml(String url, String html) {
         Document doc = Jsoup.parse(html);
         Elements elements = doc.select("table > tbody > tr");
         Uri uri = Uri.parse(url);
@@ -134,7 +153,7 @@ public class EverythingParser {
         //文件:
         //body > center > table > tbody > tr:nth-child(21) > td.sizedata > span > nobr
         //body > center > table > tbody > tr:nth-child(21) > td.file > span > nobr > a
-    }
+    }*/
 
     //14.0 GB  xx MB  xx KB  0 B
     private static long paseSize(String sizeData) {
