@@ -235,21 +235,21 @@ public class SearchActivity extends AppCompatActivity {
         adapter.setNewData(mediaInfos);
         initAdapter();
 
-        binding.recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        /*binding.recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if (!SearchActivity.this.isDestroyed()){
+                    //if (!SearchActivity.this.isDestroyed()){
                         Glide.with(SearchActivity.this).resumeRequests();//恢复Glide加载图片
-                    }
+                   // }
 
                 }else {
-                    if (!SearchActivity.this.isDestroyed()){
+                    //if (!SearchActivity.this.isDestroyed()){
                         Glide.with(SearchActivity.this).pauseRequests();//禁止Glide加载图片
-                    }
+                   // }
                 }
             }
-        });
+        });*/
 
     }
 

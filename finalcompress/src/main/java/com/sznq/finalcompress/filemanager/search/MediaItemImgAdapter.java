@@ -1,14 +1,18 @@
 package com.sznq.finalcompress.filemanager.search;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.blankj.utilcode.util.ScreenUtils;
 import com.bumptech.glide.Glide;
@@ -111,41 +115,67 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
             }
 
         } else {
-            String path = URLDecoder.decode(item.getPath());
+
+            String path = item.getPath();
+            path = path.replace(":9265/",":8080/img?path=");
             RequestBuilder<Drawable> builder = Glide.with(helper.itemView)
                     .load(path)
-                    .thumbnail(0.2f)
+                    //.thumbnail(0.2f)
                     .placeholder(R.drawable.image_placeholder);
+            String finalPath = path;
             if (FilterViewHolder.disPlayMode == 0) {
                 //.override(width,width).centerCrop()
+
                 builder.listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        helper.itemView.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                if(event.getX()<30 && event.getY()<30){
+                                    if(event.getAction() == MotionEvent.ACTION_DOWN){
+                                        showInfo(e,model,v.getContext());
+                                    }
+
+                                }
+                                return false;
+                            }
+                        });
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        if (model != null && model.equals(path)) {
-                            return false;
-                        }
-                        return true;
+                        return false;
 
                     }
                 }).into((ImageView) helper.getView(R.id.iv_img));
             } else {
+                String finalPath1 = path;
                 builder.listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        helper.itemView.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event) {
+                                if(event.getX()<30 && event.getY()<30){
+                                    if(event.getAction() == MotionEvent.ACTION_DOWN){
+                                        showInfo(e,model,v.getContext());
+                                    }
+                                }
+                                return false;
+                            }
+                        });
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        if (model != null && model.equals(path)) {
+                      /*  if (model != null && model.equals(finalPath1)) {
                             return false;
                         }
-                        return true;
+                        return true;*/
+                        return false;
 
                     }
                 }).into((ImageView) helper.getView(R.id.iv_img));
@@ -153,5 +183,21 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
 
         }
 
+    }
+
+    private static void showInfo(GlideException e, Object model, Context context) {
+        StringBuilder msg = new StringBuilder();
+        msg.append(model)
+                .append("\n\n");
+        if(e != null){
+            msg.append(e.getClass().getSimpleName())
+                    .append(": ")
+                    .append(e.getMessage());
+        }
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle("info")
+                .setMessage(msg.toString())
+                .setPositiveButton("ok",null).create();
+        dialog.show();
     }
 }
