@@ -44,6 +44,11 @@ public class EverythingSearchParser {
 
 
 
+    public static void doSearchAll(String rootUrl){
+        searchDocType(rootUrl);
+        searchMediaType(rootUrl);
+        //new EverythingSearchParser().startSearch(rootUrl,BaseMediaInfo.TYPE_DOC_PPT,0);
+    }
 
     public static void searchMediaType(String rootUrl){
         new EverythingSearchParser().startSearch(rootUrl,BaseMediaInfo.TYPE_IMAGE,0);
@@ -108,6 +113,8 @@ public class EverythingSearchParser {
                                 if(URLDecoder.decode(bean.path).contains("$RECYCLE.BIN")){
                                     info.hidden = 1;
                                 }
+                                //System.out.println(bean);
+                                //System.out.println(info);
                                 infos.add(info);
                             }
 

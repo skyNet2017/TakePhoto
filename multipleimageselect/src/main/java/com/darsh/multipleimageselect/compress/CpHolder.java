@@ -403,7 +403,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                                                 ivOriginalSaf.setImage(new InputStreamBitmapDecoderFactory(new FileInputStream(resource)));
                                             }
 
-                                            tvOriginal.setText(s+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
+                                            tvOriginal.setText(URLDecoder.decode(s)+"\n"+ ImageInfoFormater.formatFileSize(resource.length()));
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                             tvOriginal.setText(e.getMessage());
@@ -660,7 +660,7 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
                         if(!isPreview){
                             tvOriginal.setText(rootView.getContext().getResources().getString(R.string.c_origianl)+":"+i);
                         }else {
-                            tvOriginal.setText(i);
+                            tvOriginal.setText(URLDecoder.decode(i));
                         }
                     }
 

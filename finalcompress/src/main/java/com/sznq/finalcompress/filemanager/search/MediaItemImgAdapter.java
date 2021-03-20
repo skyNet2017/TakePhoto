@@ -4,11 +4,13 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.blankj.utilcode.util.ScreenUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.DataSource;
@@ -27,6 +29,7 @@ import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.fileapi.JavaFile;
 import com.sznq.finalcompress.R;
 
+import java.net.URLDecoder;
 import java.util.Collections;
 
 public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder> {
@@ -35,21 +38,34 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
     }
 
     Drawable drawable = new ColorDrawable(Color.GRAY);
+    static int width = ScreenUtils.getScreenWidth()/3;
 
     @Override
     protected void convert(@NonNull BaseViewHolder helper, IFile item) {
-
+        ImageView imageView = helper.getView(R.id.iv_img);
         if (FilterViewHolder.disPlayMode == 0) {
             //去掉adjustviewbonds
-            ImageView imageView = helper.getView(R.id.iv_img);
             imageView.setAdjustViewBounds(false);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
+            if(layoutParams != null){
+                layoutParams.height = width;
+                layoutParams.width = width;
+            }else {
+                layoutParams = new ViewGroup.LayoutParams(width,width);
+            }
+            imageView.setLayoutParams(layoutParams);
+        }else {
+            imageView.setAdjustViewBounds(true);
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         }
         helper.setGone(R.id.tv_info, true);
         if(FilterViewHolder.disPlayMode == 2 || FileTypeUtil.getTypeByFileName(item.getName()) != BaseMediaInfo.TYPE_IMAGE){
-            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+ ImageInfoFormater.formatFileSize(item.length())+"\n"+item.getName());
+            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+
+                    ImageInfoFormater.formatFileSize(item.length())+"\n"+item.getName());
         }else {
-            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+ ImageInfoFormater.formatFileSize(item.length()));
+            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+
+                    ImageInfoFormater.formatFileSize(item.length())+"\n"+item.getName());
         }
 
 
@@ -95,12 +111,14 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
             }
 
         } else {
+            String path = URLDecoder.decode(item.getPath());
             RequestBuilder<Drawable> builder = Glide.with(helper.itemView)
-                    .load(item.getPath())
+                    .load(path)
                     .thumbnail(0.2f)
                     .placeholder(R.drawable.image_placeholder);
-            if (FilterViewHolder.disPlayMode == 2) {
-                builder.centerCrop().listener(new RequestListener<Drawable>() {
+            if (FilterViewHolder.disPlayMode == 0) {
+                //.override(width,width).centerCrop()
+                builder.listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         return false;
@@ -108,7 +126,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        if (model != null && model.equals(item.getPath())) {
+                        if (model != null && model.equals(path)) {
                             return false;
                         }
                         return true;
@@ -124,7 +142,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        if (model != null && model.equals(item.getPath())) {
+                        if (model != null && model.equals(path)) {
                             return false;
                         }
                         return true;

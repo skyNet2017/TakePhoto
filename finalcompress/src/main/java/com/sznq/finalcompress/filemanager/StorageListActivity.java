@@ -107,8 +107,7 @@ public class StorageListActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v, int position) {
                         if(bean.type == StorageBean.TYPE_HTTP_Everything){
-                            EverythingSearchParser.searchDocType(bean.ip);
-                            EverythingSearchParser.searchMediaType(bean.ip);
+                            EverythingSearchParser.doSearchAll(bean.ip);
                         }else if(bean.type == StorageBean.TYPE_EXTERNAL_STORAGE){
                             JavaFile file = new JavaFile(Environment.getExternalStorageDirectory());
                             new SafFileFinder22<JavaFile>().getAlbums(file, Executors.newFixedThreadPool(3),folderCallback);

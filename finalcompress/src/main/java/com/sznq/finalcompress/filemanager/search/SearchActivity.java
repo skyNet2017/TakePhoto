@@ -17,10 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.FileOpenUtil;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
@@ -232,6 +234,23 @@ public class SearchActivity extends AppCompatActivity {
         binding.recycler.setAdapter(adapter);
         adapter.setNewData(mediaInfos);
         initAdapter();
+
+        binding.recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (!SearchActivity.this.isDestroyed()){
+                        Glide.with(SearchActivity.this).resumeRequests();//恢复Glide加载图片
+                    }
+
+                }else {
+                    if (!SearchActivity.this.isDestroyed()){
+                        Glide.with(SearchActivity.this).pauseRequests();//禁止Glide加载图片
+                    }
+                }
+            }
+        });
+
     }
 
     private void openFile(BaseMediaInfo file, List<BaseInfo> files) {

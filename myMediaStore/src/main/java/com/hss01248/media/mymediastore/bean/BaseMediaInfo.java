@@ -34,6 +34,23 @@ public class BaseMediaInfo extends BaseInfo{
     @Index
     public String dir;
 
+    @Override
+    public String toString() {
+        return "BaseMediaInfo{" +
+                "dir='" + dir + '\'' +
+                ", name='" + name + '\'' +
+                ", hidden=" + hidden +
+                ", file=" + file +
+                ", path='" + path + '\'' +
+                ", fileSize=" + fileSize +
+                ", updatedTime=" + updatedTime +
+                ", maxSide=" + maxSide +
+                ", duration=" + duration +
+                ", mediaType=" + mediaType +
+                ", praiseCount=" + praiseCount +
+                ", diskType=" + diskType +
+                '}';
+    }
 
     @Index
     public String name;
