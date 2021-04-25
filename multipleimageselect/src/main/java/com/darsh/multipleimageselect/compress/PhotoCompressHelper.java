@@ -24,7 +24,6 @@ import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.imginfo.ImageInfoFormater;
-import com.hss01248.lubanturbo.TurboCompressor;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 
@@ -384,7 +383,8 @@ public class PhotoCompressHelper {
 
         String outPath = outFile.getAbsolutePath();
         long start = System.currentTimeMillis();
-        boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
+       // boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
+        boolean success = false;
 
         String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
