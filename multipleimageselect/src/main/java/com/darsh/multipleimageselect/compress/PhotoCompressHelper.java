@@ -34,7 +34,6 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import it.sephiroth.android.library.exif2.ExifInterface;
-import top.zibin.luban.DefaultBitmapToFile;
 
 import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
@@ -435,8 +434,9 @@ public class PhotoCompressHelper {
     private static boolean compressOringinal2(String absolutePath, int quality, String outPath) {
         try {
             File file = new File(outPath);
-            new DefaultBitmapToFile().compressToFile(BitmapFactory.decodeFile(absolutePath),file,false,quality);
-            return file.exists() && file.length() > 50;
+            Bitmap bitmap = BitmapFactory.decodeFile(absolutePath);
+           boolean success =  bitmap.compress(Bitmap.CompressFormat.JPEG,quality,new FileOutputStream(file));
+            return success && file.exists() && file.length() > 50;
         } catch (Throwable e) {
             e.printStackTrace();
             return false;

@@ -94,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
        /* AdView adView = findViewById(R.id.ad_banner);
         AdUtil.loadBannerAd(this, adView);*/
-        MyImageWatcher.init();
 
 
         com.hss01248.media.mymediastore.SafUtil.getRootDir(this, new com.hss01248.media.mymediastore.SafUtil.ISdRoot() {
@@ -109,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-       //AutoStartUtil.showDialog(MainActivity.this);
-        //MyImageWatcher.init();
+       AutoStartUtil.showDialog(MainActivity.this);
+        MyImageWatcher.init();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
