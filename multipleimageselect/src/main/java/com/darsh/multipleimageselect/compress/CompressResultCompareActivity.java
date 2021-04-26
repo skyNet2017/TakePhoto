@@ -28,7 +28,6 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.hss01248.adapter.SuperPagerAdapter;
 import com.hss01248.adapter.SuperPagerHolder;
 import com.hss01248.media.metadata.ExifUtil;
-import com.hss01248.media.metadata.MediaInfoUtil;
 import com.hss01248.media.metadata.MetaDataUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;

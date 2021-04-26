@@ -24,6 +24,7 @@ import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.metadata.ExifUtil;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 
@@ -393,13 +394,7 @@ public class PhotoCompressHelper {
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
         if(success){
             copyAllExif(file.getAbsolutePath(),outPath);
-            ExifInterface exif = new ExifInterface();
-            try {
-                exif.readExif( file.getAbsolutePath(), ExifInterface.Options.OPTION_ALL );
-                exif.writeExif( outPath );
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
 
             Log.w("success", cost + filen);
 
@@ -427,7 +422,14 @@ public class PhotoCompressHelper {
     }
 
     private static void copyAllExif(String intput, String outPath) {
-
+/*ExifInterface exif = new ExifInterface();
+            try {
+                exif.readExif( file.getAbsolutePath(), ExifInterface.Options.OPTION_ALL );
+                exif.writeExif( outPath );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+        ExifUtil.copyExif(intput,outPath);
 
     }
 

@@ -30,7 +30,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0' //注解处理器
     api project(':imginfo')
     api project(':myMediaStore')
-    api project(':metadata')
+    //api project(':metadata')
+    api 'com.github.hss01248.metadata:metadata:1.0.9'
     api 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
     compile 'com.github.hss01248:SuperAdapter:3.0.1'
     //compile project(':lubanturbo')
