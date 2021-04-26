@@ -24,7 +24,6 @@ import com.darsh.multipleimageselect.activities.ImageSelectActivity;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.hss01248.imginfo.ImageInfoFormater;
-import com.hss01248.lubanturbo.TurboCompressor;
 import com.shizhefei.view.largeimage.LargeImageView;
 import com.shizhefei.view.largeimage.factory.InputStreamBitmapDecoderFactory;
 

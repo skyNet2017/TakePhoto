@@ -3,4 +3,4 @@ include ':javafs'
 include ':localvideoplayer'
 include ':metadata'
 include ':myMediaStore'
-include ':takephoto_library', ':luban', ':lubanturbo', ':multipleimageselect', ':imginfo', ':finalcompress', ':analytics'
+include ':takephoto_library', ':luban',  ':multipleimageselect', ':imginfo', ':finalcompress', ':analytics'//':lubanturbo',
