@@ -34,6 +34,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import it.sephiroth.android.library.exif2.ExifInterface;
+import top.zibin.luban.DefaultBitmapToFile;
+
 import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
 
@@ -384,12 +387,20 @@ public class PhotoCompressHelper {
 
         String outPath = outFile.getAbsolutePath();
         long start = System.currentTimeMillis();
-        boolean success = TurboCompressor.compressOringinal(file.getAbsolutePath(), quality, outPath);
+        boolean success = compressOringinal2(file.getAbsolutePath(), quality, outPath);
 
         String cost = "compressed " + success + ",cost " + (System.currentTimeMillis() - start) + "ms,\n";
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
         if(success){
+            ExifInterface exif = new ExifInterface();
+            try {
+                exif.readExif( file.getAbsolutePath(), ExifInterface.Options.OPTION_ALL );
+                exif.writeExif( outPath );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             Log.w("success", cost + filen);
 
             //文件覆盖
@@ -413,6 +424,17 @@ public class PhotoCompressHelper {
 
         }
 
+    }
+
+    private static boolean compressOringinal2(String absolutePath, int quality, String outPath) {
+        try {
+            File file = new File(outPath);
+            new DefaultBitmapToFile().compressToFile(BitmapFactory.decodeFile(absolutePath),file,false,quality);
+            return file.exists() && file.length() > 50;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private static String getoutputDesc(List<File> files,long startTime,Activity activity) {

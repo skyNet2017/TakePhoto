@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
        /* AdView adView = findViewById(R.id.ad_banner);
         AdUtil.loadBannerAd(this, adView);*/
+        MyImageWatcher.init();
 
 
         com.hss01248.media.mymediastore.SafUtil.getRootDir(this, new com.hss01248.media.mymediastore.SafUtil.ISdRoot() {
