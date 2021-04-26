@@ -41,6 +41,7 @@ import org.apache.commons.io.FileUtils;
 import org.reactivestreams.Subscriber;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -393,6 +394,7 @@ public class PhotoCompressHelper {
         String filen = file.getName() + ", original:" + ImageInfoFormater.formatImagInfo(file.getAbsolutePath(),true) +
                 ",\ncompressedFile:" + ImageInfoFormater.formatImagInfo(outPath,true);
         if(success){
+            copyAllExif(file.getAbsolutePath(),outPath);
             ExifInterface exif = new ExifInterface();
             try {
                 exif.readExif( file.getAbsolutePath(), ExifInterface.Options.OPTION_ALL );
@@ -423,6 +425,11 @@ public class PhotoCompressHelper {
             Log.e("fail", cost + filen);
 
         }
+
+    }
+
+    private static void copyAllExif(String intput, String outPath) {
+
 
     }
 
