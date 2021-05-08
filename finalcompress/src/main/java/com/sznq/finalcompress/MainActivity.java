@@ -25,6 +25,9 @@ import com.darsh.multipleimageselect.compress.StorageUtils;
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.saf.SafUtil;
 import com.gc.materialdesign.views.ButtonRectangle;
+import com.hjq.permissions.OnPermissionCallback;
+import com.hjq.permissions.Permission;
+import com.hjq.permissions.XXPermissions;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.media.mymediastore.smb.SmbjUtil;
 import com.hss01248.media.mymediastore.usb.UsbUtil;
@@ -109,13 +112,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
        AutoStartUtil.showDialog(MainActivity.this);
-        MyImageWatcher.init();
+       requestPermisson();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-           if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-               requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},78);
-           }
-        }
 
         //smb();
 
@@ -125,6 +123,45 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    private void requestPermisson() {
+
+
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},78);
+            }
+        }*/
+
+        XXPermissions.with(this)
+                // 申请安装包权限
+                //.permission(Permission.REQUEST_INSTALL_PACKAGES)
+                // 申请悬浮窗权限
+                //.permission(Permission.SYSTEM_ALERT_WINDOW)
+                // 申请通知栏权限
+                //.permission(Permission.NOTIFICATION_SERVICE)
+                // 申请系统设置权限
+                //.permission(Permission.WRITE_SETTINGS)
+                // 申请单个权限
+                .permission(Permission.Group.STORAGE)
+                // 申请多个权限
+                //.permission(Permission.WRITE_EXTERNAL_STORAGE)
+               // .permission(Permission.READ_EXTERNAL_STORAGE)
+                .request(new OnPermissionCallback() {
+
+                    @Override
+                    public void onGranted(List<String> permissions, boolean all) {
+                        MyImageWatcher.init();
+                    }
+
+                    @Override
+                    public void onDenied(List<String> permissions, boolean never) {
+
+                    }
+                });
+    }
+
+
 
     private void usb() {
         UsbUtil.regist(this);
@@ -184,6 +221,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         StorageUtils.onActivityResultForOutSdcardPermission(this,requestCode,resultCode,data);
+
+        if (requestCode == XXPermissions.REQUEST_CODE) {
+            if (XXPermissions.isGranted(this, Permission.RECORD_AUDIO) &&
+                    XXPermissions.isGranted(this, Permission.Group.CALENDAR)) {
+                //toast("用户已经在权限设置页授予了录音和日历权限");
+            } else {
+                // toast("用户没有在权限设置页授予权限");
+            }
+        }
 
     }
 
