@@ -22,6 +22,15 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
+import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.SafFileFinder22;
+import com.hss01248.media.mymediastore.ScanFolderCallback;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
+import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
+import com.hss01248.media.mymediastore.bean.StorageBean;
+import com.hss01248.media.mymediastore.fileapi.JavaFile;
+import com.hss01248.media.mymediastore.http.HttpFile;
+import com.hss01248.media.mymediastore.smb.SmbUtil2;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -59,6 +68,34 @@ public class MyImageWatcher {
         watchDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
         watchDir(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
         addFileObserver(new File(Environment.getExternalStorageDirectory(),"BaiduNetdisk"));
+
+        scan(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
+        scan(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES));
+    }
+
+    private static void scan(File file) {
+        new SafFileFinder22<JavaFile>().getAlbums(new JavaFile(file), Executors.newFixedThreadPool(3), new ScanFolderCallback() {
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onFromDB(List<BaseMediaFolderInfo> folderInfos) {
+
+            }
+
+            @Override
+            public void onScanEachFolder(List<BaseMediaFolderInfo> folderInfos) {
+
+            }
+
+            @Override
+            public void onScanFinished(List<BaseMediaFolderInfo> folderInfos) {
+
+            }
+        });
+
     }
 
     private static void watchDir(File dcim) {
@@ -115,6 +152,7 @@ public class MyImageWatcher {
                     if(fileName.endsWith(".jpg") || fileName.endsWith(".png") || fileName.endsWith(".JPG")
                             || fileName.endsWith(".jpeg")){
                         File file1 = new File(dir,fileName);
+                        updateDb(file1);
                         String fullPath = file1.getAbsolutePath();
 
                         //doCompress(path,dir);
@@ -154,6 +192,21 @@ public class MyImageWatcher {
         observerMap.put(dir.getAbsolutePath(),dcimObserver);
     }
 
+    private static void updateDb(File file) {
+        BaseMediaInfo info = new BaseMediaInfo();
+        info.path = file.getAbsolutePath();
+        info.name = file.getName();
+        info.updatedTime = file.lastModified();
+        info.fileSize = file.length();
+        info.mediaType = BaseMediaInfo.TYPE_IMAGE;
+        info.dir = file.getParentFile().getAbsolutePath();
+        info.diskType = StorageBean.TYPE_EXTERNAL_STORAGE;
+        ArrayList<BaseMediaInfo> infos =  new ArrayList<>();
+        infos.add(info);
+        DbUtil.insertOrUpdate2(infos);
+
+    }
+
     private static void runTask(int time) {
         if(fileInfoQueue.isEmpty()){
             //Log.w("监听",Thread.currentThread().getName()+" thread ,没有要压缩的任务 ");
@@ -172,6 +225,7 @@ public class MyImageWatcher {
         if(todoTasks.size() > 0){
             for (ToCompressFileInfo todoTask : todoTasks) {
                 doCompressOnCurrent(todoTask.file.getName(),todoTask.file.getParentFile());
+                updateDb(todoTask.file);
             }
             Log.w("监听",Thread.currentThread().getName()+" thread ,压"+todoTasks.size()+"张,还有"+fileInfoQueue.size()+"张在等待队列中");
             if(fileInfoQueue.size() > 0){
