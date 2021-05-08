@@ -19,11 +19,11 @@ public class FileDbUtil {
 
     public static int pagesize = 2000;
 
-    static List<BaseMediaInfo> searc(String word, int diskType, int mediaType, int sortType,int hiddenType, int[] pageInfo, int sizeType) {
+    static List<BaseMediaInfo> searc(String word, int diskType, int mediaType, int sortType,int hiddenType, int[] pageInfo, int sizeType,String dir) {
         long start = System.currentTimeMillis();
         //
         QueryBuilder<BaseMediaInfo> builder = DbUtil.getDaoSession().getBaseMediaInfoDao().queryBuilder();
-        doFilter(builder,word,diskType,mediaType,hiddenType,sizeType);
+        doFilter(builder,word,diskType,mediaType,hiddenType,sizeType,dir);
         doSort(builder,sortType,mediaType);
         List<BaseMediaInfo> infos = pager(builder,pageInfo);
 
@@ -34,7 +34,7 @@ public class FileDbUtil {
 
 
 
-    private static void doFilter(QueryBuilder<BaseMediaInfo> builder, String word, int diskType, int mediaType, int hiddenType, int sizeType) {
+    private static void doFilter(QueryBuilder<BaseMediaInfo> builder, String word, int diskType, int mediaType, int hiddenType, int sizeType,String dir) {
         if(!TextUtils.isEmpty(word)){
             word = "%"+word+"%";
             builder.where(BaseMediaInfoDao.Properties.Name.like(word));
@@ -44,7 +44,15 @@ public class FileDbUtil {
         filterDiskType(builder,diskType);
         filterHiddenType(builder,hiddenType);
         filterSizetype(builder,sizeType);
+        filterDir(builder,dir);
 
+    }
+
+    private static void filterDir(QueryBuilder<BaseMediaInfo> builder, String dir) {
+        if(TextUtils.isEmpty(dir)){
+            return;
+        }
+        builder.where(BaseMediaInfoDao.Properties.Dir.eq(dir));
     }
 
     /**

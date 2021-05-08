@@ -27,6 +27,9 @@ public class DirDbUtil {
          QueryBuilder<BaseMediaFolderInfo> builder = DbUtil.getDaoSession().getBaseMediaFolderInfoDao().queryBuilder();
          doFilter(builder,word,diskType,mediaType,hiddenType,sizeType);
          doSort(builder,sortType,mediaType);
+         if(pageInfo == null){
+             return builder.list();
+         }
          List<BaseMediaFolderInfo> infos = pager(builder,pageInfo);
 
          Log.w("DirDbUtil", " searchDir 耗时(ms):" + (System.currentTimeMillis() - start) + ", size:" + infos.size());
@@ -239,6 +242,9 @@ public class DirDbUtil {
     }
 
     private static List<BaseMediaFolderInfo> pager(QueryBuilder<BaseMediaFolderInfo> builder, int[] pageIndex) {
+        if(pageIndex == null){
+            return null;
+        }
         if(pageIndex[0] ==0){
             long count =   builder.count();
             if(count> pagesize){

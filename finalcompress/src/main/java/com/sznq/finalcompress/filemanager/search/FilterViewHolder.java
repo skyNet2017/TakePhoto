@@ -10,7 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.mymediastore.DbUtil;
+import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.view.viewholder.CommonViewHolder;
 import com.noober.menu.FloatMenu;
@@ -73,10 +75,42 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
                 showListModeMenu(v);
             }
         });
+        binding.tvChangeDir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeDir(v);
+            }
+        });
+
+    }
+    List<BaseMediaFolderInfo> allFolders;
+    private void changeDir(View v) {
+        allFolders = DirDbUtil.searchDir("",diskType,mediaType,2,hiddenType,null,1);
+        if(allFolders.isEmpty()){
+            ToastUtils.showShort("no folders");
+            return;
+        }
+        String[] dirs = new String[allFolders.size()];
+        for (int i = 0; i < allFolders.size(); i++) {
+            BaseMediaFolderInfo folderInfo = allFolders.get(i);
+            dirs[i] = ImageInfoFormater.formatFileSize(folderInfo.fileSize)+" "+folderInfo.name;
+        }
+
+        final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
+
+        floatMenu.items(dirs);
+        floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
+            @Override
+            public void onClick(View v, int position) {
+                dir = allFolders.get(position).path;
+                doSearch();
+            }
+        });
+        floatMenu.showAsDropDown(v);
 
     }
 
-  public static int disPlayMode = 0;
+    public static int disPlayMode = 0;
     private void showListModeMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
@@ -192,6 +226,7 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
             @Override
             public void onClick(View v, int position) {
                 mediaType = position;
+                dir = "";
                 doSearch();
             }
         });
@@ -238,6 +273,7 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
     static int sortType = 0;
     static int mediaType = 0;
     static int hiddenType = 0;
+    static String dir = "";
     private void showDirFilterMenu(View v) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         //String hide = DbUtil.showHidden ? "隐藏文件夹":"显示隐藏的文件夹";
@@ -256,8 +292,13 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
             public void onClick(View v, int position) {
                 if(position ==0){
                     isSearchDir = true;
+                    sortType = 2;
+                    binding.tvChangeDir.setVisibility(View.GONE);
                 }else {
                     isSearchDir = false;
+                    sortType = 0;
+                    binding.tvChangeDir.setVisibility(View.VISIBLE);
+                    dir = "";
                 }
                 doSearch();
             }
@@ -272,7 +313,7 @@ public class FilterViewHolder extends CommonViewHolder<String, HolderSearchFilte
     }
 
     private void doSearch() {
-        ToastUtils.showLong("搜索:xxxx");
+        ToastUtils.showLong("搜索开始");
         activity.doSearch();
 
     }

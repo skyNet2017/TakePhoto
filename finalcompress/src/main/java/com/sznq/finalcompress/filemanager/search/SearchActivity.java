@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.darsh.multipleimageselect.FileOpenUtil;
 import com.darsh.multipleimageselect.compress.CompressResultCompareActivity;
+import com.darsh.multipleimageselect.compress.PhotoCompressHelper;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.bean.BaseInfo;
@@ -33,10 +34,12 @@ import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
 import com.hss01248.pagestate.PageStateManager;
 import com.noober.menu.FloatMenu;
+import com.sznq.finalcompress.MyImageWatcher;
 import com.sznq.finalcompress.R;
 import com.sznq.finalcompress.databinding.ActivitySearchBinding;
 import com.sznq.finalcompress.filemanager.FolderViewActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,17 +180,35 @@ public class SearchActivity extends AppCompatActivity {
     private void showMenu(View v, int position0) {
         final FloatMenu floatMenu = new FloatMenu(v.getContext(), v);
         String hide = mediaInfos.get(position0).getHidden() == 0 ? "隐藏此文件夹":"取消此文件夹的隐藏";
-        String[] desc = new String[2];
+        String[] desc = new String[3];
         desc[0] = "显示exif/metadata信息";
         desc[1] = hide;
+        desc[2] = "压缩";
         floatMenu.items(desc);
         floatMenu.setOnItemClickListener(new FloatMenu.OnItemClickListener() {
             @Override
             public void onClick(View v, int position) {
                 if(position ==0){
                     CompressResultCompareActivity.showExif(SearchActivity.this,mediaInfos.get(position0).getPath());
-                }else {
+                }else if(position == 1){
                     hideFolder(mediaInfos.get(position0).getPath(),mediaInfos.get(position0));
+
+                }else if(position == 2){
+                    String path = mediaInfos.get(position0).getPath();
+                    File file = new File(path);
+                    if(file.exists() && file.length() > 0){
+                        if(PhotoCompressHelper.shouldCompress(file,true)){
+                            PhotoCompressHelper.compressOneFile(file,true);
+                            MyImageWatcher.updateDb(file);
+                            mediaInfos.get(position0).setFileSize(file.length());
+                            adapter.notifyItemChanged(position0);
+                            ToastUtils.showShort("压缩完成");
+                        }else {
+                            ToastUtils.showShort("无需压缩");
+                        }
+                    }else {
+                        ToastUtils.showShort("非本地文件,无法压缩覆盖");
+                    }
 
                 }
 
@@ -288,21 +309,21 @@ public class SearchActivity extends AppCompatActivity {
         String word = binding.titlebar.getSearchKey();
 
         searchDB(word,FilterViewHolder.isSearchDir,FilterViewHolder.diskType,FilterViewHolder.mediaType,
-                FilterViewHolder.sortType,FilterViewHolder.hiddenType,FilterViewHolder.sizeType);
+                FilterViewHolder.sortType,FilterViewHolder.hiddenType,FilterViewHolder.sizeType,FilterViewHolder.dir);
     }
 
     void doSearch(){
         doSearch(false);
     }
     int[] pageInfo = new int[]{0,0};
-    private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType,int hiddenType,int sizeType) {
+    private void searchDB(String word, boolean isSearchDir, int diskType, int mediaType, int sortType,int hiddenType,int sizeType,String dir) {
         stateManager.showLoading();
         Observable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(new Function<Integer, List<? extends BaseInfo>>() {
                     @Override
                     public List<? extends BaseInfo> apply(@NonNull Integer integer) throws Exception {
-                        return SearchDbUtil.searchItem(word,diskType,mediaType,sortType,isSearchDir,hiddenType,pageInfo,sizeType);
+                        return SearchDbUtil.searchItem(word,diskType,mediaType,sortType,isSearchDir,hiddenType,pageInfo,sizeType,dir);
                     }
                 }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<? extends BaseInfo>>() {

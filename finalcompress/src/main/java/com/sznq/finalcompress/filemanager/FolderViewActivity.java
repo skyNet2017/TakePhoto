@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -230,7 +231,7 @@ public class FolderViewActivity extends AppCompatActivity {
                 if(file.isDirectory()){
                     listFiles(file);
                 }else {
-                    ToastUtils.showLong("打开文件:"+file.getPath());
+                    //ToastUtils.showLong("打开文件:"+file.getPath());
                     openFile(file,files);
 
                 }
@@ -415,10 +416,19 @@ public class FolderViewActivity extends AppCompatActivity {
 
     private IFile getFile() {
         if(type == StorageBean.TYPE_EXTERNAL_STORAGE){
-            return new JavaFile(Environment.getExternalStorageDirectory());
+            if(TextUtils.isEmpty(ipOrPath)){
+                return new JavaFile(Environment.getExternalStorageDirectory());
+            }else {
+                return new JavaFile(new File(ipOrPath));
+            }
+
         }
         if(type == StorageBean.TYPE_SAF){
-            return new IDocumentFile(SafUtil.sdRoot);
+            if(TextUtils.isEmpty(ipOrPath)){
+                return new IDocumentFile(SafUtil.sdRoot);
+            }else {
+                return new IDocumentFile(SafUtil.findFile(SafUtil.sdRoot,ipOrPath));
+            }
         }
         if(type == StorageBean.TYPE_HTTP_Everything){
             HttpResponseBean bean = new HttpResponseBean();

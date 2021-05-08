@@ -13,12 +13,12 @@ import java.util.List;
 public class SearchDbUtil {
 
     public static List<? extends BaseInfo> searchItem(String word, int diskType, int mediaType, int sortType,
-                                                      boolean isSearchDir, int hiddenType, int[] pageInfo, int sizeType) {
+                                                      boolean isSearchDir, int hiddenType, int[] pageInfo, int sizeType,String dir) {
 
         if(isSearchDir){
             return DirDbUtil.searchDir(word,diskType,mediaType,sortType,hiddenType,pageInfo,sizeType);
         }
-        return FileDbUtil.searc(word,diskType,mediaType,sortType,hiddenType,pageInfo,sizeType);
+        return FileDbUtil.searc(word,diskType,mediaType,sortType,hiddenType,pageInfo,sizeType,dir);
     }
 
 

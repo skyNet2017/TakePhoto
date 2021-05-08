@@ -192,7 +192,7 @@ public class MyImageWatcher {
         observerMap.put(dir.getAbsolutePath(),dcimObserver);
     }
 
-    private static void updateDb(File file) {
+    public static void updateDb(File file) {
         BaseMediaInfo info = new BaseMediaInfo();
         info.path = file.getAbsolutePath();
         info.name = file.getName();

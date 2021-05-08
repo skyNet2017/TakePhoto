@@ -25,6 +25,9 @@ public class JavaFile extends BaseFileApi<File>{
     public IFile[] listFiles() {
         if(isDirectory()){
             File[] files = file.listFiles();
+            if(files == null){
+                return null;
+            }
             IFile[] iFiles = new IFile[files.length];
             if(files != null){
                 for (int i = 0; i < files.length; i++) {
