@@ -23,7 +23,6 @@ import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.ForegroundNotification;
 import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
 import com.fanjun.keeplive.config.KeepLiveService;
-import com.hjq.permissions.XXPermissions;
 import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.metadata.ExifUtil;
@@ -81,7 +80,6 @@ public class BaseApp extends Application {
 
       if(isMainProcess){
           //开启保活后,不再走oncreate
-          XXPermissions.setScopedStorage(true);
           MyImageWatcher.init();
           //Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
