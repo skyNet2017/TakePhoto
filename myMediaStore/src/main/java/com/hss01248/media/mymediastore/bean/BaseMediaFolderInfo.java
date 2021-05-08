@@ -1,12 +1,23 @@
 package com.hss01248.media.mymediastore.bean;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.EncryptUtils;
+import com.hss01248.media.mymediastore.SafUtil;
+import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
+import com.hss01248.media.mymediastore.fileapi.IFile;
+import com.hss01248.media.mymediastore.fileapi.JavaFile;
+import com.hss01248.media.mymediastore.http.HttpFile;
+import com.hss01248.media.mymediastore.http.HttpResponseBean;
+import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 @Keep
 @Entity
@@ -197,13 +208,112 @@ public class BaseMediaFolderInfo extends BaseInfo{
     public BaseMediaFolderInfo() {
     }
 
-   
 
 
 
 
 
+    public IFile getFile() {
+        if(file == null){
+            genFile();
+        }
+        return file;
+    }
 
+    public transient IFile file;
+
+    public void genFile(){
+        if(path.startsWith("smb://")){
+            this.file = SmbToHttp.getFile(path);
+        }else if(path.startsWith("content://")){
+            file = new IDocumentFile(SafUtil.findFile(SafUtil.sdRoot, path));
+        }else if(path.startsWith("/storage/")){
+            file = new JavaFile(new java.io.File(path));
+        }else if(path.startsWith("http")){
+            HttpResponseBean bean = new HttpResponseBean();
+            bean.path = path;
+            bean.name = name;
+            bean.size = fileSize+"";
+            bean.date_modified = updatedTime+"";
+            bean.type = "folder";
+            file = new HttpFile(bean);
+        }
+
+    }
+
+
+
+    @Override
+    public String storageId() {
+        return null;
+    }
+
+    @Override
+    public IFile[] listFiles() {
+        return new IFile[0];
+    }
+
+
+
+    @Override
+    public boolean isDirectory() {
+        return false;
+    }
+
+    @Override
+    public long length() {
+        return fileSize;
+    }
+
+    @Override
+    public long lastModified() {
+        return updatedTime;
+    }
+
+    @Override
+    public boolean exists() {
+        return getFile().exists();
+    }
+
+    @Override
+    public boolean delete() {
+        return getFile().delete();
+    }
+
+    @Override
+    public boolean canWrite() {
+        return getFile().canWrite();
+    }
+
+    @Override
+    public IFile getParentFile() {
+        return getFile().getParentFile();
+    }
+
+    @Override
+    public IFile createDirectory(@NonNull String displayName) {
+        return getFile().createDirectory(displayName);
+    }
+
+    @Override
+    public IFile createFile(@NonNull String mimeType, @NonNull String displayName) {
+        return getFile().createFile(mimeType, displayName);
+    }
+
+    @Override
+    public boolean renameTo(@NonNull String displayName) {
+        return getFile().renameTo(displayName);
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return getFile().getInputStream();
+    }
+
+    @Override
+    public OutputStream getOutPutStream() {
+        return getFile().getOutPutStream();
+    }
 
 
 

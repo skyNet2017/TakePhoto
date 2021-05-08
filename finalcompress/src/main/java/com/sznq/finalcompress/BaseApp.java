@@ -18,7 +18,7 @@ import android.util.Log;
 
 import com.blankj.utilcode.util.Utils;
 import com.darsh.multipleimageselect.compress.StorageUtils;
-import com.facebook.stetho.Stetho;
+
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.ForegroundNotification;
 import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
@@ -27,20 +27,10 @@ import com.hss01248.analytics.ReportUtil;
 import com.hss01248.imginfo.ImageInfoFormater;
 import com.hss01248.media.metadata.ExifUtil;
 import com.hss01248.media.mymediastore.SafUtil;
-import com.hss01248.media.mymediastore.ScanFolderCallback;
-import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
-import com.hss01248.media.mymediastore.bean.BaseMediaInfo;
-import com.hss01248.media.mymediastore.http.EverythingSearchParser;
-import com.hss01248.media.mymediastore.http.HttpHelper;
-import com.hss01248.media.mymediastore.smb.SmbjUtil;
-import com.hss01248.pagestate.PageStateManager;
-import com.kongzue.dialog.util.DialogSettings;
-import com.shizhefei.view.largeimage.BlockImageLoader;
+
 import com.simple.spiderman.SpiderMan;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.List;
+
 
 /**
  * Created by hss on 2018/12/22.
@@ -91,7 +81,7 @@ public class BaseApp extends Application {
       if(isMainProcess){
           //开启保活后,不再走oncreate
           MyImageWatcher.init();
-          Stetho.initializeWithDefaults(this);
+          //Stetho.initializeWithDefaults(this);
           SmbUtil.init(this);
           Utils.init(this);
 

@@ -115,7 +115,7 @@ dependencies {
     //implementation 'com.google.android.gms:play-services:12.0.1'
     //implementation 'com.google.android.gms:play-services-base:15.0.1'
     implementation "androidx.work:work-runtime:2.5.0"
-    implementation 'com.facebook.stetho:stetho:1.5.1'
+    //implementation 'com.facebook.stetho:stetho:1.5.1'
 
     implementation group: 'jcifs', name: 'jcifs', version: '1.3.17'
     implementation group: 'com.hierynomus', name: 'smbj', version: '0.10.0'
@@ -135,6 +135,8 @@ dependencies {
     api 'com.github.bumptech.glide:okhttp3-integration:4.11.0' // 新增
     implementation 'me.jessyan:progressmanager:1.5.0'
     implementation 'com.kongzue.dialog_v3x:dialog:3.2.4'
+
+    debugImplementation 'com.glance.guolindev:glance:1.0.0'
 
 }
 configurations {

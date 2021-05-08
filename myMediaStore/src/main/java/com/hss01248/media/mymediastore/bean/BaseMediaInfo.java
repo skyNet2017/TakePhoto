@@ -1,19 +1,25 @@
 package com.hss01248.media.mymediastore.bean;
 
+import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.fileapi.JavaFile;
+import com.hss01248.media.mymediastore.http.HttpFile;
+import com.hss01248.media.mymediastore.http.HttpResponseBean;
 import com.hss01248.media.mymediastore.smb.SmbToHttp;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Objects;
 import org.greenrobot.greendao.annotation.Generated;
 
@@ -73,6 +79,14 @@ public class BaseMediaInfo extends BaseInfo{
             file = new IDocumentFile(SafUtil.findFile(SafUtil.sdRoot, path));
         }else if(path.startsWith("/storage/")){
             file = new JavaFile(new java.io.File(path));
+        }else if(path.startsWith("http")){
+            HttpResponseBean bean = new HttpResponseBean();
+            bean.path = path;
+            bean.name = name;
+            bean.size = fileSize+"";
+            bean.date_modified = updatedTime+"";
+            bean.type = "file";
+            file = new HttpFile(bean);
         }
 
     }
@@ -116,25 +130,14 @@ public class BaseMediaInfo extends BaseInfo{
         this.dir = dir;
     }
 
-    public String getName() {
-        return this.name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public int getHidden() {
-        return this.hidden;
-    }
 
-    public void setHidden(int hidden) {
-        this.hidden = hidden;
-    }
 
-    public String getPath() {
-        return this.path;
-    }
+
+
+
+
 
     public void setPath(String path) {
         this.path = path;
@@ -197,7 +200,32 @@ public class BaseMediaInfo extends BaseInfo{
     }
 
 
+    @Override
+    public String getName() {
+        return this.name;
+    }
 
+    @Override
+    public Uri getUri() {
+        return null;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getHidden() {
+        return this.hidden;
+    }
+
+    public void setHidden(int hidden) {
+        this.hidden = hidden;
+    }
+
+    @Override
+    public String getPath() {
+        return this.path;
+    }
 
 
 
@@ -252,7 +280,91 @@ public class BaseMediaInfo extends BaseInfo{
 
 
 
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public String storageId() {
+        return null;
     }
+
+    @Override
+    public IFile[] listFiles() {
+        return new IFile[0];
+    }
+
+
+
+    @Override
+    public boolean isDirectory() {
+        return false;
+    }
+
+    @Override
+    public long length() {
+        return fileSize;
+    }
+
+    @Override
+    public long lastModified() {
+        return updatedTime;
+    }
+
+    @Override
+    public boolean exists() {
+        return getFile().exists();
+    }
+
+    @Override
+    public boolean delete() {
+        return getFile().delete();
+    }
+
+    @Override
+    public boolean canWrite() {
+        return getFile().canWrite();
+    }
+
+    @Override
+    public IFile getParentFile() {
+        return getFile().getParentFile();
+    }
+
+    @Override
+    public IFile createDirectory(@NonNull String displayName) {
+        return getFile().createDirectory(displayName);
+    }
+
+    @Override
+    public IFile createFile(@NonNull String mimeType, @NonNull String displayName) {
+        return getFile().createFile(mimeType, displayName);
+    }
+
+    @Override
+    public boolean renameTo(@NonNull String displayName) {
+        return getFile().renameTo(displayName);
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return getFile().getInputStream();
+    }
+
+    @Override
+    public OutputStream getOutPutStream() {
+        return getFile().getOutPutStream();
+    }
+
+
+
+}
 
 
 

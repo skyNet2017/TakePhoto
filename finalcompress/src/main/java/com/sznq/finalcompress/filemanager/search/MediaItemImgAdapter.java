@@ -65,11 +65,11 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
         }
         helper.setGone(R.id.tv_info, true);
         if(FilterViewHolder.disPlayMode == 2 || FileTypeUtil.getTypeByFileName(item.getName()) != BaseMediaInfo.TYPE_IMAGE){
-            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+
-                    ImageInfoFormater.formatFileSize(item.length())+"\n"+item.getName());
+            helper.setText(R.id.tv_info,
+                    ImageInfoFormater.formatFileSize(item.length())+"\n"+ImageInfoFormater.formatTime(item.lastModified())+" "+item.getName());
         }else {
-            helper.setText(R.id.tv_info, ImageInfoFormater.formatTime(item.lastModified())+"-"+
-                    ImageInfoFormater.formatFileSize(item.length())+"\n"+item.getName());
+            helper.setText(R.id.tv_info,
+                    ImageInfoFormater.formatFileSize(item.length())+"\n"+ ImageInfoFormater.formatTime(item.lastModified()));//+"\n"+item.getName()
         }
 
 
