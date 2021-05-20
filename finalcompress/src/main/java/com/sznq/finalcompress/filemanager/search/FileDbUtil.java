@@ -270,4 +270,8 @@ public class FileDbUtil {
             return infos;
         }
     }
+
+    public static void delete(BaseMediaInfo mediaInfo) {
+        DbUtil.getDaoSession().getBaseMediaInfoDao().deleteByKey(mediaInfo.path);
+    }
 }

@@ -6,6 +6,7 @@ import android.os.Build;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
+import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.SafUtil;
 import com.hss01248.media.mymediastore.fileapi.IDocumentFile;
 import com.hss01248.media.mymediastore.fileapi.IFile;
@@ -18,6 +19,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
@@ -39,6 +41,18 @@ public class BaseMediaInfo extends BaseInfo{
     public static final int TYPE_UNKNOWN = -1;
     @Index
     public String dir;
+
+    public static BaseMediaInfo fromJavaFile(File file){
+        BaseMediaInfo mediaInfo = new BaseMediaInfo();
+        mediaInfo.path = file.getAbsolutePath();
+        mediaInfo.dir = file.getParentFile().getAbsolutePath();
+        mediaInfo.name = file.getName();
+        mediaInfo.mediaType = FileTypeUtil.getTypeByFileName(file.getName());
+        mediaInfo.diskType = StorageBean.TYPE_EXTERNAL_STORAGE;
+        mediaInfo.fileSize = file.length();
+        mediaInfo.updatedTime = file.lastModified();
+        return mediaInfo;
+    }
 
     @Override
     public String toString() {

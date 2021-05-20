@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.bumptech.glide.request.target.Target;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.hss01248.imginfo.ImageInfoFormater;
+import com.hss01248.media.mymediastore.DbUtil;
 import com.hss01248.media.mymediastore.FileTypeUtil;
 import com.hss01248.media.mymediastore.bean.BaseInfo;
 import com.hss01248.media.mymediastore.bean.BaseMediaFolderInfo;
@@ -33,8 +35,12 @@ import com.hss01248.media.mymediastore.fileapi.IFile;
 import com.hss01248.media.mymediastore.fileapi.JavaFile;
 import com.sznq.finalcompress.R;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder> {
     public MediaItemImgAdapter(int layoutResId) {
@@ -117,6 +123,7 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
         } else {
 
             String path = item.getPath();
+
             path = path.replace(":9265/",":8080/img?path=");
             RequestBuilder<Drawable> builder = Glide.with(helper.itemView)
                     .load(path)
@@ -180,7 +187,13 @@ public class MediaItemImgAdapter extends BaseQuickAdapter<IFile, BaseViewHolder>
                     }
                 }).into((ImageView) helper.getView(R.id.iv_img));
             }
-
+            if(path.startsWith("/storage/")){
+                if(!new File(path).exists()){
+                    BaseMediaInfo mediaInfo = BaseMediaInfo.fromJavaFile(new File(path));
+                    FileDbUtil.delete(mediaInfo);
+                    return;
+                }
+            }
         }
 
     }
