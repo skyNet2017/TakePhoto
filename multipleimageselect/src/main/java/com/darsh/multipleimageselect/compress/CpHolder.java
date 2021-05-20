@@ -154,8 +154,8 @@ public class CpHolder extends SuperPagerHolder<String, Activity> {
 
     public void switchDec(boolean show){
         if(show){
-            tvCompressed.setVisibility(View.VISIBLE);
-            tvOriginal.setVisibility(View.VISIBLE);
+            tvCompressed.setVisibility(View.GONE);
+            tvOriginal.setVisibility(View.GONE);
         }else {
             tvCompressed.setVisibility(View.GONE);
             tvOriginal.setVisibility(View.GONE);

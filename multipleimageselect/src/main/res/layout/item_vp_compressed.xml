@@ -76,6 +76,7 @@
             android:id="@+id/tv_compressed"
             android:maxLines="3"
             android:ellipsize="end"
+            android:visibility="gone"
             android:gravity="center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

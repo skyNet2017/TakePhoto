@@ -137,6 +137,7 @@ dependencies {
     implementation 'com.kongzue.dialog_v3x:dialog:3.2.4'
 
     debugImplementation 'com.glance.guolindev:glance:1.0.0'
+    implementation 'me.weishu:free_reflection:3.0.1'
 
 }
 configurations {

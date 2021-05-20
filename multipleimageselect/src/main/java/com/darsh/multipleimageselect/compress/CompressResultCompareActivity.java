@@ -302,8 +302,7 @@ public class CompressResultCompareActivity extends AppCompatActivity {
                     public String apply(@NonNull String path) throws Exception {
                         String str = "";
                         if(type== BaseMediaInfo.TYPE_IMAGE){
-                            Map<String, String> exif = ExifUtil.readExif(PathToStream.getInput(path));
-                            str = exif.toString().replace(",","\n");
+                            str = ExifUtil.getExifStr(PathToStream.getInput(path));
                         }else if(type == BaseMediaInfo.TYPE_VIDEO){
                             if(!path.startsWith("http")){
                                 Map<String, String> allInfo = MetaDataUtil.getAllInfo(path);

@@ -30,6 +30,7 @@ import com.hss01248.media.mymediastore.SafUtil;
 
 import com.simple.spiderman.SpiderMan;
 
+import me.weishu.reflection.Reflection;
 
 
 /**
@@ -48,6 +49,7 @@ public class BaseApp extends Application {
         super.attachBaseContext(base);
         Log.e("willz", "App attachBaseContext");
         MultiDex.install(this);
+        Reflection.unseal(base);
     }
 
     @Override
