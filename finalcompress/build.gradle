@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'io.fabric'
 //apply plugin: 'com.google.firebase.firebase-perf'
-apply from: 'https://cdn.jsdelivr.net/gh/hss01248/flipperUtil@master/remote_forceokhttp3_12.gradle'
+//apply from: 'https://cdn.jsdelivr.net/gh/hss01248/flipperUtil@master/remote_forceokhttp3_12.gradle'
 com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 android {
     compileSdkVersion 30
